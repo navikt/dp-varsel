@@ -17,7 +17,7 @@ dependencies {
     implementation("com.github.navikt:rapids-and-rivers:2022112407251669271100.df879df951cf")
     implementation("io.github.microutils:kotlin-logging:3.0.4")
     implementation("com.natpryce:konfig:1.6.10.0")
-    implementation("org.apache.avro:avro:1.11.0")
+    implementation("org.apache.avro:avro:1.11.1")
     implementation("io.confluent:kafka-avro-serializer:7.2.2")
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
