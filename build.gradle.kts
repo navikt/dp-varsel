@@ -29,7 +29,7 @@ dependencies {
 
     testImplementation("io.mockk:mockk:1.13.2")
     testImplementation("io.ktor:ktor-server-tests-jvm:2.1.3")
-    // testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.21")
+    testImplementation("io.ktor:ktor-client-content-negotiation:2.1.3")
 }
 
 tasks.test {

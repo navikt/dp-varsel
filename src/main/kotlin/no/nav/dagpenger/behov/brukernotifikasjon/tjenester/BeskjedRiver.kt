@@ -39,8 +39,8 @@ internal class BeskjedRiver(
         }.register(this)
     }
 
-    companion object {
-        private val logger = KotlinLogging.logger { }
+    private companion object {
+        val logger = KotlinLogging.logger { }
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
@@ -51,8 +51,8 @@ internal class BeskjedRiver(
             "behovId" to behovId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon" }
+            val nøkkel = Nøkkel(behovId.toString(), ident)
             val notifikasjon = Beskjed(packet["tekst"].asText(), packet["@opprettet"].asLocalDateTime())
-            val nøkkel = Nøkkel(behovId.toString(), ident, "yo")
 
             beskjedTopic.send(nøkkel, notifikasjon)
         }

@@ -16,7 +16,9 @@ internal open class NotifikasjonTopic<T : SpecificRecord> private constructor(
     }
 
     fun publiser(nøkkel: NokkelInput, notifikasjon: T) {
-        producer.send(ProducerRecord(topic, nøkkel, notifikasjon))
+        producer.send(ProducerRecord(topic, nøkkel, notifikasjon)) { _, e: Exception ->
+            println(e)
+        }
     }
 
     internal class BeskjedTopic(producer: KafkaProducer<NokkelInput, BeskjedInput>, topic: String) :

@@ -1,9 +1,11 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.db
 
+import java.util.UUID
+
 internal object InMemoryNotifikasjonRepository : NotifikasjonRepository {
-    private val notifikasjoner = mutableMapOf<Nøkkel, Beskjed>()
+    private val notifikasjoner = mutableMapOf<UUID, Beskjed>()
 
     override fun lagre(nøkkel: Nøkkel, beskjed: Beskjed) {
-        notifikasjoner[nøkkel] = beskjed
+        notifikasjoner[UUID.randomUUID()] = beskjed
     }
 }

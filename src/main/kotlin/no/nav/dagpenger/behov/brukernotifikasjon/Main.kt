@@ -52,6 +52,7 @@ private fun <K, V> createProducer(producerConfig: Properties = Properties()) =
     KafkaProducer<K, V>(producerConfig).also { producer ->
         Runtime.getRuntime().addShutdownHook(
             Thread {
+                producer.flush()
                 producer.close()
             }
         )
