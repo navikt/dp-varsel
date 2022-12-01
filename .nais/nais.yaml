@@ -1,0 +1,26 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: dp-behov-brukernotifikasjon
+  namespace: teamdagpenger
+  labels:
+    team: teamdagpenger
+spec:
+  image: {{ image }}
+  kafka:
+    pool: {{ kafka.pool }}
+  secureLogs:
+    enabled: true
+  env:
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: dp-data-innlop-v1
+    - name: KAFKA_RAPID_TOPIC
+      value: teamdagpenger.journalforing.v1
+    - name: KAFKA_RESET_POLICY
+      value: earliest
+    - name: KAFKA_PRODUKT_TOPIC
+      value: teamdagpenger.data-innlop-v2
+    - name: KAFKA_PRODUKT_UTLAND_TOPIC
+      value: teamdagpenger.data-innlop-utland-v2
+    - name: KAFKA_PRODUKT_IDENT_TOPIC
+      value: teamdagpenger.data-innlop-ident-v1

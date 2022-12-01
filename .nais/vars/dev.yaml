@@ -1,0 +1,5 @@
+kafka:
+  pool: nav-dev
+brukernotifikasjoner:
+  beskjed:
+    topic: min-side.aapen-brukernotifikasjon-beskjed-v1
