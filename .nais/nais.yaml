@@ -6,21 +6,17 @@ metadata:
   labels:
     team: teamdagpenger
 spec:
-  image: {{ image }}
+  image: {{image}}
   kafka:
-    pool: {{ kafka.pool }}
+    pool: {{kafka.pool}}
   secureLogs:
     enabled: true
   env:
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: dp-data-innlop-v1
+      value: dp-behov-brukernotifikasjon
     - name: KAFKA_RAPID_TOPIC
-      value: teamdagpenger.journalforing.v1
+      value: teamdagpenger.rapid.v1
     - name: KAFKA_RESET_POLICY
       value: earliest
-    - name: KAFKA_PRODUKT_TOPIC
-      value: teamdagpenger.data-innlop-v2
-    - name: KAFKA_PRODUKT_UTLAND_TOPIC
-      value: teamdagpenger.data-innlop-utland-v2
-    - name: KAFKA_PRODUKT_IDENT_TOPIC
-      value: teamdagpenger.data-innlop-ident-v1
+    - name: BRUKERNOTIFIKASJON_BESKJED_TOPIC
+      value: min-side.aapen-brukernotifikasjon-beskjed-v1
