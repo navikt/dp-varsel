@@ -18,7 +18,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:3.0.4")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.11.0")
-    implementation("io.confluent:kafka-avro-serializer:7.2.2")
+    implementation("io.confluent:kafka-avro-serializer:7.3.0")
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
 
