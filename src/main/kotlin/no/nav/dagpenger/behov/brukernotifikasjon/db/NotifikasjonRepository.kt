@@ -11,10 +11,8 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 interface NotifikasjonRepository {
-    fun lagre(notifikasjon: String)
+    fun lagre(nøkkel: Nøkkel, beskjed: Beskjed)
 }
-
-data class Notifikasjon(val nøkkel: Nøkkel, val beskjed: Beskjed)
 
 data class Beskjed(private val tekst: String, private val opprettet: LocalDateTime, val sikkerhetsnivå: Int) {
     constructor(tekst: String, opprettet: LocalDateTime) : this(tekst, opprettet, 3)
