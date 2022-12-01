@@ -37,12 +37,11 @@ data class Beskjed(
     }.build()
 }
 
-data class Nøkkel(private val eventId: String, private val ident: String) {
+data class Nøkkel(val eventId: UUID, val ident: String) {
     constructor(ident: String) : this(UUID.randomUUID(), ident)
-    constructor(eventId: UUID, ident: String) : this(eventId.toString(), ident)
 
     fun somNøkkel(): NokkelInput = NokkelInputBuilder().apply {
-        withEventId(eventId)
+        withEventId(eventId.toString())
         withFodselsnummer(ident)
         withGrupperingsId("deprecated")
         withAppnavn(config[nais_app_name])

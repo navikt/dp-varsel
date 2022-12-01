@@ -25,10 +25,15 @@ dependencies {
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
 
-    implementation("io.getunleash:unleash-client-java:7.0.0")
+    implementation("org.flywaydb:flyway-core:9.8.2")
+    implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("org.postgresql:postgresql:42.5.1")
+    implementation("com.github.seratch:kotliquery:1.9.0")
 
     testImplementation("io.mockk:mockk:1.13.2")
     testImplementation("io.ktor:ktor-server-tests-jvm:2.1.3")
+    testImplementation("org.testcontainers:testcontainers:1.17.6")
+    testImplementation("org.testcontainers:postgresql:1.17.6")
     testImplementation("io.ktor:ktor-client-content-negotiation:2.1.3")
 }
 

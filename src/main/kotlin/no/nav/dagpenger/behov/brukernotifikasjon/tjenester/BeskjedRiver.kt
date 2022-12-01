@@ -51,7 +51,7 @@ internal class BeskjedRiver(
             "behovId" to behovId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon" }
-            val nøkkel = Nøkkel(behovId.toString(), ident)
+            val nøkkel = Nøkkel(behovId, ident)
             val notifikasjon = Beskjed(packet["tekst"].asText(), packet["@opprettet"].asLocalDateTime())
 
             beskjedTopic.send(nøkkel, notifikasjon)
