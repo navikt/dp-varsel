@@ -3,10 +3,9 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
-import no.nav.brukernotifikasjon.schemas.builders.BeskjedInputBuilder
-import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.nøkkel
+import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
+import no.nav.dagpenger.behov.brukernotifikasjon.db.Beskjed
+import no.nav.dagpenger.behov.brukernotifikasjon.db.Nøkkel
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -16,7 +15,7 @@ import java.util.UUID
 
 internal class BeskjedRiver(
     rapidsConnection: RapidsConnection,
-    private val beskjedTopic: NotifikasjonTopic<BeskjedInput>
+    private val beskjedTopic: Notifikasjoner
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -52,15 +51,10 @@ internal class BeskjedRiver(
             "behovId" to behovId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon" }
-            val notifikasjon = BeskjedInputBuilder().apply {
-                withTekst(packet["tekst"].asText())
-                withTidspunkt(packet["@opprettet"].asLocalDateTime())
-                withSikkerhetsnivaa(3)
-            }.build()
-            val nøkkel = nøkkel(behovId.toString(), ident, "yo")
-            beskjedTopic.publiser(nøkkel, notifikasjon).also {
-                logger.info { "Sender ut $notifikasjon til $nøkkel" }
-            }
+            val notifikasjon = Beskjed(packet["tekst"].asText(), packet["@opprettet"].asLocalDateTime())
+            val nøkkel = Nøkkel(behovId.toString(), ident, "yo")
+
+            beskjedTopic.send(nøkkel, notifikasjon)
         }
     }
 }

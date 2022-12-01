@@ -4,6 +4,7 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
 import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.brukernotifikasjon.schemas.input.NokkelInput
+import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
@@ -38,10 +39,15 @@ fun main() {
             config[brukernotifikasjon_beskjed_topic]
         )
     }
+    val notifikasjoner = Notifikasjoner(beskjedTopic)
 
-    RapidApplication.create(env) { _, rapidsConnection ->
-        BeskjedRiver(rapidsConnection, beskjedTopic)
-    }.start()
+    RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(env))
+        .withKtorModule {
+            notifikasjonApi(notifikasjoner)
+        }
+        .build { _, rapidsConnection ->
+            BeskjedRiver(rapidsConnection, notifikasjoner)
+        }.start()
 }
 
 private fun <K, V> createProducer(producerConfig: Properties = Properties()) =

@@ -12,6 +12,9 @@ repositories {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:2.1.3")
+    implementation("io.ktor:ktor-server-core-jvm:2.1.3")
+    implementation("io.ktor:ktor-serialization-jackson-jvm:2.1.3")
     testImplementation(kotlin("test"))
 
     implementation("com.github.navikt:rapids-and-rivers:2022112407251669271100.df879df951cf")
@@ -25,6 +28,8 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:7.0.0")
 
     testImplementation("io.mockk:mockk:1.13.2")
+    testImplementation("io.ktor:ktor-server-tests-jvm:2.1.3")
+    // testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.21")
 }
 
 tasks.test {
