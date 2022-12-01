@@ -2,11 +2,9 @@ package no.nav.dagpenger.behov.brukernotifikasjon
 
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
-import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
-import no.nav.brukernotifikasjon.schemas.input.NokkelInput
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -34,8 +32,8 @@ private val avroProducerConfig = Properties().apply {
 fun main() {
     val env = System.getenv()
     val beskjedTopic by lazy {
-        NotifikasjonTopic(
-            createProducer<NokkelInput, BeskjedInput>(aivenKafka.producerConfig(avroProducerConfig)),
+        BeskjedTopic(
+            createProducer(aivenKafka.producerConfig(avroProducerConfig)),
             config[brukernotifikasjon_beskjed_topic]
         )
     }

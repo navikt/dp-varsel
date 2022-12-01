@@ -1,18 +1,17 @@
 package no.nav.dagpenger.behov.brukernotifikasjon
 
-import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.db.InMemoryNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Nøkkel
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.Companion.logger
 
 internal class Notifikasjoner(
     private val repository: NotifikasjonRepository,
-    private val beskjedTopic: NotifikasjonTopic<BeskjedInput>
+    private val beskjedTopic: BeskjedTopic
 ) {
-    constructor(beskjedTopic: NotifikasjonTopic<BeskjedInput>) : this(InMemoryNotifikasjonRepository, beskjedTopic)
+    constructor(beskjedTopic: BeskjedTopic) : this(InMemoryNotifikasjonRepository, beskjedTopic)
 
     fun send(nøkkel: Nøkkel, beskjed: Beskjed) {
         repository.lagre(nøkkel, beskjed)
