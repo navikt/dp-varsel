@@ -9,9 +9,3 @@ internal object InMemoryNotifikasjonRepository : NotifikasjonRepository {
         notifikasjoner[UUID.randomUUID()] = beskjed
     }
 }
-
-// Nøkkel (felles FK)
-
-// Beskjed
-// Oppgave
-// Done
