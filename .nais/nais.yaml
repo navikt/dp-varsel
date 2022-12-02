@@ -20,3 +20,20 @@ spec:
       value: earliest
     - name: BRUKERNOTIFIKASJON_BESKJED_TOPIC
       value: min-side.aapen-brukernotifikasjon-beskjed-v1
+  gcp:
+    sqlInstances:
+      - name: dp-brukernotifikasjoner
+        type: POSTGRES_14
+        tier: db-custom-1-3840
+        cascadingDelete: false
+        collation: nb_NO.UTF8
+        autoBackupHour: 1
+        databases:
+          - envVarPrefix: DB
+            name: brukernotifikasjoner
+        diskAutoresize: true
+        diskSize: 10
+        diskType: SSD
+        highAvailability: true
+        pointInTimeRecovery: true
+        retainedBackups: 14
