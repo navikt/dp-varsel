@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Beskjed
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Nøkkel
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -15,7 +14,7 @@ import java.util.UUID
 
 internal class BeskjedRiver(
     rapidsConnection: RapidsConnection,
-    private val beskjedTopic: Notifikasjoner
+    private val notifikasjoner: Notifikasjoner
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -51,10 +50,15 @@ internal class BeskjedRiver(
             "behovId" to behovId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon" }
-            val nøkkel = Nøkkel(behovId, ident)
-            val notifikasjon = Beskjed(packet["tekst"].asText(), packet["@opprettet"].asLocalDateTime())
 
-            beskjedTopic.send(nøkkel, notifikasjon)
+            notifikasjoner.send(
+                Beskjed(
+                    eventId = behovId,
+                    ident = ident,
+                    tekst = packet["tekst"].asText(),
+                    oppprettet = packet["@opprettet"].asLocalDateTime()
+                )
+            )
         }
     }
 }

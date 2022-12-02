@@ -13,8 +13,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Beskjed
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Nøkkel
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import kotlin.test.Test
@@ -57,15 +56,14 @@ class NotifikasjonApiTest {
                 )
             )
         }.apply {
-            val nøkkel = slot<Nøkkel>()
-            val beskjed = slot<Beskjed>()
+            val kommando = slot<Beskjed>()
 
             verify {
-                notifikasjoner.send(capture(nøkkel), capture(beskjed))
+                notifikasjoner.send(capture(kommando))
             }
 
-            assertEquals(ident, nøkkel.captured.somNøkkel().fodselsnummer)
-            assertEquals(tekst, beskjed.captured.somMelding().tekst)
+            assertEquals(ident, kommando.captured.getNøkkel().somInput().fodselsnummer)
+            assertEquals(tekst, kommando.captured.getMelding().somInput().tekst)
         }
     }
 

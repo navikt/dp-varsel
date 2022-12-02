@@ -3,8 +3,11 @@ package no.nav.dagpenger.behov.brukernotifikasjon
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
+import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
+import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.BeskjedTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.Companion.beskjedTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.Companion.oppgaveTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -32,12 +35,22 @@ private val avroProducerConfig = Properties().apply {
 fun main() {
     val env = System.getenv()
     val beskjedTopic by lazy {
-        BeskjedTopic(
+        beskjedTopic(
             createProducer(aivenKafka.producerConfig(avroProducerConfig)),
             config[brukernotifikasjon_beskjed_topic]
         )
     }
-    val notifikasjoner = Notifikasjoner(beskjedTopic)
+    val oppgaveTopic by lazy {
+        oppgaveTopic(
+            createProducer(aivenKafka.producerConfig(avroProducerConfig)),
+            config[brukernotifikasjon_oppgave_topic]
+        )
+    }
+    val notifikasjoner = Notifikasjoner(
+        PostgresNotifikasjonRepository(dataSource),
+        beskjedTopic,
+        oppgaveTopic
+    )
 
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(env))
         .withKtorModule {

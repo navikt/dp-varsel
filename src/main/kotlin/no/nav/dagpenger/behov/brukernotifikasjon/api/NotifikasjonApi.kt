@@ -6,9 +6,8 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.api.plugins.configureSerialization
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Beskjed
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Nøkkel
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -20,7 +19,7 @@ internal fun Application.notifikasjonApi(notifikasjoner: Notifikasjoner) {
             get {}
             get("{id?}") {}
             post<PostBeskjed> { body ->
-                notifikasjoner.send(Nøkkel(UUID.randomUUID(), body.ident), body.somBeskjed())
+                notifikasjoner.send(body.somKommando())
             }
         }
     }
@@ -31,5 +30,5 @@ data class PostBeskjed(
     val tekst: String,
     val eksternVarsling: Boolean = false
 ) {
-    fun somBeskjed() = Beskjed(tekst, LocalDateTime.now(), eksternVarsling)
+    internal fun somKommando() = Beskjed(UUID.randomUUID(), ident, tekst, LocalDateTime.now())
 }

@@ -1,29 +1,50 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.kafka
 
 import mu.KotlinLogging
+import no.nav.brukernotifikasjon.schemas.builders.NokkelInputBuilder
 import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.brukernotifikasjon.schemas.input.NokkelInput
+import no.nav.brukernotifikasjon.schemas.input.OppgaveInput
+import no.nav.dagpenger.behov.brukernotifikasjon.config
+import no.nav.dagpenger.behov.brukernotifikasjon.nais_app_name
+import no.nav.dagpenger.behov.brukernotifikasjon.nais_namespace
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
+import java.util.UUID
 
-internal open class NotifikasjonTopic<T : SpecificRecord> private constructor(
+internal class NotifikasjonTopic<T : SpecificRecord> private constructor(
     private val producer: KafkaProducer<NokkelInput, T>,
     private val topic: String
 ) {
     companion object {
-        val logger = KotlinLogging.logger {}
+        private val logger = KotlinLogging.logger {}
+
+        fun beskjedTopic(producer: KafkaProducer<NokkelInput, BeskjedInput>, topic: String) =
+            NotifikasjonTopic(producer, topic)
+
+        fun oppgaveTopic(producer: KafkaProducer<NokkelInput, OppgaveInput>, topic: String) =
+            NotifikasjonTopic(producer, topic)
     }
 
-    fun publiser(nøkkel: NokkelInput, notifikasjon: T) {
-        producer.send(ProducerRecord(topic, nøkkel, notifikasjon)) { _, e: Exception ->
-            println(e)
-        }
+    fun publiser(nøkkel: Nøkkel, melding: NotifikasjonMelding<T>) {
+        producer.send(ProducerRecord(topic, nøkkel.somInput(), melding.somInput()))
+            .also { logger.info { "Sender ut $melding til $nøkkel" } }
     }
+}
 
-    internal class BeskjedTopic(producer: KafkaProducer<NokkelInput, BeskjedInput>, topic: String) :
-        NotifikasjonTopic<BeskjedInput>(
-            producer,
-            topic
-        )
+internal interface NotifikasjonMelding<T : SpecificRecord> {
+    fun somInput(): T
+}
+
+internal data class Nøkkel(internal val eventId: UUID, internal val ident: String) {
+    constructor(ident: String) : this(UUID.randomUUID(), ident)
+
+    fun somInput(): NokkelInput = NokkelInputBuilder().apply {
+        withEventId(eventId.toString())
+        withFodselsnummer(ident)
+        withGrupperingsId("deprecated")
+        withAppnavn(config[nais_app_name])
+        withNamespace(config[nais_namespace])
+    }.build()
 }

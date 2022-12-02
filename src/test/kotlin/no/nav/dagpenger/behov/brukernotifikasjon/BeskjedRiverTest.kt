@@ -2,7 +2,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon
 
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.behov.brukernotifikasjon.db.Beskjed
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -31,7 +31,7 @@ internal class BeskjedRiverTest {
         rapid.sendTestMessage(beskjedBehov.toJson())
 
         verify {
-            notifikasjoner.send(any(), any<Beskjed>())
+            notifikasjoner.send(any<Beskjed>())
         }
     }
 }

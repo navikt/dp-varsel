@@ -1,50 +1,10 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.db
 
-import no.nav.brukernotifikasjon.schemas.builders.BeskjedInputBuilder
-import no.nav.brukernotifikasjon.schemas.builders.NokkelInputBuilder
-import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
-import no.nav.brukernotifikasjon.schemas.input.NokkelInput
-import no.nav.dagpenger.behov.brukernotifikasjon.config
-import no.nav.dagpenger.behov.brukernotifikasjon.nais_app_name
-import no.nav.dagpenger.behov.brukernotifikasjon.nais_namespace
-import java.time.LocalDateTime
-import java.util.UUID
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedMelding
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveMelding
 
-interface NotifikasjonRepository {
-    fun lagre(nøkkel: Nøkkel, beskjed: Beskjed)
-}
-
-data class Beskjed(
-    val tekst: String,
-    val opprettet: LocalDateTime,
-    val sikkerhetsnivå: Int,
-    val eksternVarsling: Boolean
-) {
-    constructor(tekst: String) : this(tekst, LocalDateTime.now(), 3, false)
-    constructor(tekst: String, opprettet: LocalDateTime) : this(tekst, opprettet, 3, false)
-    constructor(tekst: String, opprettet: LocalDateTime, eksternVarsling: Boolean) : this(
-        tekst,
-        opprettet,
-        3,
-        eksternVarsling
-    )
-
-    fun somMelding(): BeskjedInput = BeskjedInputBuilder().apply {
-        withTekst(tekst)
-        withTidspunkt(opprettet)
-        withSikkerhetsnivaa(sikkerhetsnivå)
-        withEksternVarsling(eksternVarsling)
-    }.build()
-}
-
-data class Nøkkel(val eventId: UUID, val ident: String) {
-    constructor(ident: String) : this(UUID.randomUUID(), ident)
-
-    fun somNøkkel(): NokkelInput = NokkelInputBuilder().apply {
-        withEventId(eventId.toString())
-        withFodselsnummer(ident)
-        withGrupperingsId("deprecated")
-        withAppnavn(config[nais_app_name])
-        withNamespace(config[nais_namespace])
-    }.build()
+internal interface NotifikasjonRepository {
+    fun lagre(nøkkel: Nøkkel, beskjed: BeskjedMelding): Boolean
+    fun lagre(nøkkel: Nøkkel, beskjed: OppgaveMelding): Boolean
 }

@@ -17,3 +17,4 @@ val config = EnvironmentVariables() overriding
 val nais_app_name by stringType
 val nais_namespace by stringType
 val brukernotifikasjon_beskjed_topic by stringType
+val brukernotifikasjon_oppgave_topic by stringType
