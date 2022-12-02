@@ -5,6 +5,7 @@ import no.nav.brukernotifikasjon.schemas.builders.NokkelInputBuilder
 import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.brukernotifikasjon.schemas.input.NokkelInput
 import no.nav.brukernotifikasjon.schemas.input.OppgaveInput
+import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.config
 import no.nav.dagpenger.behov.brukernotifikasjon.nais_app_name
 import no.nav.dagpenger.behov.brukernotifikasjon.nais_namespace
@@ -37,12 +38,12 @@ internal interface NotifikasjonMelding<T : SpecificRecord> {
     fun somInput(): T
 }
 
-internal data class Nøkkel(internal val eventId: UUID, internal val ident: String) {
-    constructor(ident: String) : this(UUID.randomUUID(), ident)
+internal data class Nøkkel(internal val eventId: UUID, internal val ident: Ident) {
+    constructor(ident: Ident) : this(UUID.randomUUID(), ident)
 
     fun somInput(): NokkelInput = NokkelInputBuilder().apply {
         withEventId(eventId.toString())
-        withFodselsnummer(ident)
+        withFodselsnummer(ident.ident)
         withGrupperingsId("deprecated")
         withAppnavn(config[nais_app_name])
         withNamespace(config[nais_namespace])

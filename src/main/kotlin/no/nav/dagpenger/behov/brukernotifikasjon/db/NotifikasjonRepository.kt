@@ -1,10 +1,9 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.db
 
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedMelding
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveMelding
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 
 internal interface NotifikasjonRepository {
-    fun lagre(nøkkel: Nøkkel, beskjed: BeskjedMelding): Boolean
-    fun lagre(nøkkel: Nøkkel, beskjed: OppgaveMelding): Boolean
+    fun lagre(beskjed: Beskjed): Boolean
+    fun lagre(oppgave: Oppgave): Boolean
 }

@@ -20,7 +20,7 @@ internal class NotifikasjonerTest {
     fun test() {
         notifikasjoner.send(
             Beskjed(
-                "12312312311",
+                Ident("12312312311"),
                 "1-2-3 nå kommer en beskjed"
             )
         )

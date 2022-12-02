@@ -5,9 +5,10 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.api.plugins.configureSerialization
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -30,5 +31,6 @@ data class PostBeskjed(
     val tekst: String,
     val eksternVarsling: Boolean = false
 ) {
-    internal fun somKommando() = Beskjed(UUID.randomUUID(), ident, tekst, LocalDateTime.now())
+    internal fun somKommando() =
+        Beskjed(UUID.randomUUID(), Ident(ident), tekst, LocalDateTime.now(), 3, eksternVarsling = eksternVarsling)
 }

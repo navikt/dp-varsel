@@ -12,6 +12,7 @@ import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -62,8 +63,8 @@ class NotifikasjonApiTest {
                 notifikasjoner.send(capture(kommando))
             }
 
-            assertEquals(ident, kommando.captured.getNøkkel().somInput().fodselsnummer)
-            assertEquals(tekst, kommando.captured.getMelding().somInput().tekst)
+            assertEquals(Ident(ident), kommando.captured.getSnapshot().ident)
+            assertEquals(tekst, kommando.captured.getSnapshot().tekst)
         }
     }
 
