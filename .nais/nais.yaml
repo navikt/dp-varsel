@@ -20,6 +20,8 @@ spec:
       value: earliest
     - name: BRUKERNOTIFIKASJON_BESKJED_TOPIC
       value: min-side.aapen-brukernotifikasjon-beskjed-v1
+    - name: BRUKERNOTIFIKASJON_OPPGAVE_TOPIC
+      value: min-side.aapen-brukernotifikasjon-oppgave-v1
   gcp:
     sqlInstances:
       - name: dp-brukernotifikasjoner
