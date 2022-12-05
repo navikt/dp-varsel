@@ -20,7 +20,7 @@ internal fun Application.notifikasjonApi(notifikasjoner: Notifikasjoner, notifik
         route("beskjed") {
             get {}
             get("{id?}") {}
-            post<PostBeskjedTilAlleIdenter> { body ->
+            post<PostBeskjedTilAlleIdenter>("broadcast") { body ->
                 notifikasjonBroadcaster.sendBeskjedTilAlleIdenterISecreten(body.dryRun)
             }
             post<PostBeskjed> { body ->
