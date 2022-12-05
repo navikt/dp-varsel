@@ -39,3 +39,6 @@ spec:
         highAvailability: true
         pointInTimeRecovery: true
         retainedBackups: 14
+  filesFrom:
+    - secret: dummy-secret-jorn
+      mountPath: /var/run/secrets/dummy-secret-jorn
