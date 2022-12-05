@@ -42,3 +42,4 @@ spec:
   filesFrom:
     - secret: dummy-secret-jorn
       mountPath: /var/run/secrets/dummy-secret-jorn
+      optional: true
