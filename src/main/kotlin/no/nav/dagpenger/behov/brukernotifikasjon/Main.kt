@@ -51,10 +51,11 @@ fun main() {
         beskjedTopic,
         oppgaveTopic
     )
+     val notifikasjonBroadcaster = NotifikasjonBroadcaster()
 
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(env))
         .withKtorModule {
-            notifikasjonApi(notifikasjoner)
+            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
         }
         .build { _, rapidsConnection ->
             BeskjedRiver(rapidsConnection, notifikasjoner)

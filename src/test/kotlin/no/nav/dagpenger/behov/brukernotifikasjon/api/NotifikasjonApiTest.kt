@@ -13,6 +13,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.Ident
+import no.nav.dagpenger.behov.brukernotifikasjon.NotifikasjonBroadcaster
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,6 +22,7 @@ import kotlin.test.Test
 
 class NotifikasjonApiTest {
     private val notifikasjoner: Notifikasjoner = mockk(relaxed = true)
+    private val notifikasjonBroadcaster: NotifikasjonBroadcaster = mockk()
     private val ident = "12312312311"
     private val tekst = "asdfasdf"
 
@@ -28,7 +30,7 @@ class NotifikasjonApiTest {
     @Disabled
     fun testGetBeskjed() = testApplication {
         application {
-            notifikasjonApi(notifikasjoner)
+            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
         }
         client.get("/beskjed").apply {
             TODO("Please write your test here")
@@ -45,7 +47,7 @@ class NotifikasjonApiTest {
             }
         }
         application {
-            notifikasjonApi(notifikasjoner)
+            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
         }
         client.post("/beskjed") {
             header("Content-Type", Json)
@@ -72,7 +74,7 @@ class NotifikasjonApiTest {
     @Disabled
     fun testGetBeskjedId() = testApplication {
         application {
-            notifikasjonApi(notifikasjoner)
+            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
         }
         client.get("/beskjed/{id").apply {
             TODO("Please write your test here")
