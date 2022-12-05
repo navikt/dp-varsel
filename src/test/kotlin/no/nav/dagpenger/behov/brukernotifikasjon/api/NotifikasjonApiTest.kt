@@ -16,13 +16,13 @@ import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.NotifikasjonBroadcaster
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import kotlin.test.Test
 
 class NotifikasjonApiTest {
     private val notifikasjoner: Notifikasjoner = mockk(relaxed = true)
-    private val notifikasjonBroadcaster: NotifikasjonBroadcaster = mockk()
+    private val notifikasjonBroadcaster: NotifikasjonBroadcaster = mockk(relaxed = true)
     private val ident = "12312312311"
     private val tekst = "asdfasdf"
 
@@ -80,4 +80,33 @@ class NotifikasjonApiTest {
             TODO("Please write your test here")
         }
     }
+
+    @Test
+    fun testBroadcastBeskjed() = testApplication {
+        val client = createClient {
+            install(ContentNegotiation) {
+                jackson {
+                    registerModule(JavaTimeModule())
+                }
+            }
+        }
+        application {
+            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
+        }
+        client.post("/beskjed/broadcast") {
+            header("Content-Type", Json)
+            setBody(
+                PostBeskjedTilAlleIdenter(true)
+            )
+        }.apply {
+            val isDryRun = slot<Boolean>()
+
+            verify {
+                notifikasjonBroadcaster.sendBeskjedTilAlleIdenterISecreten(capture(isDryRun))
+            }
+
+            assertTrue(isDryRun.captured)
+        }
+    }
+
 }
