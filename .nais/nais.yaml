@@ -40,6 +40,6 @@ spec:
         pointInTimeRecovery: true
         retainedBackups: 14
   filesFrom:
-    - secret: dummy-secret-jorn
-      mountPath: /var/run/secrets/dummy-secret-jorn
+    - secret: brukernotifikasjon-broadcast-beskjed
+      mountPath: /var/run/secrets/brukernotifikasjon-broadcast-beskjed
       optional: true

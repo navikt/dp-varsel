@@ -2,7 +2,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon
 
 import java.io.File
 
-class NotifikasjonBroadcaster(private val pathToSecret: String = "/var/run/secrets/dummy-secret-jorn/dummyFnr.txt") {
+class NotifikasjonBroadcaster(private val pathToSecret: String = "/var/run/secrets/brukernotifikasjon-broadcast-beskjed/beskjedBroadcastReceivers.txt") {
 
     fun sendBeskjedTilAlleIdenterISecreten(dryRun: Boolean) {
         println("dry run: $dryRun")
