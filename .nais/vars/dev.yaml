@@ -1,2 +1,5 @@
 kafka:
   pool: nav-dev
+ingresses: |
+  ingresses:
+    - https://dp-behov-brukernotifikasjon.dev.intern.nav.no
