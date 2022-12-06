@@ -6,6 +6,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Json
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.testApplication
@@ -106,6 +107,7 @@ class NotifikasjonApiTest {
             }
 
             assertTrue(isDryRun.captured)
+            assertEquals(HttpStatusCode.OK, status)
         }
     }
 

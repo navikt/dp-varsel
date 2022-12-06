@@ -1,6 +1,8 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.api
 
-import io.ktor.server.application.Application
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -22,6 +24,7 @@ internal fun Application.notifikasjonApi(notifikasjoner: Notifikasjoner, notifik
             get("{id?}") {}
             post<PostBeskjedTilAlleIdenter>("broadcast") { body ->
                 notifikasjonBroadcaster.sendBeskjedTilAlleIdenterISecreten(body.dryRun)
+                call.respond(HttpStatusCode.OK)
             }
             post<PostBeskjed> { body ->
                 notifikasjoner.send(body.somKommando())
