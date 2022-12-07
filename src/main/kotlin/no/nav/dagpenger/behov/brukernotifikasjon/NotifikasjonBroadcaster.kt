@@ -1,25 +1,54 @@
 package no.nav.dagpenger.behov.brukernotifikasjon
 
 import mu.KotlinLogging
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
+import java.time.LocalDateTime
+import java.util.*
 
-internal class NotifikasjonBroadcaster(private val mottakerkilde: Mottakerkilde) {
+internal class NotifikasjonBroadcaster(
+    private val mottakerkilde: Mottakerkilde,
+    private val notifikasjoner: Notifikasjoner
+) {
 
     companion object {
+        private val tekst = "Din påbegynte dagpengesøknad må fullføres innen 15.12.22, eller så må det opprettes en ny."
         private val logger = KotlinLogging.logger {}
         private val sikkerLogger = KotlinLogging.logger("tjenestekall")
     }
 
-    fun sendBeskjedTilAlleIdenterISecreten(dryRun: Boolean): Int {
+    fun sendBeskjedTilAlleIdenterISecreten(dryRun: Boolean): Oppsummering {
         val identer: List<Ident> = mottakerkilde.hentMottakere()
         logger.info("Hentet ${identer.size} identer")
 
-        identer.forEachIndexed { index, ident ->
-            sikkerLogger.info("Ident $index: $ident")
-        }
+        var success = 0
+        var feilet = 0
+        if (dryRun) {
+            logger.info("Dry run, ville ha produsert ${identer.size} beskjeder.")
 
-        if (!dryRun) {
-            logger.info("Skal bestille beskjed til ${identer.size} brukere...")
+        } else {
+            logger.info("Skal produsere beskjeder til ${identer.size} identer")
+            identer.forEach { ident ->
+                try {
+                    val beskjeden =
+                        Beskjed(UUID.randomUUID(), ident, tekst, LocalDateTime.now(), 3, eksternVarsling = true)
+                    notifikasjoner.send(beskjeden)
+                    sikkerLogger.info("Sendte beskjed til $ident")
+                    success++
+
+                } catch (e: Exception) {
+                    feilet++
+                    sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident")
+                }
+            }
         }
-        return identer.size
+        val oppsummering = Oppsummering(success, feilet, identer.size)
+        logger.info("Oppsummering: $oppsummering")
+        return oppsummering
     }
+
+    internal data class Oppsummering(
+        val success: Int,
+        val feilet: Int,
+        val skulleProdusert: Int
+    )
 }
