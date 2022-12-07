@@ -4,6 +4,7 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
+import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.Companion.beskjedTopic
@@ -34,6 +35,7 @@ private val avroProducerConfig = Properties().apply {
 
 fun main() {
     val env = System.getenv()
+    runMigration()
     val beskjedTopic by lazy {
         beskjedTopic(
             createProducer(aivenKafka.producerConfig(avroProducerConfig)),
