@@ -20,31 +20,38 @@ internal class NotifikasjonBroadcaster(
         val identer: List<Ident> = mottakerkilde.hentMottakere()
         logger.info("Hentet ${identer.size} identer")
 
-        var success = 0
-        var feilet = 0
-        if (dryRun) {
+        val oppsummering = if (dryRun) {
             logger.info("Dry run, ville ha produsert ${identer.size} beskjeder.")
+            Oppsummering(0, 0, identer.size)
 
         } else {
-            logger.info("Skal produsere beskjeder til ${identer.size} identer")
-            identer.forEach { ident ->
-                try {
-                    val beskjeden =
-                        Beskjed(UUID.randomUUID(), ident, tekst, LocalDateTime.now(), 3, eksternVarsling = true)
-                    notifikasjoner.send(beskjeden)
-                    sikkerLogger.info("Sendte beskjed til $ident")
-                    success++
-
-                } catch (e: Exception) {
-                    feilet++
-                    sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident", e)
-                }
-            }
+            identer.sendEnBeskjedTilHver()
         }
-        val oppsummering = Oppsummering(success, feilet, identer.size)
+
         logger.info("Oppsummering: $oppsummering")
         return oppsummering
     }
+
+    private fun List<Ident>.sendEnBeskjedTilHver(): Oppsummering {
+        logger.info("Skal produsere beskjeder til $size identer")
+        var success = 0
+        var feilet = 0
+        val tidspunkt = LocalDateTime.now()
+        forEach { ident ->
+            try {
+                val beskjeden = Beskjed(UUID.randomUUID(), ident, tekst, tidspunkt, 3, eksternVarsling = true)
+                notifikasjoner.send(beskjeden)
+                sikkerLogger.info("Sendte beskjed til $ident")
+                success++
+
+            } catch (e: Exception) {
+                feilet++
+                sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident", e)
+            }
+        }
+        return Oppsummering(success, feilet, size)
+    }
+
 
     internal data class Oppsummering(
         val success: Int,
