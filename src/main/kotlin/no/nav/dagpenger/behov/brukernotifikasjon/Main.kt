@@ -13,7 +13,6 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.serialization.StringSerializer
 import java.util.Properties
 
 private val aivenKafka: AivenConfig = AivenConfig.default
@@ -29,7 +28,7 @@ private val avroProducerConfig = Properties().apply {
     )
     put(KafkaAvroSerializerConfig.USER_INFO_CONFIG, "$schemaRegistryUser:$schemaRegistryPassword")
     put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO")
-    put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
+    put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer::class.java)
     put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer::class.java)
 }
 
