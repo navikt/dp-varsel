@@ -23,7 +23,7 @@ Denne beskjeden går ut til alle brukere som er definert i kubernetes secret-en
    ```
    { "dryRun": true }
    ```
-   F.eks.
+   F.eks. i dev kan de gjøres slik:
    ```bash
    curl --location --request POST 'https://dp-behov-brukernotifikasjon.dev.intern.nav.no/beskjed/broadcast' \
     --header 'Content-Type: application/json' \
