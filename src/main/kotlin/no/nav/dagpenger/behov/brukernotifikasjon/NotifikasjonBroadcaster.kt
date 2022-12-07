@@ -37,7 +37,7 @@ internal class NotifikasjonBroadcaster(
 
                 } catch (e: Exception) {
                     feilet++
-                    sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident")
+                    sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident", e)
                 }
             }
         }
