@@ -20,8 +20,7 @@ internal class Notifikasjoner(
 ) {
     fun send(kommando: Beskjed) {
         kommando.lagre(repository)
-        // TODO: Aktiver denne igjen
-        // kommando.send(beskjedTopic)
+        kommando.send(beskjedTopic)
     }
 
     fun send(kommando: Oppgave) {
