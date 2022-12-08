@@ -46,7 +46,9 @@ internal class PostgresNotifikasjonRepository(
         beskjed: BeskjedSnapshot
     ) = queryOf( //language=PostgreSQL
         """
-        INSERT INTO beskjed (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link) VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link) ON CONFLICT DO NOTHING
+        INSERT INTO beskjed (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link)
+        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link)
+        ON CONFLICT DO NOTHING
         """.trimIndent(),
         mapOf(
             "nokkel" to nøkkelPK,
