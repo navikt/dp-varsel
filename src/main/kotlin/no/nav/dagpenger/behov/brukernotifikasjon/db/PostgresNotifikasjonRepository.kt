@@ -20,7 +20,7 @@ internal class PostgresNotifikasjonRepository(
             val nøkkelPK = session.run(
                 lagreNøkkelQuery(nøkkel).map { it.bigDecimal(1).toBigInteger() }.asSingle
             )
-            requireNotNull(nøkkelPK) { "Kan ikke lagre dupplikate nøkkler" }
+            requireNotNull(nøkkelPK) { "Kan ikke lagre duplikate nøkler" }
             session.run(
                 lagreBeskjedQuery(nøkkelPK, data).asExecute
             )
@@ -46,14 +46,15 @@ internal class PostgresNotifikasjonRepository(
         beskjed: BeskjedSnapshot
     ) = queryOf( //language=PostgreSQL
         """
-        INSERT INTO beskjed (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling) VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling) ON CONFLICT DO NOTHING
+        INSERT INTO beskjed (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link) VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link) ON CONFLICT DO NOTHING
         """.trimIndent(),
         mapOf(
             "nokkel" to nøkkelPK,
             "tekst" to beskjed.tekst,
             "opprettet" to beskjed.opprettet,
             "sikkerhetsnivaa" to beskjed.sikkerhetsnivå,
-            "eksternVarsling" to beskjed.eksternVarsling
+            "eksternVarsling" to beskjed.eksternVarsling,
+            "link" to beskjed.link.toString()
         )
     )
 }

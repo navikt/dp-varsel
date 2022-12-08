@@ -8,28 +8,59 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
+import java.net.URL
 import java.time.LocalDateTime
 import java.util.UUID
 
 internal typealias BeskjedTopic = NotifikasjonTopic<BeskjedInput>
 
-internal data class Beskjed(
+internal data class Beskjed constructor(
     override val eventId: UUID,
     private val ident: Ident,
     private val tekst: String,
     private val opprettet: LocalDateTime,
     private val sikkerhetsnivå: Int,
-    private val eksternVarsling: Boolean
+    private val eksternVarsling: Boolean,
+    private val link: URL?
 ) : NotifikasjonKommando(), NotifikasjonMelding<BeskjedInput> {
-    constructor(ident: Ident, tekst: String) : this(UUID.randomUUID(), ident, tekst, LocalDateTime.now(), 3, false)
-    constructor(eventId: UUID, ident: Ident, tekst: String) : this(eventId, ident, tekst, LocalDateTime.now(), 3, false)
+    constructor(ident: Ident, tekst: String) : this(
+        UUID.randomUUID(),
+        ident,
+        tekst,
+        LocalDateTime.now(),
+        3,
+        false,
+        null
+    )
+
+    constructor(eventId: UUID, ident: Ident, tekst: String) : this(
+        eventId,
+        ident,
+        tekst,
+        LocalDateTime.now(),
+        3,
+        false,
+        null
+    )
+
+    constructor(ident: Ident, tekst: String, sikkerhetsnivå: Int, eksternVarsling: Boolean, link: URL?) : this(
+        UUID.randomUUID(),
+        ident,
+        tekst,
+        LocalDateTime.now(),
+        sikkerhetsnivå,
+        eksternVarsling,
+        link
+    )
+
     constructor(eventId: UUID, ident: Ident, tekst: String, opprettet: LocalDateTime) : this(
         eventId,
         ident,
         tekst,
         opprettet,
         3,
-        false
+        false,
+        null
     )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
@@ -41,6 +72,7 @@ internal data class Beskjed(
         withTidspunkt(opprettet)
         withSikkerhetsnivaa(sikkerhetsnivå)
         withEksternVarsling(eksternVarsling)
+        withLink(link)
     }.build()
 
     internal data class BeskjedSnapshot(
@@ -49,7 +81,8 @@ internal data class Beskjed(
         val tekst: String,
         val opprettet: LocalDateTime,
         val sikkerhetsnivå: Int,
-        val eksternVarsling: Boolean
+        val eksternVarsling: Boolean,
+        val link: URL?
     ) {
         constructor(beskjed: Beskjed) : this(
             beskjed.eventId,
@@ -57,7 +90,8 @@ internal data class Beskjed(
             beskjed.tekst,
             beskjed.opprettet,
             beskjed.sikkerhetsnivå,
-            beskjed.eksternVarsling
+            beskjed.eksternVarsling,
+            beskjed.link
         )
     }
 }

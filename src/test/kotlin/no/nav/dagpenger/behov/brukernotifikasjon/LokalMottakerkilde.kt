@@ -1,6 +1,6 @@
 package no.nav.dagpenger.behov.brukernotifikasjon
 
-class LokalMotakerkilde : Mottakerkilde {
+class LokalMottakerkilde : Mottakerkilde {
 
     override fun lesInnFraKilden(): List<String> = javaClass.getResource("/beskjedReceivers.txt")
         ?.readText()

@@ -2,14 +2,14 @@ package no.nav.dagpenger.behov.brukernotifikasjon
 
 import mu.KotlinLogging
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
+import java.net.URL
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal class NotifikasjonBroadcaster(
     private val mottakerkilde: Mottakerkilde,
     private val notifikasjoner: Notifikasjoner
 ) {
-
     companion object {
         private val tekst = "Din påbegynte dagpengesøknad må fullføres innen 15.12.22, eller så må det opprettes en ny."
         private val logger = KotlinLogging.logger {}
@@ -19,11 +19,9 @@ internal class NotifikasjonBroadcaster(
     fun sendBeskjedTilAlleIdenterISecreten(dryRun: Boolean): Oppsummering {
         val identer: List<Ident> = mottakerkilde.hentMottakere()
         logger.info("Hentet ${identer.size} identer")
-
         val oppsummering = if (dryRun) {
             logger.info("Dry run, ville ha produsert ${identer.size} beskjeder.")
             Oppsummering(0, 0, identer.size)
-
         } else {
             identer.sendEnBeskjedTilHver()
         }
@@ -39,11 +37,18 @@ internal class NotifikasjonBroadcaster(
         val tidspunkt = LocalDateTime.now()
         forEach { ident ->
             try {
-                val beskjeden = Beskjed(UUID.randomUUID(), ident, tekst, tidspunkt, 3, eksternVarsling = true)
+                val beskjeden = Beskjed(
+                    UUID.randomUUID(),
+                    ident,
+                    tekst,
+                    tidspunkt,
+                    3,
+                    eksternVarsling = true,
+                    URL("https://www.nav.no/arbeid/dagpenger/mine-dagpenger")
+                )
                 notifikasjoner.send(beskjeden)
                 sikkerLogger.info("Sendte beskjed til $ident")
                 success++
-
             } catch (e: Exception) {
                 feilet++
                 sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident", e)
@@ -51,7 +56,6 @@ internal class NotifikasjonBroadcaster(
         }
         return Oppsummering(success, feilet, size)
     }
-
 
     internal data class Oppsummering(
         val success: Int,

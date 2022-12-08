@@ -7,7 +7,8 @@ Appen har to modus:
 * Produsere en identisk beskjed til mange brukere samtidig
 
 ## Produsere beskjed til mange brukere samtidig
-Appen har et REST-endepunkt, `.../beskjed/broadcast`, for å trigge genereringen av en hardkodet beskjed til mange brukere. 
+Appen har et REST-endepunkt, `.../internal/broadcast`, for å trigge genereringen av en hardkodet beskjed til mange 
+brukere. 
 Denne beskjeden går ut til alle brukere som er definert i kubernetes secret-en 
 `brukernotifikasjon-broadcast-beskjed`.
 
@@ -25,7 +26,7 @@ Denne beskjeden går ut til alle brukere som er definert i kubernetes secret-en
    ```
    F.eks. i dev kan de gjøres slik:
    ```bash
-   curl --location --request POST 'https://dp-behov-brukernotifikasjon.dev.intern.nav.no/beskjed/broadcast' \
+   curl --location --request POST 'https://dp-behov-brukernotifikasjon.dev.intern.nav.no/internal/broadcast' \
     --header 'Content-Type: application/json' \
     --data-raw '{ "dryRun": true }'
    ```
@@ -37,7 +38,7 @@ Denne beskjeden går ut til alle brukere som er definert i kubernetes secret-en
    > Oppsummering: Oppsummering(success=0, feilet=0, skulleProdusert=X)
    ```
    Hvor X skal være samme antall identer som ligger i secret-en.
-5. Gjør et nytt POST-kall mot endepunktet `.../beskjed/broadcast`, med følgende body:
+5. Gjør et nytt POST-kall mot endepunktet `.../internal/broadcast`, med følgende body:
    ```
    { "dryRun": false }
    ```

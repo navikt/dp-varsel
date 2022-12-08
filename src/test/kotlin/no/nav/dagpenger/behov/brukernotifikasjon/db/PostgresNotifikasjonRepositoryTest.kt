@@ -2,35 +2,54 @@ package no.nav.dagpenger.behov.brukernotifikasjon.db
 
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Postgres.withMigratedDb
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.net.URL
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.test.assertEquals
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
-    fun lagre() {
-        withMigratedDb {
-            PostgresNotifikasjonRepository(dataSource).let { repository ->
-                val uuid = UUID.randomUUID()
-                repository.lagre(Beskjed(uuid, Ident("12345678901"), "tekst"))
+    fun lagre() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            lagre(
+                Beskjed(
+                    eventId = UUID.randomUUID(),
+                    ident = Ident("12345678901"),
+                    tekst = "tekst",
+                    opprettet = LocalDateTime.now(),
+                    sikkerhetsnivå = 3,
+                    eksternVarsling = false,
+                    link = URL("https://www.nav.no")
+                )
+            )
 
-                assertThrows<IllegalArgumentException> {
-                    repository.lagre(Beskjed(uuid, Ident("12345678901"), "tekst"))
-                }
-
-                assertEquals(1, getAntallRader("nokkel"))
-                assertEquals(1, getAntallRader("beskjed"))
-            }
+            assertEquals(1, getAntallRader("nokkel"))
+            assertEquals(1, getAntallRader("beskjed"))
         }
     }
 
-    private fun getAntallRader(tabell: String) = using(sessionOf(dataSource)) {
-        it.run(queryOf("select count (*) from $tabell").map { it.int(1) }.asSingle)
+    @Test
+    fun `duplikate nøkler feiler`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val uuid = UUID.randomUUID()
+            lagre(Beskjed(uuid, Ident("12345678901"), "tekst"))
+
+            assertThrows<IllegalArgumentException> {
+                lagre(Beskjed(uuid, Ident("12345678901"), "tekst"))
+            }
+
+            assertEquals(1, getAntallRader("nokkel"))
+            assertEquals(1, getAntallRader("beskjed"))
+        }
+    }
+
+    private fun getAntallRader(tabell: String) = sessionOf(dataSource).use { session ->
+        session.run(queryOf("select count (*) from $tabell").map { it.int(1) }.asSingle)
     }
 }

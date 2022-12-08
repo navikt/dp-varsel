@@ -6,8 +6,8 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Json
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
@@ -17,7 +17,8 @@ import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.NotifikasjonBroadcaster
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Disabled
 import kotlin.test.Test
 
@@ -94,7 +95,7 @@ class NotifikasjonApiTest {
         application {
             notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
         }
-        client.post("/beskjed/broadcast") {
+        client.post("/internal/broadcast") {
             header("Content-Type", Json)
             setBody(
                 PostBeskjedTilAlleIdenter(true)
@@ -110,5 +111,4 @@ class NotifikasjonApiTest {
             assertEquals(HttpStatusCode.OK, status)
         }
     }
-
 }
