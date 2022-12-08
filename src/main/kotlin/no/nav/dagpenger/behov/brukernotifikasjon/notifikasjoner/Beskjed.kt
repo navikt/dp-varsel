@@ -1,6 +1,7 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
 import no.nav.brukernotifikasjon.schemas.builders.BeskjedInputBuilder
+import no.nav.brukernotifikasjon.schemas.builders.domain.PreferertKanal.SMS
 import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.NotifikasjonKommando
@@ -73,6 +74,7 @@ internal data class Beskjed constructor(
         withSikkerhetsnivaa(sikkerhetsnivå)
         withEksternVarsling(eksternVarsling)
         withLink(link)
+        withPrefererteKanaler(SMS)
     }.build()
 
     internal data class BeskjedSnapshot(
