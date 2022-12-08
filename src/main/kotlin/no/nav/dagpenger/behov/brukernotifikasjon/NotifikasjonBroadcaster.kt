@@ -11,7 +11,8 @@ internal class NotifikasjonBroadcaster(
     private val notifikasjoner: Notifikasjoner
 ) {
     companion object {
-        private val tekst = "Du har en påbegynt søknad om dagpenger, som snart vil bli slettet på grunn av oppdateringer i systemene våre. Hvis du ikke vil miste søknaden må du fullføre den innen 14. desember 2022, ellers må du starte en ny."
+        private val tekst =
+            "Du har en påbegynt søknad om dagpenger, som snart vil bli slettet på grunn av oppdateringer i systemene våre."
         private val logger = KotlinLogging.logger {}
         private val sikkerLogger = KotlinLogging.logger("tjenestekall")
     }
