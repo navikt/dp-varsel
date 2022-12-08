@@ -1,2 +1,4 @@
 kafka:
   pool: nav-prod
+ingresses:
+  - https://dp-behov-brukernotifikasjon.intern.nav.no

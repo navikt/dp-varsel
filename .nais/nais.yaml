@@ -43,4 +43,7 @@ spec:
     - secret: brukernotifikasjon-broadcast-beskjed
       mountPath: /var/run/secrets/brukernotifikasjon-broadcast-beskjed
       optional: true
-  {{ ingresses }}
+  ingresses:
+  {{#each ingresses as |url|}}
+     - {{url}}
+  {{/each}}
