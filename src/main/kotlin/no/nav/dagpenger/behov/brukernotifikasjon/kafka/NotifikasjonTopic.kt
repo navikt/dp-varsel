@@ -2,9 +2,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon.kafka
 
 import mu.KotlinLogging
 import no.nav.brukernotifikasjon.schemas.builders.NokkelInputBuilder
-import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.brukernotifikasjon.schemas.input.NokkelInput
-import no.nav.brukernotifikasjon.schemas.input.OppgaveInput
 import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.config
 import no.nav.dagpenger.behov.brukernotifikasjon.nais_app_name
@@ -14,18 +12,12 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import java.util.UUID
 
-internal class NotifikasjonTopic<T : SpecificRecord> private constructor(
+internal class NotifikasjonTopic<T : SpecificRecord> constructor(
     private val producer: KafkaProducer<NokkelInput, T>,
     private val topic: String
 ) {
     companion object {
         private val logger = KotlinLogging.logger {}
-
-        fun beskjedTopic(producer: KafkaProducer<NokkelInput, BeskjedInput>, topic: String) =
-            NotifikasjonTopic(producer, topic)
-
-        fun oppgaveTopic(producer: KafkaProducer<NokkelInput, OppgaveInput>, topic: String) =
-            NotifikasjonTopic(producer, topic)
     }
 
     fun publiser(nøkkel: Nøkkel, melding: NotifikasjonMelding<T>) {

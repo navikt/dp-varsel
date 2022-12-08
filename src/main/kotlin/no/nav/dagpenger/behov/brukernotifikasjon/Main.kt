@@ -7,8 +7,8 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.da
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.Companion.beskjedTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic.Companion.oppgaveTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -36,13 +36,13 @@ fun main() {
     val env = System.getenv()
     runMigration()
     val beskjedTopic by lazy {
-        beskjedTopic(
+        BeskjedTopic(
             createProducer(aivenKafka.producerConfig(avroProducerConfig)),
             config[brukernotifikasjon_beskjed_topic]
         )
     }
-    val oppgaveTopic by lazy {
-        oppgaveTopic(
+    val oppgaveTopic: OppgaveTopic by lazy {
+        OppgaveTopic(
             createProducer(aivenKafka.producerConfig(avroProducerConfig)),
             config[brukernotifikasjon_oppgave_topic]
         )
