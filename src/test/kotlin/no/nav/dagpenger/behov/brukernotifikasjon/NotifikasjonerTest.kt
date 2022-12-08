@@ -5,7 +5,6 @@ import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class NotifikasjonerTest {
@@ -17,8 +16,6 @@ internal class NotifikasjonerTest {
         oppgaveTopic
     )
 
-    // TODO: Aktiver denne igjen
-    @Disabled
     @Test
     fun test() {
         notifikasjoner.send(
