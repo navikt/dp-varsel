@@ -52,7 +52,7 @@ fun main() {
         beskjedTopic,
         oppgaveTopic
     )
-    val mottakereFraKubernetesSecret = KubernetesScretsMotakerkilde()
+    val mottakereFraKubernetesSecret = KubernetesScretsMottakerkilde()
     val notifikasjonBroadcaster = NotifikasjonBroadcaster(mottakereFraKubernetesSecret, notifikasjoner)
 
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(env))

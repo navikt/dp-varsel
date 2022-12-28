@@ -14,7 +14,7 @@ internal interface Mottakerkilde {
     fun lesInnFraKilden(): List<String>
 }
 
-class KubernetesScretsMotakerkilde(
+class KubernetesScretsMottakerkilde(
     private val pathToSecret: String = "/var/run/secrets/brukernotifikasjon-broadcast-beskjed/beskjedReceivers.txt"
 ) : Mottakerkilde {
     override fun lesInnFraKilden(): List<String> =
