@@ -24,13 +24,13 @@ internal data class Beskjed constructor(
     private val eksternVarsling: Boolean,
     private val link: URL?
 ) : NotifikasjonKommando(), NotifikasjonMelding<BeskjedInput> {
-    constructor(ident: Ident, tekst: String) : this(
+    constructor(ident: Ident, tekst: String, eksternVarsling: Boolean = false) : this(
         UUID.randomUUID(),
         ident,
         tekst,
         LocalDateTime.now(),
         3,
-        false,
+        eksternVarsling,
         null
     )
 
@@ -72,9 +72,11 @@ internal data class Beskjed constructor(
         withTekst(tekst)
         withTidspunkt(opprettet)
         withSikkerhetsnivaa(sikkerhetsnivå)
-        withEksternVarsling(eksternVarsling)
         withLink(link)
-        withPrefererteKanaler(SMS)
+        withEksternVarsling(eksternVarsling)
+        if (eksternVarsling) {
+            withPrefererteKanaler(SMS)
+        }
     }.build()
 
     internal data class BeskjedSnapshot(
