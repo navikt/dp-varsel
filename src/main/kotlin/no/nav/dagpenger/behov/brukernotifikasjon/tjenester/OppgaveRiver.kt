@@ -5,15 +5,11 @@ import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
-import java.util.UUID
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
+import no.nav.helse.rapids_rivers.*
+import java.net.URL
 
-internal class BeskjedRiver(
+internal class OppgaveRiver(
     rapidsConnection: RapidsConnection,
     private val notifikasjoner: Notifikasjoner
 ) : River.PacketListener {
@@ -21,19 +17,20 @@ internal class BeskjedRiver(
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
-            validate { it.requireValue("type", "beskjed") }
+            validate { it.requireValue("type", "oppgave") }
             validate {
                 it.requireKey(
                     "@behovId",
                     "@opprettet",
                     "ident",
-                    "tekst"
+                    "tekst",
+                    "link"
                 )
             }
 
             validate {
                 it.interestedIn(
-                    "link"
+                    "eksternVarsling"
                 )
             }
         }.register(this)
@@ -50,18 +47,19 @@ internal class BeskjedRiver(
         withLoggingContext(
             "behovId" to behovId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: beskjed" }
+            logger.info { "Løser behov for brukernotifikasjon: oppgave" }
 
             notifikasjoner.send(
-                Beskjed(
+                Oppgave(
                     eventId = behovId,
                     ident = Ident(ident),
                     tekst = packet["tekst"].asText(),
                     opprettet = packet["@opprettet"].asLocalDateTime(),
+                    link = packet["link"].asUrl()
                 )
             )
         }
     }
 }
 
-internal fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }
+private fun JsonNode.asUrl() = URL(asText())
