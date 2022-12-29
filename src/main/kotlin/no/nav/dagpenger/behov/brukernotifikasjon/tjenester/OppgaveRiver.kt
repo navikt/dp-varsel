@@ -8,6 +8,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.helse.rapids_rivers.*
 import java.net.URL
+import java.util.*
 
 internal class OppgaveRiver(
     rapidsConnection: RapidsConnection,
@@ -24,7 +25,8 @@ internal class OppgaveRiver(
                     "@opprettet",
                     "ident",
                     "tekst",
-                    "link"
+                    "link",
+                    "søknad_uuid"
                 )
             }
 
@@ -43,6 +45,7 @@ internal class OppgaveRiver(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val behovId = packet["@behovId"].asUUID()
         val ident = packet["ident"].asText()
+        val søknadId = packet.søknadUUID()
 
         withLoggingContext(
             "behovId" to behovId.toString()
@@ -55,11 +58,13 @@ internal class OppgaveRiver(
                     ident = Ident(ident),
                     tekst = packet["tekst"].asText(),
                     opprettet = packet["@opprettet"].asLocalDateTime(),
-                    link = packet["link"].asUrl()
+                    link = packet["link"].asUrl(),
+                    søknadId = søknadId
                 )
             )
         }
     }
 }
 
-private fun JsonNode.asUrl() = URL(asText())
+internal fun JsonNode.asUrl() = URL(asText())
+internal fun JsonMessage.søknadUUID() = this["søknad_uuid"].asText().let { UUID.fromString(it) }

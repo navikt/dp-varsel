@@ -11,7 +11,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 internal typealias OppgaveTopic = NotifikasjonTopic<OppgaveInput>
 
@@ -22,36 +22,30 @@ internal data class Oppgave(
     private val opprettet: LocalDateTime,
     private val sikkerhetsnivå: Int,
     private val eksternVarsling: Boolean,
-    private val link: URL
+    private val link: URL,
+    private val søknadId : UUID
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
-    constructor(ident: Ident, tekst: String, link: URL) : this(
-        UUID.randomUUID(),
-        ident,
-        tekst,
-        LocalDateTime.now(),
-        3,
-        false,
-        link
-    )
 
-    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link: URL) : this(
+    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link: URL, søknadId: UUID) : this(
         eventId,
         ident,
         tekst,
         opprettet,
         3,
         false,
-        link
+        link,
+        søknadId
     )
 
-    constructor(eventId: UUID, ident: Ident, link: URL, tekst: String) : this(
+    constructor(eventId: UUID, ident: Ident, link: URL, tekst: String, søknadId: UUID) : this(
         eventId,
         ident,
         tekst,
         LocalDateTime.now(),
         3,
         false,
-        link
+        link,
+        søknadId
     )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
@@ -77,7 +71,8 @@ internal data class Oppgave(
         val opprettet: LocalDateTime,
         val sikkerhetsnivå: Int,
         val eksternVarsling: Boolean,
-        val link: URL
+        val link: URL,
+        val søknadId: UUID
     ) {
         constructor(oppgave: Oppgave) : this(
             oppgave.eventId,
@@ -86,7 +81,8 @@ internal data class Oppgave(
             oppgave.opprettet,
             oppgave.sikkerhetsnivå,
             oppgave.eksternVarsling,
-            oppgave.link
+            oppgave.link,
+            oppgave.søknadId
         )
     }
 

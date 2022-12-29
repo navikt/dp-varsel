@@ -1,13 +1,16 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.db
 
+import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
+import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed.BeskjedSnapshot
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave.OppgaveSnapshot
 import java.math.BigInteger
+import java.net.URL
 import javax.sql.DataSource
 
 internal class PostgresNotifikasjonRepository(
@@ -43,6 +46,36 @@ internal class PostgresNotifikasjonRepository(
         }
     }
 
+    override fun hentOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
+        session.run(
+            oppgaverQuery(ident).map {
+                it.toOppgave()
+            }.asList
+        )
+    }
+
+    private fun oppgaverQuery(ident: Ident) = queryOf( //language=PostgreSQL
+        """SELECT * 
+            FROM oppgave o 
+            JOIN nokkel n ON n.id = o.nokkel
+            WHERE n.ident = :ident
+            """.trimIndent(),
+        mapOf(
+            "ident" to ident.ident,
+        )
+    )
+
+    private fun Row.toOppgave() = Oppgave(
+        ident = Ident(string("ident")),
+        søknadId = uuid("soknadId"),
+        eventId = uuid("eventId"),
+        tekst = string("tekst"),
+        opprettet = localDateTime("opprettet"),
+        sikkerhetsnivå = int("sikkerhetsnivaa"),
+        eksternVarsling = boolean("ekstern_varsling"),
+        link = URL(string("link"))
+    )
+
     private fun lagreNøkkelQuery(nøkkel: Nøkkel) = queryOf( //language=PostgreSQL
         """
         INSERT INTO nokkel (ident, eventid) VALUES (:ident, :eventId) ON CONFLICT DO NOTHING RETURNING id
@@ -77,8 +110,8 @@ internal class PostgresNotifikasjonRepository(
         oppgave: OppgaveSnapshot
     ) = queryOf( //language=PostgreSQL
         """
-        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link)
-        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link)
+        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId)
+        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId)
         ON CONFLICT DO NOTHING
         """.trimIndent(),
         mapOf(
@@ -87,7 +120,8 @@ internal class PostgresNotifikasjonRepository(
             "opprettet" to oppgave.opprettet,
             "sikkerhetsnivaa" to oppgave.sikkerhetsnivå,
             "eksternVarsling" to oppgave.eksternVarsling,
-            "link" to oppgave.link.toString()
+            "link" to oppgave.link.toString(),
+            "soknadId" to oppgave.søknadId
         )
     )
 

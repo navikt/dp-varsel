@@ -8,6 +8,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import java.util.*
 
 internal class OppgaveRiverTest {
     private val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
@@ -42,6 +43,7 @@ val oppgaveBehov = JsonMessage.newNeed(
         "type" to "oppgave",
         "ident" to "12312312312",
         "tekst" to "1-2-3 nå kommer en oppgave",
-        "link" to "https://url.til.oppgaven/123"
+        "link" to "https://url.til.oppgaven/123",
+        "søknad_uuid" to UUID.randomUUID()
     )
 )

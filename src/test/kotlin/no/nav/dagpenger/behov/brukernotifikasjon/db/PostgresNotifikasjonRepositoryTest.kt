@@ -11,8 +11,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -46,7 +47,8 @@ class PostgresNotifikasjonRepositoryTest {
                     opprettet = LocalDateTime.now(),
                     sikkerhetsnivå = 3,
                     eksternVarsling = false,
-                    link = URL("https://www.nav.no")
+                    link = URL("https://www.nav.no"),
+                    søknadId = UUID.randomUUID()
                 )
             )
 
@@ -54,6 +56,41 @@ class PostgresNotifikasjonRepositoryTest {
             assertEquals(1, getAntallRader("oppgave"))
             assertEquals(0, getAntallRader("beskjed"))
         }
+    }
+
+    @Test
+    fun `Hente oppgaver for en ident`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident1 = Ident("12345678901")
+            val expectedOppgave1ForId1 = createOppgaveFor(ident1)
+            val expectedOppgave2ForId1 = createOppgaveFor(ident1)
+            lagre(expectedOppgave1ForId1)
+            lagre(expectedOppgave2ForId1)
+
+            val ident2 = Ident("98765432107")
+            lagre(createOppgaveFor(ident2))
+
+            val oppgaverForId1 = hentOppgaver(ident1)
+            assertEquals(2, oppgaverForId1.size)
+            assertTrue(oppgaverForId1.containsAll(listOf(expectedOppgave1ForId1, expectedOppgave2ForId1)))
+
+            val oppgaverForId2 = hentOppgaver(ident2)
+            assertEquals(1, oppgaverForId2.size)
+        }
+    }
+
+    private fun createOppgaveFor(ident: Ident): Oppgave {
+        val originalOppgave = Oppgave(
+            eventId = UUID.randomUUID(),
+            ident = ident,
+            tekst = "oppgavetekst",
+            opprettet = LocalDateTime.now(),
+            sikkerhetsnivå = 3,
+            eksternVarsling = false,
+            link = URL("https://www.nav.no"),
+            søknadId = UUID.randomUUID()
+        )
+        return originalOppgave
     }
 
     @Test
@@ -75,10 +112,11 @@ class PostgresNotifikasjonRepositoryTest {
     fun `duplikate nøkler feiler for oppgave`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val uuid = UUID.randomUUID()
-            lagre(Oppgave(uuid, Ident("12345678901"), URL("https://dummyOppgave"),"oppgavetekst"))
+            val søknadId = UUID.randomUUID()
+            lagre(Oppgave(uuid, Ident("12345678901"), URL("https://dummyOppgave"), "oppgavetekst", søknadId))
 
             assertThrows<IllegalArgumentException> {
-                lagre(Oppgave(uuid, Ident("12345678901"), URL("https://dummyOppgave"),"oppgavetekst"))
+                lagre(Oppgave(uuid, Ident("12345678901"), URL("https://dummyOppgave"), "oppgavetekst", søknadId))
             }
 
             assertEquals(1, getAntallRader("nokkel"))
