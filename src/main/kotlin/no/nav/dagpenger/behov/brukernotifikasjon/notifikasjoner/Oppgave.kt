@@ -34,7 +34,7 @@ internal data class Oppgave(
         link
     )
 
-    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link : URL) : this(
+    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link: URL) : this(
         eventId,
         ident,
         tekst,
@@ -44,13 +44,13 @@ internal data class Oppgave(
         link
     )
 
-    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, eksternVarsling: Boolean, link : URL) : this(
+    constructor(eventId: UUID, ident: Ident, link: URL, tekst: String) : this(
         eventId,
         ident,
         tekst,
-        opprettet,
+        LocalDateTime.now(),
         3,
-        eksternVarsling,
+        false,
         link
     )
 
@@ -62,9 +62,32 @@ internal data class Oppgave(
         withTidspunkt(opprettet)
         withSikkerhetsnivaa(sikkerhetsnivå)
         withEksternVarsling(eksternVarsling)
-        if(eksternVarsling) {
+        if (eksternVarsling) {
             withPrefererteKanaler(PreferertKanal.SMS)
         }
         withLink(link)
     }.build()
+
+    fun getSnapshot() = OppgaveSnapshot(this)
+
+    internal data class OppgaveSnapshot(
+        val eventId: UUID,
+        val ident: Ident,
+        val tekst: String,
+        val opprettet: LocalDateTime,
+        val sikkerhetsnivå: Int,
+        val eksternVarsling: Boolean,
+        val link: URL
+    ) {
+        constructor(oppgave: Oppgave) : this(
+            oppgave.eventId,
+            oppgave.ident,
+            oppgave.tekst,
+            oppgave.opprettet,
+            oppgave.sikkerhetsnivå,
+            oppgave.eksternVarsling,
+            oppgave.link
+        )
+    }
+
 }
