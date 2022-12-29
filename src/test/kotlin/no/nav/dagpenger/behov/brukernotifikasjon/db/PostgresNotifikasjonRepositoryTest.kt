@@ -79,7 +79,27 @@ class PostgresNotifikasjonRepositoryTest {
         }
     }
 
-    private fun createOppgaveFor(ident: Ident): Oppgave {
+    @Test
+    fun `Hente oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("12345678901")
+            val expectedSøknadsId = UUID.randomUUID()
+
+            val expectedOppgave1 = createOppgaveFor(ident, expectedSøknadsId)
+            val expectedOppgave2 = createOppgaveFor(ident, expectedSøknadsId)
+            lagre(expectedOppgave1)
+            lagre(expectedOppgave2)
+            lagre(createOppgaveFor(ident))
+
+            val oppgaverTilknyttetSøknaden = hentOppgaver(ident, expectedSøknadsId)
+            assertEquals(2, oppgaverTilknyttetSøknaden.size)
+            assertTrue(oppgaverTilknyttetSøknaden.containsAll(listOf(expectedOppgave1, expectedOppgave2)))
+
+            assertEquals(3, hentOppgaver(ident).size)
+        }
+    }
+
+    private fun createOppgaveFor(ident: Ident, søknadId: UUID = UUID.randomUUID()): Oppgave {
         val originalOppgave = Oppgave(
             eventId = UUID.randomUUID(),
             ident = ident,
@@ -88,7 +108,7 @@ class PostgresNotifikasjonRepositoryTest {
             sikkerhetsnivå = 3,
             eksternVarsling = false,
             link = URL("https://www.nav.no"),
-            søknadId = UUID.randomUUID()
+            søknadId = søknadId
         )
         return originalOppgave
     }

@@ -11,6 +11,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave.OppgaveSnapshot
 import java.math.BigInteger
 import java.net.URL
+import java.util.*
 import javax.sql.DataSource
 
 internal class PostgresNotifikasjonRepository(
@@ -48,13 +49,33 @@ internal class PostgresNotifikasjonRepository(
 
     override fun hentOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
-            oppgaverQuery(ident).map {
+            alleOppgaverQuery(ident).map {
                 it.toOppgave()
             }.asList
         )
     }
 
-    private fun oppgaverQuery(ident: Ident) = queryOf( //language=PostgreSQL
+    override fun hentOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
+        session.run(
+            alleOppgaverForKonkretSøknadQuery(ident, søknadId).map {
+                it.toOppgave()
+            }.asList
+        )
+    }
+
+    private fun alleOppgaverForKonkretSøknadQuery(ident: Ident, søknadId: UUID) = queryOf( //language=PostgreSQL
+        """SELECT * 
+            FROM oppgave o 
+            JOIN nokkel n ON n.id = o.nokkel
+            WHERE n.ident = :ident AND o.soknadId = :soknadId
+            """.trimIndent(),
+        mapOf(
+            "ident" to ident.ident,
+            "soknadId" to søknadId
+        )
+    )
+
+    private fun alleOppgaverQuery(ident: Ident) = queryOf( //language=PostgreSQL
         """SELECT * 
             FROM oppgave o 
             JOIN nokkel n ON n.id = o.nokkel
