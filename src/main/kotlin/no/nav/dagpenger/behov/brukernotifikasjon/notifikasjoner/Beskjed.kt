@@ -16,8 +16,8 @@ import java.util.*
 internal typealias BeskjedTopic = NotifikasjonTopic<BeskjedInput>
 
 internal data class Beskjed constructor(
-    override val eventId: UUID,
     private val ident: Ident,
+    override val eventId: UUID,
     private val tekst: String,
     private val opprettet: LocalDateTime,
     private val sikkerhetsnivå: Int,
@@ -25,8 +25,8 @@ internal data class Beskjed constructor(
     private val link: URL?
 ) : NotifikasjonKommando(), NotifikasjonMelding<BeskjedInput> {
     constructor(ident: Ident, tekst: String, eksternVarsling: Boolean = false) : this(
-        UUID.randomUUID(),
         ident,
+        UUID.randomUUID(),
         tekst,
         LocalDateTime.now(),
         3,
@@ -34,9 +34,9 @@ internal data class Beskjed constructor(
         null
     )
 
-    constructor(eventId: UUID, ident: Ident, tekst: String) : this(
-        eventId,
+    constructor(ident: Ident, eventId: UUID, tekst: String) : this(
         ident,
+        eventId,
         tekst,
         LocalDateTime.now(),
         3,
@@ -45,8 +45,8 @@ internal data class Beskjed constructor(
     )
 
     constructor(ident: Ident, tekst: String, sikkerhetsnivå: Int, eksternVarsling: Boolean, link: URL?) : this(
-        UUID.randomUUID(),
         ident,
+        UUID.randomUUID(),
         tekst,
         LocalDateTime.now(),
         sikkerhetsnivå,
@@ -54,9 +54,9 @@ internal data class Beskjed constructor(
         link
     )
 
-    constructor(eventId: UUID, ident: Ident, tekst: String, opprettet: LocalDateTime) : this(
-        eventId,
+    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime) : this(
         ident,
+        eventId,
         tekst,
         opprettet,
         3,

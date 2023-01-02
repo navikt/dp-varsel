@@ -117,10 +117,10 @@ class PostgresNotifikasjonRepositoryTest {
     fun `duplikate nøkler feiler for beskjed`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val uuid = UUID.randomUUID()
-            lagre(Beskjed(uuid, Ident("12345678901"), "tekst"))
+            lagre(Beskjed(Ident("12345678901"), uuid, "tekst"))
 
             assertThrows<IllegalArgumentException> {
-                lagre(Beskjed(uuid, Ident("12345678901"), "tekst"))
+                lagre(Beskjed(Ident("12345678901"), uuid, "tekst"))
             }
 
             assertEquals(1, getAntallRader("nokkel"))
@@ -133,10 +133,10 @@ class PostgresNotifikasjonRepositoryTest {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val uuid = UUID.randomUUID()
             val søknadId = UUID.randomUUID()
-            lagre(Oppgave(uuid, Ident("12345678901"), URL("https://dummyOppgave"), "oppgavetekst", søknadId))
+            lagre(Oppgave(Ident("12345678901"), uuid, URL("https://dummyOppgave"), "oppgavetekst", søknadId))
 
             assertThrows<IllegalArgumentException> {
-                lagre(Oppgave(uuid, Ident("12345678901"), URL("https://dummyOppgave"), "oppgavetekst", søknadId))
+                lagre(Oppgave(Ident("12345678901"), uuid, URL("https://dummyOppgave"), "oppgavetekst", søknadId))
             }
 
             assertEquals(1, getAntallRader("nokkel"))

@@ -39,8 +39,8 @@ internal class NotifikasjonBroadcaster(
         forEach { ident ->
             try {
                 val beskjeden = Beskjed(
-                    UUID.randomUUID(),
                     ident,
+                    UUID.randomUUID(),
                     tekst,
                     tidspunkt,
                     3,

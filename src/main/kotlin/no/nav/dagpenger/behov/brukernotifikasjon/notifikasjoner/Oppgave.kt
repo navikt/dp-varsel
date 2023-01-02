@@ -16,19 +16,19 @@ import java.util.*
 internal typealias OppgaveTopic = NotifikasjonTopic<OppgaveInput>
 
 internal data class Oppgave(
-    override val eventId: UUID,
     private val ident: Ident,
+    override val eventId: UUID,
     private val tekst: String,
     private val opprettet: LocalDateTime,
     private val sikkerhetsnivå: Int,
     private val eksternVarsling: Boolean,
     private val link: URL,
-    private val søknadId : UUID
+    private val søknadId: UUID
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
 
     constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link: URL, søknadId: UUID) : this(
-        eventId,
         ident,
+        eventId,
         tekst,
         opprettet,
         3,
@@ -37,9 +37,9 @@ internal data class Oppgave(
         søknadId
     )
 
-    constructor(eventId: UUID, ident: Ident, link: URL, tekst: String, søknadId: UUID) : this(
-        eventId,
+    constructor(ident: Ident, eventId: UUID, link: URL, tekst: String, søknadId: UUID) : this(
         ident,
+        eventId,
         tekst,
         LocalDateTime.now(),
         3,
