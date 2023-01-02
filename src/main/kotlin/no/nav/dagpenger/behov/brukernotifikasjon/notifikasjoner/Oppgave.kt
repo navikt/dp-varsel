@@ -23,7 +23,9 @@ internal data class Oppgave(
     private val sikkerhetsnivå: Int,
     private val eksternVarsling: Boolean,
     private val link: URL,
-    private val søknadId: UUID
+    private val søknadId: UUID,
+    private val deaktiveringstidspunkt: LocalDateTime?,
+    private val aktiv: Boolean = true
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
 
     constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link: URL, søknadId: UUID) : this(
@@ -34,7 +36,8 @@ internal data class Oppgave(
         3,
         false,
         link,
-        søknadId
+        søknadId,
+        null
     )
 
     constructor(ident: Ident, eventId: UUID, link: URL, tekst: String, søknadId: UUID) : this(
@@ -45,7 +48,9 @@ internal data class Oppgave(
         3,
         false,
         link,
-        søknadId
+        søknadId,
+        null,
+        true
     )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
@@ -72,7 +77,9 @@ internal data class Oppgave(
         val sikkerhetsnivå: Int,
         val eksternVarsling: Boolean,
         val link: URL,
-        val søknadId: UUID
+        val søknadId: UUID,
+        val aktiv: Boolean,
+        val deaktiveringstidspunkt: LocalDateTime?
     ) {
         constructor(oppgave: Oppgave) : this(
             oppgave.eventId,
@@ -82,7 +89,9 @@ internal data class Oppgave(
             oppgave.sikkerhetsnivå,
             oppgave.eksternVarsling,
             oppgave.link,
-            oppgave.søknadId
+            oppgave.søknadId,
+            oppgave.aktiv,
+            oppgave.deaktiveringstidspunkt
         )
     }
 

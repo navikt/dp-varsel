@@ -8,6 +8,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.ru
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.DoneTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.KubernetesScretsMottakerkilde
@@ -50,10 +51,17 @@ fun main() {
             config[brukernotifikasjon_oppgave_topic]
         )
     }
+    val doneTopic: DoneTopic by lazy {
+        DoneTopic(
+            createProducer(aivenKafka.producerConfig(avroProducerConfig)),
+            config[brukernotifikasjon_done_topic]
+        )
+    }
     val notifikasjoner = Notifikasjoner(
         PostgresNotifikasjonRepository(dataSource),
         beskjedTopic,
-        oppgaveTopic
+        oppgaveTopic,
+        doneTopic
     )
     val mottakereFraKubernetesSecret = KubernetesScretsMottakerkilde()
     val notifikasjonBroadcaster = NotifikasjonBroadcaster(mottakereFraKubernetesSecret, notifikasjoner)

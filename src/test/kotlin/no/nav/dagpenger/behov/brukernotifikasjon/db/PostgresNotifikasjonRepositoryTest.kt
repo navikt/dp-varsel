@@ -2,9 +2,11 @@ package no.nav.dagpenger.behov.brukernotifikasjon.db
 
 import kotliquery.queryOf
 import kotliquery.sessionOf
+import no.nav.dagpenger.behov.brukernotifikasjon.db.OppgaveObjectMother.giveMeOppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Postgres.withMigratedDb
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import org.junit.jupiter.api.Test
@@ -13,6 +15,8 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class PostgresNotifikasjonRepositoryTest {
@@ -39,18 +43,7 @@ class PostgresNotifikasjonRepositoryTest {
     @Test
     fun `Lagre oppgave`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
-            lagre(
-                Oppgave(
-                    eventId = UUID.randomUUID(),
-                    ident = Ident("12345678901"),
-                    tekst = "oppgavetekst",
-                    opprettet = LocalDateTime.now(),
-                    sikkerhetsnivå = 3,
-                    eksternVarsling = false,
-                    link = URL("https://www.nav.no"),
-                    søknadId = UUID.randomUUID()
-                )
-            )
+            lagre(giveMeOppgave())
 
             assertEquals(1, getAntallRader("nokkel"))
             assertEquals(1, getAntallRader("oppgave"))
@@ -62,17 +55,19 @@ class PostgresNotifikasjonRepositoryTest {
     fun `Hente oppgaver for en ident`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident1 = Ident("12345678901")
-            val expectedOppgave1ForId1 = createOppgaveFor(ident1)
-            val expectedOppgave2ForId1 = createOppgaveFor(ident1)
+            val expectedOppgave1ForId1 = giveMeOppgave(ident = ident1)
+            val expectedOppgave2ForId1 = giveMeOppgave(ident = ident1)
             lagre(expectedOppgave1ForId1)
             lagre(expectedOppgave2ForId1)
 
             val ident2 = Ident("98765432107")
-            lagre(createOppgaveFor(ident2))
+            lagre(giveMeOppgave(ident2))
 
             val oppgaverForId1 = hentOppgaver(ident1)
             assertEquals(2, oppgaverForId1.size)
-            assertTrue(oppgaverForId1.containsAll(listOf(expectedOppgave1ForId1, expectedOppgave2ForId1)))
+
+            assertNotNull(oppgaverForId1.find { it.getSnapshot().eventId == expectedOppgave1ForId1.getSnapshot().eventId })
+            assertNotNull(oppgaverForId1.find { it.getSnapshot().eventId == expectedOppgave2ForId1.getSnapshot().eventId })
 
             val oppgaverForId2 = hentOppgaver(ident2)
             assertEquals(1, oppgaverForId2.size)
@@ -83,34 +78,21 @@ class PostgresNotifikasjonRepositoryTest {
     fun `Hente oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")
-            val expectedSøknadsId = UUID.randomUUID()
+            val expectedSøknadId = UUID.randomUUID()
 
-            val expectedOppgave1 = createOppgaveFor(ident, expectedSøknadsId)
-            val expectedOppgave2 = createOppgaveFor(ident, expectedSøknadsId)
+            val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
+            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
             lagre(expectedOppgave1)
             lagre(expectedOppgave2)
-            lagre(createOppgaveFor(ident))
+            lagre(giveMeOppgave(ident))
 
-            val oppgaverTilknyttetSøknaden = hentOppgaver(ident, expectedSøknadsId)
+            val oppgaverTilknyttetSøknaden = hentOppgaver(ident, expectedSøknadId)
             assertEquals(2, oppgaverTilknyttetSøknaden.size)
-            assertTrue(oppgaverTilknyttetSøknaden.containsAll(listOf(expectedOppgave1, expectedOppgave2)))
+            assertNotNull(oppgaverTilknyttetSøknaden.find { it.getSnapshot().eventId == expectedOppgave1.getSnapshot().eventId })
+            assertNotNull(oppgaverTilknyttetSøknaden.find { it.getSnapshot().eventId == expectedOppgave2.getSnapshot().eventId })
 
             assertEquals(3, hentOppgaver(ident).size)
         }
-    }
-
-    private fun createOppgaveFor(ident: Ident, søknadId: UUID = UUID.randomUUID()): Oppgave {
-        val originalOppgave = Oppgave(
-            eventId = UUID.randomUUID(),
-            ident = ident,
-            tekst = "oppgavetekst",
-            opprettet = LocalDateTime.now(),
-            sikkerhetsnivå = 3,
-            eksternVarsling = false,
-            link = URL("https://www.nav.no"),
-            søknadId = søknadId
-        )
-        return originalOppgave
     }
 
     @Test
@@ -141,6 +123,27 @@ class PostgresNotifikasjonRepositoryTest {
 
             assertEquals(1, getAntallRader("nokkel"))
             assertEquals(1, getAntallRader("oppgave"))
+        }
+    }
+
+    @Test
+    fun `Et done-event skal deaktivere et korresponderende oppgave-event`() {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("98765432101")
+            val eventId = UUID.randomUUID()
+            lagre(giveMeOppgave(ident = ident, eventId = eventId))
+
+            val oppgaver = hentOppgaver(ident)
+            assertEquals(1, oppgaver.size)
+            assertTrue(oppgaver[0].getSnapshot().aktiv)
+
+            val doneEventForOppgave = Done(ident = ident, eventId = eventId, Done.Eventtype.OPPGAVE)
+
+            lagre(doneEventForOppgave)
+
+            val oppgaverEtterDeaktivering = hentOppgaver(ident)
+            assertEquals(1, oppgaverEtterDeaktivering.size)
+            assertFalse(oppgaverEtterDeaktivering[0].getSnapshot().aktiv)
         }
     }
 

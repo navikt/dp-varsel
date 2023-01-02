@@ -4,10 +4,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.*
 import org.apache.avro.specific.SpecificRecord
 import java.util.*
 
@@ -16,7 +13,8 @@ internal data class Ident(val ident: String)
 internal class Notifikasjoner(
     private val repository: NotifikasjonRepository,
     private val beskjedTopic: BeskjedTopic,
-    private val oppgaveTopic: OppgaveTopic
+    private val oppgaveTopic: OppgaveTopic,
+    private val doneTopic: DoneTopic
 ) {
     fun send(kommando: Beskjed) {
         kommando.lagre(repository)
@@ -26,6 +24,11 @@ internal class Notifikasjoner(
     fun send(kommando: Oppgave) {
         kommando.lagre(repository)
         kommando.send(oppgaveTopic)
+    }
+
+    fun send(kommando: Done) {
+        kommando.lagre(repository)
+        kommando.send(doneTopic)
     }
 }
 

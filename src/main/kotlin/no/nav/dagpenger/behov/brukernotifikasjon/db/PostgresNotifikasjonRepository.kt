@@ -1,11 +1,13 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.db
 
+import kotliquery.Query
 import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed.BeskjedSnapshot
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave.OppgaveSnapshot
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
@@ -46,6 +48,45 @@ internal class PostgresNotifikasjonRepository(
             )
         }
     }
+
+    override fun lagre(done: Done): Boolean {
+        val nøkkel = done.getNøkkel()
+        val data = done.getSnapshot()
+
+        return sessionOf(dataSource).use { session ->
+            val nøkkelPK = session.run(
+                finnNøkkelQuery(nøkkel).map { it.bigDecimal(1).toBigInteger() }.asSingle
+            )
+            requireNotNull(nøkkelPK) { "Eventet som skal markeres som done ble ikke funnet" }
+            session.run(
+                lagreDoneQuery(nøkkelPK, data).asExecute
+            )
+        }
+    }
+
+    private fun lagreDoneQuery(
+        nøkkelPK: BigInteger,
+        done: Done.DoneSnapshot
+    ): Query {
+        val tabell = done.eventtype.name.lowercase()
+        return queryOf( //language=PostgreSQL
+            """
+        UPDATE $tabell SET aktiv = false, deaktiveringstidspunkt = :sistOppdatert WHERE nokkel = :nokkel
+        """.trimIndent(),
+            mapOf(
+                "nokkel" to nøkkelPK,
+                "deaktiveringstidspunkt" to done.deaktiveringstidspunkt
+            )
+        )
+    }
+
+    private fun finnNøkkelQuery(nøkkel: Nøkkel) = queryOf( //language=PostgreSQL
+        "SELECT id FROM nokkel WHERE ident = :ident AND eventid = :eventId",
+        mapOf(
+            "ident" to nøkkel.ident.ident,
+            "eventId" to nøkkel.eventId
+        )
+    )
 
     override fun hentOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
@@ -94,7 +135,9 @@ internal class PostgresNotifikasjonRepository(
         opprettet = localDateTime("opprettet"),
         sikkerhetsnivå = int("sikkerhetsnivaa"),
         eksternVarsling = boolean("ekstern_varsling"),
-        link = URL(string("link"))
+        link = URL(string("link")),
+        aktiv = boolean("aktiv"),
+        deaktiveringstidspunkt = localDateTimeOrNull("deaktiveringstidspunkt")
     )
 
     private fun lagreNøkkelQuery(nøkkel: Nøkkel) = queryOf( //language=PostgreSQL
@@ -131,8 +174,8 @@ internal class PostgresNotifikasjonRepository(
         oppgave: OppgaveSnapshot
     ) = queryOf( //language=PostgreSQL
         """
-        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId)
-        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId)
+        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId, aktiv)
+        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId, :aktiv)
         ON CONFLICT DO NOTHING
         """.trimIndent(),
         mapOf(
@@ -142,7 +185,8 @@ internal class PostgresNotifikasjonRepository(
             "sikkerhetsnivaa" to oppgave.sikkerhetsnivå,
             "eksternVarsling" to oppgave.eksternVarsling,
             "link" to oppgave.link.toString(),
-            "soknadId" to oppgave.søknadId
+            "soknadId" to oppgave.søknadId,
+            "aktiv" to oppgave.aktiv
         )
     )
 

@@ -22,6 +22,8 @@ spec:
       value: min-side.aapen-brukernotifikasjon-beskjed-v1
     - name: BRUKERNOTIFIKASJON_OPPGAVE_TOPIC
       value: min-side.aapen-brukernotifikasjon-oppgave-v1
+    - name: BRUKERNOTIFIKASJON_DONE_TOPIC
+      value: min-side.aapen-brukernotifikasjon-done-v1
   gcp:
     sqlInstances:
       - name: dp-brukernotifikasjoner
