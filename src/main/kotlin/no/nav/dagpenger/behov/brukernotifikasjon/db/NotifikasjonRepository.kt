@@ -1,8 +1,8 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.db
 
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import java.util.*
 
 internal interface NotifikasjonRepository {

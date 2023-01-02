@@ -1,9 +1,8 @@
-package no.nav.dagpenger.behov.brukernotifikasjon
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach

@@ -1,18 +1,14 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.api
 
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
-import no.nav.dagpenger.behov.brukernotifikasjon.NotifikasjonBroadcaster
-import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.dagpenger.behov.brukernotifikasjon.api.plugins.configureSerialization
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcaster
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import java.net.URL
 
 internal fun Application.notifikasjonApi(

@@ -3,12 +3,12 @@ package no.nav.dagpenger.behov.brukernotifikasjon.db
 import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed.BeskjedSnapshot
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave.OppgaveSnapshot
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import java.math.BigInteger
 import java.net.URL
 import java.util.*

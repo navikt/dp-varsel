@@ -3,8 +3,6 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
-import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.helse.rapids_rivers.*
 import java.net.URL

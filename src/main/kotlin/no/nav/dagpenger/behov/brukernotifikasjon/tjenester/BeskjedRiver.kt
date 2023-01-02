@@ -3,15 +3,9 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
-import no.nav.dagpenger.behov.brukernotifikasjon.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
-import java.util.UUID
+import no.nav.helse.rapids_rivers.*
+import java.util.*
 
 internal class BeskjedRiver(
     rapidsConnection: RapidsConnection,

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.behov.brukernotifikasjon
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
 import io.mockk.every
 import io.mockk.mockk

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.behov.brukernotifikasjon
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
@@ -9,7 +9,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
 import org.apache.avro.specific.SpecificRecord
-import java.util.UUID
+import java.util.*
 
 internal data class Ident(val ident: String)
 

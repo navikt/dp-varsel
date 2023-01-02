@@ -10,10 +10,13 @@ import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.BeskjedRiver
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.KubernetesScretsMottakerkilde
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcaster
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
-import java.util.Properties
+import java.util.*
 
 private val aivenKafka: AivenConfig = AivenConfig.default
 private val avroProducerConfig = Properties().apply {

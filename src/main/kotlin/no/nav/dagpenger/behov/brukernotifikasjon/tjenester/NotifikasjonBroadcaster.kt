@@ -1,10 +1,10 @@
-package no.nav.dagpenger.behov.brukernotifikasjon
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
 import mu.KotlinLogging
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 internal class NotifikasjonBroadcaster(
     private val mottakerkilde: Mottakerkilde,

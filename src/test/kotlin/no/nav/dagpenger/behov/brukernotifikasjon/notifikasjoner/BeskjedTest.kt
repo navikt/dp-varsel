@@ -1,7 +1,7 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
 import no.nav.brukernotifikasjon.schemas.builders.domain.PreferertKanal
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

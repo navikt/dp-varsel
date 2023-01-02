@@ -2,11 +2,11 @@ package no.nav.dagpenger.behov.brukernotifikasjon.db
 
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Postgres.withMigratedDb
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.URL

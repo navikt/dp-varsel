@@ -3,15 +3,15 @@ package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 import no.nav.brukernotifikasjon.schemas.builders.BeskjedInputBuilder
 import no.nav.brukernotifikasjon.schemas.builders.domain.PreferertKanal.SMS
 import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
-import no.nav.dagpenger.behov.brukernotifikasjon.Ident
-import no.nav.dagpenger.behov.brukernotifikasjon.NotifikasjonKommando
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonKommando
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 internal typealias BeskjedTopic = NotifikasjonTopic<BeskjedInput>
 
