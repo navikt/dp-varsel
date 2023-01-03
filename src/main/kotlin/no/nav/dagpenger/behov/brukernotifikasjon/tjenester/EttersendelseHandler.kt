@@ -14,17 +14,21 @@ internal class EttersendelseHandler(
     }
 
     fun opprettHvisIkkeFinnesFraFør(nyOppgave: Oppgave) {
-        val snapshotAvNyOppgave = nyOppgave.getSnapshot()
-        val oppgaver = notifikasjonRepository.hentOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
+        val eksisterendeOppgaverForSøknadId = eksisterendeOppgaverForSammeSøknadId(nyOppgave)
 
-        if(oppgaver.isEmpty()) {
+        if (eksisterendeOppgaverForSøknadId.isEmpty()) {
             notifikasjoner.send(nyOppgave)
             logger.info("Ny oppgave opprettet.")
 
         } else {
-            logger.info("Søknaden har alt en eller flere oppgaver knyttet til seg. Antall ${oppgaver.size}")
+            logger.info("Søknaden har alt en eller flere oppgaver knyttet til seg. Antall ${eksisterendeOppgaverForSøknadId.size}")
         }
 
+    }
+
+    private fun eksisterendeOppgaverForSammeSøknadId(nyOppgave: Oppgave): List<Oppgave> {
+        val snapshotAvNyOppgave = nyOppgave.getSnapshot()
+        return notifikasjonRepository.hentOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
     }
 
 }
