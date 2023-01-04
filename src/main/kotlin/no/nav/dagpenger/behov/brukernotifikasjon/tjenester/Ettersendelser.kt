@@ -4,7 +4,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 
-internal class EttersendelseHandler(
+internal class Ettersendelser(
     private val notifikasjoner: Notifikasjoner,
     private val notifikasjonRepository: NotifikasjonRepository
 ) {

@@ -9,7 +9,7 @@ import java.util.*
 
 internal class EttersendingsoppgaveRiver(
     rapidsConnection: RapidsConnection,
-    private val ettersendelseHandler: EttersendelseHandler
+    private val ettersendelser: Ettersendelser
 ) : River.PacketListener {
 
     init {
@@ -52,7 +52,7 @@ internal class EttersendingsoppgaveRiver(
         ) {
             logger.info { "Løser behov for brukernotifikasjon: ettersendingsoppgave" }
 
-            ettersendelseHandler.opprettHvisIkkeFinnesFraFør(
+            ettersendelser.opprettHvisIkkeFinnesFraFør(
                 Oppgave(
                     eventId = behovId,
                     ident = Ident(ident),

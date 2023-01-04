@@ -12,10 +12,10 @@ import java.util.*
 import kotlin.test.assertContains
 
 internal class EttersendingsoppgaveRiverTest {
-    private val ettersendelseHandler = mockk<EttersendelseHandler>(relaxed = true)
+    private val ettersendelser = mockk<Ettersendelser>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingsoppgaveRiver(this, ettersendelseHandler)
+            EttersendingsoppgaveRiver(this, ettersendelser)
         }
     }
 
@@ -35,7 +35,7 @@ internal class EttersendingsoppgaveRiverTest {
         val opprettetOppgave = slot<Oppgave>()
 
         verify {
-            ettersendelseHandler.opprettHvisIkkeFinnesFraFør(capture(opprettetOppgave))
+            ettersendelser.opprettHvisIkkeFinnesFraFør(capture(opprettetOppgave))
         }
 
         assertContains(opprettetOppgave.captured.getSnapshot().link.toString(), søknadId.toString())

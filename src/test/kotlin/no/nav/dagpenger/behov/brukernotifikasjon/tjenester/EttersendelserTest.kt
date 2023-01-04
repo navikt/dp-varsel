@@ -8,13 +8,13 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.OppgaveObjectMother.giveMeOp
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import org.junit.jupiter.api.Test
 
-class EttersendelseHandlerTest {
+class EttersendelserTest {
 
     @Test
     fun `Skal opprette ny oppgave kun hvis det ikke finnes en oppgave for søknaden fra før`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
-        val eh = EttersendelseHandler(notifikasjoner, notifikasjonRepo)
+        val eh = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
         eh.opprettHvisIkkeFinnesFraFør(nyOppgave)
@@ -27,7 +27,7 @@ class EttersendelseHandlerTest {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
         every { notifikasjonRepo.hentOppgaver(any(), any()) } returns listOf(giveMeOppgave())
-        val eh = EttersendelseHandler(notifikasjoner, notifikasjonRepo)
+        val eh = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
         eh.opprettHvisIkkeFinnesFraFør(nyOppgave)
