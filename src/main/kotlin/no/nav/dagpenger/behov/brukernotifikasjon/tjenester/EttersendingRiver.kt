@@ -7,7 +7,7 @@ import no.nav.helse.rapids_rivers.*
 import java.net.URL
 import java.util.*
 
-internal class EttersendingsoppgaveRiver(
+internal class EttersendingRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendelser: Ettersendelser
 ) : River.PacketListener {

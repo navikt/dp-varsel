@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertContains
 
-internal class EttersendingsoppgaveRiverTest {
+internal class EttersendingRiverTest {
     private val ettersendelser = mockk<Ettersendelser>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingsoppgaveRiver(this, ettersendelser)
+            EttersendingRiver(this, ettersendelser)
         }
     }
 
