@@ -1,22 +1,19 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.util.*
-import kotlin.test.assertContains
 
-internal class EttersendingRiverTest {
+class EttersendingDoneRiverTest {
     private val ettersendelser = mockk<Ettersendelser>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingRiver(this, ettersendelser)
+            EttersendingDoneRiver(this, ettersendelser)
         }
     }
 
@@ -31,25 +28,19 @@ internal class EttersendingRiverTest {
 
     @Test
     fun `skal publisere brukernotifikasjoner`() {
-        rapid.sendTestMessage(ettersendelseoppgaveBehov.toJson())
-
-        val opprettetOppgave = slot<Oppgave>()
+        rapid.sendTestMessage(ettersendelseoppgaveUtførtBehov.toJson())
 
         verify {
-            ettersendelser.opprettOppgave(capture(opprettetOppgave))
+            ettersendelser.markerOppgaveSomUtført(any())
         }
-
-        assertContains(opprettetOppgave.captured.getSnapshot().link.toString(), søknadId.toString())
     }
 }
 
-private val søknadId = UUID.randomUUID()
-
-val ettersendelseoppgaveBehov = JsonMessage.newNeed(
+val ettersendelseoppgaveUtførtBehov = JsonMessage.newNeed(
     behov = listOf("brukernotifikasjon"),
     map = mapOf(
-        "type" to "ettersending_oppgave",
+        "type" to "ettersending_done",
         "ident" to "12312312312",
-        "søknad_uuid" to søknadId
+        "søknad_uuid" to UUID.randomUUID()
     )
 )

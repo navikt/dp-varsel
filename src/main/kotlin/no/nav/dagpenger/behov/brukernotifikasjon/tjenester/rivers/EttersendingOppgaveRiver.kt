@@ -2,20 +2,23 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.EttersendingUtført
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.helse.rapids_rivers.*
+import java.net.URL
+import java.util.*
 
-internal class EttersendingUtførtRiver(
+internal class EttersendingOppgaveRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendelser: Ettersendelser
 ) : River.PacketListener {
+
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
-            validate { it.requireValue("type", "ettersending_done") }
+            validate { it.requireValue("type", "ettersending_oppgave") }
             validate {
                 it.requireKey(
                     "@behovId",
@@ -25,6 +28,11 @@ internal class EttersendingUtførtRiver(
                 )
             }
 
+            validate {
+                it.interestedIn(
+                    "eksternVarsling"
+                )
+            }
         }.register(this)
     }
 
@@ -32,23 +40,33 @@ internal class EttersendingUtførtRiver(
         val logger = KotlinLogging.logger { }
     }
 
+    private val ingressForSøknadsdialogen = "https://arbeid.dev.nav.no/dagpenger/dialog/soknad"
+    private val oppgavetekst = "Du må ettersende et eller flere vedlegg til din søknad om Dagpenger"
+
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val behovId = packet["@behovId"].asUUID()
-        val ident = Ident(packet["ident"].asText())
+        val ident = packet["ident"].asText()
         val søknadId = packet.søknadUUID()
 
         withLoggingContext(
             "behovId" to behovId.toString(),
             "søknadId" to søknadId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: ettersending_done" }
-            ettersendelser.markerOppgaveSomUtført(
-                EttersendingUtført(
-                    søknadId = søknadId,
-                    ident = ident,
-                    deaktiveringstidspunkt = packet["@opprettet"].asLocalDateTime(),
+            logger.info { "Løser behov for brukernotifikasjon: ettersending_oppgave" }
+
+            ettersendelser.opprettOppgave(
+                Oppgave(
+                    eventId = behovId,
+                    ident = Ident(ident),
+                    tekst = oppgavetekst,
+                    opprettet = packet["@opprettet"].asLocalDateTime(),
+                    link = urlTilKvitteringssiden(søknadId),
+                    søknadId = søknadId
                 )
             )
         }
     }
+
+    private fun urlTilKvitteringssiden(søknadId: UUID) = URL("$ingressForSøknadsdialogen/$søknadId/kvittering")
+
 }
