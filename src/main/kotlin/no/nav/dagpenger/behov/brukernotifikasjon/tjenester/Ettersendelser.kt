@@ -18,25 +18,25 @@ internal class Ettersendelser(
     }
 
     fun sendOppgaveHvisIkkeFinnesFraFør(nyOppgave: Oppgave) {
-        val eksisterendeOppgaverForSøknadId = eksisterendeOppgaverForSammeSøknadId(nyOppgave)
+        val aktiveOppgaverForSøknadId = eksisterendeAktiveOppgaverForSammeSøknadId(nyOppgave)
 
-        if (eksisterendeOppgaverForSøknadId.isEmpty()) {
+        if (aktiveOppgaverForSøknadId.isEmpty()) {
             notifikasjoner.send(nyOppgave)
             logger.info { "Ny oppgave opprettet." }
 
         } else {
-            logger.info { "Søknaden har alt en eller flere oppgaver knyttet til seg. Antall: ${eksisterendeOppgaverForSøknadId.size}" }
+            logger.info { "Søknaden har alt en eller flere aktive oppgaver knyttet til seg. Antall: ${aktiveOppgaverForSøknadId.size}" }
         }
 
     }
 
-    private fun eksisterendeOppgaverForSammeSøknadId(nyOppgave: Oppgave): List<Oppgave> {
+    private fun eksisterendeAktiveOppgaverForSammeSøknadId(nyOppgave: Oppgave): List<Oppgave> {
         val snapshotAvNyOppgave = nyOppgave.getSnapshot()
-        return notifikasjonRepository.hentOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
+        return notifikasjonRepository.hentAktiveOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
     }
 
     fun merkerOppgaveSomUtført(utførtEttersending: EttersendingUtført) {
-        val aktiveOppgaverForSøknaden = notifikasjonRepository.hentOppgaver(
+        val aktiveOppgaverForSøknaden = notifikasjonRepository.hentAktiveOppgaver(
             utførtEttersending.ident,
             utførtEttersending.søknadId
         )

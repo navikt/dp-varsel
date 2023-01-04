@@ -13,5 +13,5 @@ internal interface NotifikasjonRepository {
 
     fun hentOppgaver(ident: Ident): List<Oppgave>
 
-    fun hentOppgaver(ident: Ident, søknadId: UUID): List<Oppgave>
+    fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave>
 }

@@ -75,21 +75,20 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Hente oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
+    fun `Hente aktive oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")
             val expectedSøknadId = UUID.randomUUID()
 
             val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
-            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
+            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId, aktiv = false)
             lagre(expectedOppgave1)
             lagre(expectedOppgave2)
             lagre(giveMeOppgave(ident))
 
-            val oppgaverTilknyttetSøknaden = hentOppgaver(ident, expectedSøknadId)
-            assertEquals(2, oppgaverTilknyttetSøknaden.size)
-            assertNotNull(oppgaverTilknyttetSøknaden.find { it.getSnapshot().eventId == expectedOppgave1.getSnapshot().eventId })
-            assertNotNull(oppgaverTilknyttetSøknaden.find { it.getSnapshot().eventId == expectedOppgave2.getSnapshot().eventId })
+            val aktiveOppgaverTilknyttetSøknaden = hentAktiveOppgaver(ident, expectedSøknadId)
+            assertEquals(1, aktiveOppgaverTilknyttetSøknaden.size)
+            assertEquals(expectedOppgave1.getSnapshot().eventId, aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId)
 
             assertEquals(3, hentOppgaver(ident).size)
         }

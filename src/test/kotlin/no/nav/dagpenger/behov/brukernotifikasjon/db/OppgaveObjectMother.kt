@@ -3,6 +3,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon.db
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import java.net.URL
+import java.time.LocalDateTime
 import java.util.*
 
 internal object OppgaveObjectMother {
@@ -12,13 +13,19 @@ internal object OppgaveObjectMother {
         eventId: UUID = UUID.randomUUID(),
         link: URL = URL("https://dummyOppgave/123"),
         tekst: String = "Dette er en oppgave",
-        søknadId: UUID = UUID.randomUUID()
+        aktiv: Boolean = true,
+        søknadId: UUID = UUID.randomUUID(),
     ) = Oppgave(
         ident = ident,
         eventId = eventId,
-        link = link,
         tekst = tekst,
-        søknadId = søknadId
+        opprettet = LocalDateTime.now().minusDays(90),
+        sikkerhetsnivå = 3,
+        eksternVarsling = false,
+        link = link,
+        søknadId = søknadId,
+        deaktiveringstidspunkt = LocalDateTime.now(),
+        aktiv = aktiv
     )
 
 }

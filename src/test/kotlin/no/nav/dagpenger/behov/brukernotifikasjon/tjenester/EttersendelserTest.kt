@@ -31,7 +31,7 @@ class EttersendelserTest {
     fun `Skal ikke opprette ny oppgave kun hvis det finnes en oppgave for søknaden fra før`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
-        every { notifikasjonRepo.hentOppgaver(any(), any()) } returns listOf(giveMeOppgave())
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(giveMeOppgave())
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
@@ -51,7 +51,7 @@ class EttersendelserTest {
 
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
-        every { notifikasjonRepo.hentOppgaver(any(), any()) } returns listOf(oppgave)
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave)
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         ettersendelser.merkerOppgaveSomUtført(utførtEvent)
@@ -76,7 +76,7 @@ class EttersendelserTest {
 
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
-        every { notifikasjonRepo.hentOppgaver(any(), any()) } returns listOf(oppgave1, oppgave2)
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave1, oppgave2)
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         ettersendelser.merkerOppgaveSomUtført(utførtEvent)
@@ -92,7 +92,7 @@ class EttersendelserTest {
 
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
-        every { notifikasjonRepo.hentOppgaver(any(), any()) } returns emptyList()
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns emptyList()
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         ettersendelser.merkerOppgaveSomUtført(utførtEvent)
