@@ -60,13 +60,13 @@ internal class EttersendingOppgaveRiver(
                     ident = Ident(ident),
                     tekst = oppgavetekst,
                     opprettet = packet["@opprettet"].asLocalDateTime(),
-                    link = urlTilKvitteringssiden(søknadId),
+                    link = urlTilEttersendingssiden(søknadId),
                     søknadId = søknadId
                 )
             )
         }
     }
 
-    private fun urlTilKvitteringssiden(søknadId: UUID) = URL("$ingressForSøknadsdialogen/$søknadId/kvittering")
+    private fun urlTilEttersendingssiden(søknadId: UUID) = URL("$ingressForSøknadsdialogen/$søknadId/ettersending")
 
 }
