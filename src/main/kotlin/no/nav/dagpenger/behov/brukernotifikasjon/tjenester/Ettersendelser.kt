@@ -1,8 +1,12 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
+import java.time.LocalDateTime
+import java.util.*
 
 internal class Ettersendelser(
     private val notifikasjoner: Notifikasjoner,
@@ -13,15 +17,15 @@ internal class Ettersendelser(
         private val logger = KotlinLogging.logger {}
     }
 
-    fun opprettHvisIkkeFinnesFraFør(nyOppgave: Oppgave) {
+    fun sendOppgaveHvisIkkeFinnesFraFør(nyOppgave: Oppgave) {
         val eksisterendeOppgaverForSøknadId = eksisterendeOppgaverForSammeSøknadId(nyOppgave)
 
         if (eksisterendeOppgaverForSøknadId.isEmpty()) {
             notifikasjoner.send(nyOppgave)
-            logger.info("Ny oppgave opprettet.")
+            logger.info { "Ny oppgave opprettet." }
 
         } else {
-            logger.info("Søknaden har alt en eller flere oppgaver knyttet til seg. Antall ${eksisterendeOppgaverForSøknadId.size}")
+            logger.info { "Søknaden har alt en eller flere oppgaver knyttet til seg. Antall: ${eksisterendeOppgaverForSøknadId.size}" }
         }
 
     }
@@ -31,4 +35,44 @@ internal class Ettersendelser(
         return notifikasjonRepository.hentOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
     }
 
+    fun merkerOppgaveSomUtført(utførtEttersending: EttersendingUtført) {
+        val aktiveOppgaverForSøknaden = notifikasjonRepository.hentOppgaver(
+            utførtEttersending.ident,
+            utførtEttersending.søknadId
+        )
+        if (aktiveOppgaverForSøknaden.isEmpty()) {
+            logger.warn { "Det finnes ingen aktive oppgaver for søknadId=${utførtEttersending.søknadId}" }
+            return
+        }
+
+        if (aktiveOppgaverForSøknaden.erFlereEnnEn()) {
+            logger.info { "Det finnes mer enn en aktiv oppgave for denne søknaden. Antall ${aktiveOppgaverForSøknaden.size}. Alle vil bli markert som utført." }
+        }
+        aktiveOppgaverForSøknaden.forEach { oppgave: Oppgave ->
+            val eventId = oppgave.getSnapshot().eventId
+            logger.info { "Skal deaktivere oppgaven med eventId=$eventId" }
+            withLoggingContext("eventId" to eventId.toString()) {
+                notifikasjoner.send(utførtEttersending.somDoneEvent(eventId))
+            }
+        }
+    }
+
+    private fun List<Oppgave>.erFlereEnnEn() = size > 1
+
 }
+
+internal data class EttersendingUtført(
+    val ident: Ident,
+    val søknadId: UUID,
+    private val deaktiveringstidspunkt: LocalDateTime
+) {
+    fun somDoneEvent(eventId: UUID): Done {
+        return Done(
+            eventId = eventId,
+            ident = ident,
+            deaktiveringstidspunkt = deaktiveringstidspunkt,
+            eventtype = Done.Eventtype.OPPGAVE
+        )
+    }
+}
+
