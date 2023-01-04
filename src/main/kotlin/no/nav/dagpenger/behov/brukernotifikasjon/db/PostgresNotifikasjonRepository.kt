@@ -88,14 +88,6 @@ internal class PostgresNotifikasjonRepository(
         )
     )
 
-    override fun hentOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
-        session.run(
-            alleOppgaverQuery(ident).map {
-                it.toOppgave()
-            }.asList
-        )
-    }
-
     override fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
             aktiveOppgaverForKonkretSøknadQuery(ident, søknadId).map {
@@ -113,17 +105,6 @@ internal class PostgresNotifikasjonRepository(
         mapOf(
             "ident" to ident.ident,
             "soknadId" to søknadId
-        )
-    )
-
-    private fun alleOppgaverQuery(ident: Ident) = queryOf( //language=PostgreSQL
-        """SELECT * 
-            FROM oppgave o 
-            JOIN nokkel n ON n.id = o.nokkel
-            WHERE n.ident = :ident
-            """.trimIndent(),
-        mapOf(
-            "ident" to ident.ident,
         )
     )
 

@@ -11,7 +11,5 @@ internal interface NotifikasjonRepository {
     fun lagre(oppgave: Oppgave): Boolean
     fun lagre(done: Done): Boolean
 
-    fun hentOppgaver(ident: Ident): List<Oppgave>
-
     fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave>
 }

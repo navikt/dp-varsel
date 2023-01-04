@@ -15,9 +15,6 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -52,29 +49,6 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Hente oppgaver for en ident`() = withMigratedDb {
-        with(PostgresNotifikasjonRepository(dataSource)) {
-            val ident1 = Ident("12345678901")
-            val expectedOppgave1ForId1 = giveMeOppgave(ident = ident1)
-            val expectedOppgave2ForId1 = giveMeOppgave(ident = ident1)
-            lagre(expectedOppgave1ForId1)
-            lagre(expectedOppgave2ForId1)
-
-            val ident2 = Ident("98765432107")
-            lagre(giveMeOppgave(ident2))
-
-            val oppgaverForId1 = hentOppgaver(ident1)
-            assertEquals(2, oppgaverForId1.size)
-
-            assertNotNull(oppgaverForId1.find { it.getSnapshot().eventId == expectedOppgave1ForId1.getSnapshot().eventId })
-            assertNotNull(oppgaverForId1.find { it.getSnapshot().eventId == expectedOppgave2ForId1.getSnapshot().eventId })
-
-            val oppgaverForId2 = hentOppgaver(ident2)
-            assertEquals(1, oppgaverForId2.size)
-        }
-    }
-
-    @Test
     fun `Hente aktive oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")
@@ -89,8 +63,6 @@ class PostgresNotifikasjonRepositoryTest {
             val aktiveOppgaverTilknyttetSøknaden = hentAktiveOppgaver(ident, expectedSøknadId)
             assertEquals(1, aktiveOppgaverTilknyttetSøknaden.size)
             assertEquals(expectedOppgave1.getSnapshot().eventId, aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId)
-
-            assertEquals(3, hentOppgaver(ident).size)
         }
     }
 
@@ -126,23 +98,21 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Et done-event skal deaktivere et korresponderende oppgave-event`() {
+    fun `Et done-event skal deaktivere et korresponderende aktivt oppgave-event`() {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("98765432101")
             val eventId = UUID.randomUUID()
-            lagre(giveMeOppgave(ident = ident, eventId = eventId))
+            val søknadId = UUID.randomUUID()
+            lagre(giveMeOppgave(ident = ident, eventId = eventId, søknadId = søknadId))
 
-            val oppgaver = hentOppgaver(ident)
+            val oppgaver = hentAktiveOppgaver(ident, søknadId)
             assertEquals(1, oppgaver.size)
-            assertTrue(oppgaver[0].getSnapshot().aktiv)
 
             val doneEventForOppgave = Done(ident = ident, eventId = eventId, Done.Eventtype.OPPGAVE)
-
             lagre(doneEventForOppgave)
 
-            val oppgaverEtterDeaktivering = hentOppgaver(ident)
-            assertEquals(1, oppgaverEtterDeaktivering.size)
-            assertFalse(oppgaverEtterDeaktivering[0].getSnapshot().aktiv)
+            val oppgaverEtterDeaktivering = hentAktiveOppgaver(ident, søknadId)
+            assertEquals(0, oppgaverEtterDeaktivering.size)
         }
     }
 
