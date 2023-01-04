@@ -48,7 +48,7 @@ private val søknadId = UUID.randomUUID()
 val ettersendelseoppgaveBehov = JsonMessage.newNeed(
     behov = listOf("brukernotifikasjon"),
     map = mapOf(
-        "type" to "ettersendingsoppgave",
+        "type" to "ettersending_oppgave",
         "ident" to "12312312312",
         "søknad_uuid" to søknadId
     )

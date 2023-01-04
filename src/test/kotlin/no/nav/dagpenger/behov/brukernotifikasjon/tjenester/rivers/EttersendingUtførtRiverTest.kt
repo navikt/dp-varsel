@@ -39,7 +39,7 @@ class EttersendingUtførtRiverTest {
 val ettersendelseoppgaveUtførtBehov = JsonMessage.newNeed(
     behov = listOf("brukernotifikasjon"),
     map = mapOf(
-        "type" to "ettersendingsoppgave_utført",
+        "type" to "ettersending_done",
         "ident" to "12312312312",
         "søknad_uuid" to UUID.randomUUID()
     )

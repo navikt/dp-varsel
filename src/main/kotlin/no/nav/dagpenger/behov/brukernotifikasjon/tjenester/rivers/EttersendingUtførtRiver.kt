@@ -15,7 +15,7 @@ internal class EttersendingUtførtRiver(
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
-            validate { it.requireValue("type", "ettersendingsoppgave_utført") }
+            validate { it.requireValue("type", "ettersending_done") }
             validate {
                 it.requireKey(
                     "@behovId",
@@ -41,7 +41,7 @@ internal class EttersendingUtførtRiver(
             "behovId" to behovId.toString(),
             "søknadId" to søknadId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: ettersendingsoppgave_utført" }
+            logger.info { "Løser behov for brukernotifikasjon: ettersending_done" }
             ettersendelser.markerOppgaveSomUtført(
                 EttersendingUtført(
                     søknadId = søknadId,
