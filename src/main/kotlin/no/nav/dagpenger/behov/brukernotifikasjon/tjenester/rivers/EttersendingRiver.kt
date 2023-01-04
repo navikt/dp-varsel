@@ -54,7 +54,7 @@ internal class EttersendingRiver(
         ) {
             logger.info { "Løser behov for brukernotifikasjon: ettersendingsoppgave" }
 
-            ettersendelser.sendOppgaveHvisIkkeFinnesFraFør(
+            ettersendelser.opprettOppgave(
                 Oppgave(
                     eventId = behovId,
                     ident = Ident(ident),

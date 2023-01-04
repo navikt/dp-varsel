@@ -17,7 +17,7 @@ internal class Ettersendelser(
         private val logger = KotlinLogging.logger {}
     }
 
-    fun sendOppgaveHvisIkkeFinnesFraFør(nyOppgave: Oppgave) {
+    fun opprettOppgave(nyOppgave: Oppgave) {
         val aktiveOppgaverForSøknadId = eksisterendeAktiveOppgaverForSammeSøknadId(nyOppgave)
 
         if (aktiveOppgaverForSøknadId.isEmpty()) {
@@ -35,7 +35,7 @@ internal class Ettersendelser(
         return notifikasjonRepository.hentAktiveOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
     }
 
-    fun merkerOppgaveSomUtført(utførtEttersending: EttersendingUtført) {
+    fun markerOppgaveSomUtført(utførtEttersending: EttersendingUtført) {
         val aktiveOppgaverForSøknaden = notifikasjonRepository.hentAktiveOppgaver(
             utførtEttersending.ident,
             utførtEttersending.søknadId
@@ -75,4 +75,3 @@ internal data class EttersendingUtført(
         )
     }
 }
-

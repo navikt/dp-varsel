@@ -22,7 +22,7 @@ class EttersendelserTest {
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
-        ettersendelser.sendOppgaveHvisIkkeFinnesFraFør(nyOppgave)
+        ettersendelser.opprettOppgave(nyOppgave)
 
         verify { notifikasjoner.send(any<Oppgave>()) }
     }
@@ -35,7 +35,7 @@ class EttersendelserTest {
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
-        ettersendelser.sendOppgaveHvisIkkeFinnesFraFør(nyOppgave)
+        ettersendelser.opprettOppgave(nyOppgave)
 
         verify(exactly = 0) { notifikasjoner.send(any<Oppgave>()) }
     }
@@ -54,7 +54,7 @@ class EttersendelserTest {
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave)
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
-        ettersendelser.merkerOppgaveSomUtført(utførtEvent)
+        ettersendelser.markerOppgaveSomUtført(utførtEvent)
 
         val verifisertParameter = slot<Done>()
         verify { notifikasjoner.send(capture(verifisertParameter)) }
@@ -79,7 +79,7 @@ class EttersendelserTest {
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave1, oppgave2)
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
-        ettersendelser.merkerOppgaveSomUtført(utførtEvent)
+        ettersendelser.markerOppgaveSomUtført(utførtEvent)
 
         verify { notifikasjoner.send(any<Done>()) }
     }
@@ -95,7 +95,7 @@ class EttersendelserTest {
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns emptyList()
         val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
 
-        ettersendelser.merkerOppgaveSomUtført(utførtEvent)
+        ettersendelser.markerOppgaveSomUtført(utførtEvent)
 
         verify(exactly = 0) { notifikasjoner.send(any<Done>()) }
     }

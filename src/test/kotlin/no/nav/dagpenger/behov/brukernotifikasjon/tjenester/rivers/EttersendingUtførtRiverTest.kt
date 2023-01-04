@@ -31,7 +31,7 @@ class EttersendingUtførtRiverTest {
         rapid.sendTestMessage(ettersendelseoppgaveUtførtBehov.toJson())
 
         verify {
-            ettersendelser.merkerOppgaveSomUtført(any())
+            ettersendelser.markerOppgaveSomUtført(any())
         }
     }
 }

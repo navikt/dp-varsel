@@ -42,7 +42,7 @@ internal class EttersendingUtførtRiver(
             "søknadId" to søknadId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon: ettersendingsoppgave_utført" }
-            ettersendelser.merkerOppgaveSomUtført(
+            ettersendelser.markerOppgaveSomUtført(
                 EttersendingUtført(
                     søknadId = søknadId,
                     ident = ident,

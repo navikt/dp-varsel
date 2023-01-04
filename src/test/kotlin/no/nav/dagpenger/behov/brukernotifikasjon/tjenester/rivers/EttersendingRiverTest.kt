@@ -36,7 +36,7 @@ internal class EttersendingRiverTest {
         val opprettetOppgave = slot<Oppgave>()
 
         verify {
-            ettersendelser.sendOppgaveHvisIkkeFinnesFraFør(capture(opprettetOppgave))
+            ettersendelser.opprettOppgave(capture(opprettetOppgave))
         }
 
         assertContains(opprettetOppgave.captured.getSnapshot().link.toString(), søknadId.toString())
