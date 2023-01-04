@@ -37,7 +37,8 @@ internal class DoneRiver(
         val eventId = packet.eventId()
 
         withLoggingContext(
-            "behovId" to behovId.toString()
+            "behovId" to behovId.toString(),
+            "eventId" to eventId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon: done" }
 
