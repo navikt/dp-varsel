@@ -19,20 +19,20 @@ internal class NotifikasjonBroadcaster(
 
     fun sendBeskjedTilAlleIdenterISecreten(dryRun: Boolean): Oppsummering {
         val identer: List<Ident> = mottakerkilde.hentMottakere()
-        logger.info("Hentet ${identer.size} identer")
+        logger.info { "Hentet ${identer.size} identer" }
         val oppsummering = if (dryRun) {
-            logger.info("Dry run, ville ha produsert ${identer.size} beskjeder.")
+            logger.info { "Dry run, ville ha produsert ${identer.size} beskjeder." }
             Oppsummering(0, 0, identer.size)
         } else {
             identer.sendEnBeskjedTilHver()
         }
 
-        logger.info("Oppsummering: $oppsummering")
+        logger.info { "Oppsummering: $oppsummering" }
         return oppsummering
     }
 
     private fun List<Ident>.sendEnBeskjedTilHver(): Oppsummering {
-        logger.info("Skal produsere beskjeder til $size identer")
+        logger.info { "Skal produsere beskjeder til $size identer" }
         var success = 0
         var feilet = 0
         val tidspunkt = LocalDateTime.now()
@@ -48,11 +48,11 @@ internal class NotifikasjonBroadcaster(
                     URL("https://www.nav.no/arbeid/dagpenger/mine-dagpenger")
                 )
                 notifikasjoner.send(beskjeden)
-                sikkerLogger.info("Sendte beskjed til $ident")
+                sikkerLogger.info { "Sendte beskjed til $ident" }
                 success++
             } catch (e: Exception) {
                 feilet++
-                sikkerLogger.warn("Klarte ikke å sende beskjeden til $ident", e)
+                sikkerLogger.warn(e) { "Klarte ikke å sende beskjeden til $ident" }
             }
         }
         return Oppsummering(success, feilet, size)
