@@ -1,9 +1,11 @@
-package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.helse.rapids_rivers.*
 import java.util.*
 

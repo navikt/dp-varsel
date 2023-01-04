@@ -1,29 +1,29 @@
-package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.helse.rapids_rivers.*
 import java.net.URL
 import java.util.*
 
-internal class OppgaveRiver(
+internal class EttersendingRiver(
     rapidsConnection: RapidsConnection,
-    private val notifikasjoner: Notifikasjoner
+    private val ettersendelser: Ettersendelser
 ) : River.PacketListener {
+
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
-            validate { it.requireValue("type", "oppgave") }
+            validate { it.requireValue("type", "ettersendingsoppgave") }
             validate {
                 it.requireKey(
                     "@behovId",
                     "@opprettet",
                     "ident",
-                    "tekst",
-                    "link",
                     "søknad_uuid"
                 )
             }
@@ -40,29 +40,33 @@ internal class OppgaveRiver(
         val logger = KotlinLogging.logger { }
     }
 
+    private val ingressForSøknadsdialogen = "https://arbeid.dev.nav.no/dagpenger/dialog/soknad"
+    private val oppgavetekst = "Du må ettersende et eller flere vedlegg til din søknad om Dagpenger"
+
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val behovId = packet["@behovId"].asUUID()
         val ident = packet["ident"].asText()
         val søknadId = packet.søknadUUID()
 
         withLoggingContext(
-            "behovId" to behovId.toString()
+            "behovId" to behovId.toString(),
+            "søknadId" to søknadId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: oppgave" }
+            logger.info { "Løser behov for brukernotifikasjon: ettersendingsoppgave" }
 
-            notifikasjoner.send(
+            ettersendelser.opprettHvisIkkeFinnesFraFør(
                 Oppgave(
                     eventId = behovId,
                     ident = Ident(ident),
-                    tekst = packet["tekst"].asText(),
+                    tekst = oppgavetekst,
                     opprettet = packet["@opprettet"].asLocalDateTime(),
-                    link = packet["link"].asUrl(),
+                    link = urlTilKvitteringssiden(søknadId),
                     søknadId = søknadId
                 )
             )
         }
     }
-}
 
-internal fun JsonNode.asUrl() = URL(asText())
-internal fun JsonMessage.søknadUUID() = this["søknad_uuid"].asText().let { UUID.fromString(it) }
+    private fun urlTilKvitteringssiden(søknadId: UUID) = URL("$ingressForSøknadsdialogen/$søknadId/kvittering")
+
+}

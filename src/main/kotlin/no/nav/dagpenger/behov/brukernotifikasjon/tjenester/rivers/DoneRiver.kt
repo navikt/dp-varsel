@@ -1,8 +1,10 @@
-package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
+package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.helse.rapids_rivers.*
 import java.util.*
 
