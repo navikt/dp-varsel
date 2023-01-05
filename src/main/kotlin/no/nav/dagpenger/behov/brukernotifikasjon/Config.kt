@@ -16,3 +16,6 @@ val brukernotifikasjon_beskjed_topic by stringType
 val brukernotifikasjon_oppgave_topic by stringType
 val brukernotifikasjon_done_topic by stringType
 val soknadsdialogens_url by uriType
+val nais_cluster_name by stringType
+
+fun runningInDev() = config[nais_cluster_name].equals("dev-gcp", ignoreCase = true)
