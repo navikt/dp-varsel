@@ -7,7 +7,6 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.Postgres.withMigratedDb
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -84,12 +83,13 @@ class PostgresNotifikasjonRepositoryTest {
     @Test
     fun `duplikate nøkler feiler for oppgave`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
-            val uuid = UUID.randomUUID()
+            val eventId = UUID.randomUUID()
             val søknadId = UUID.randomUUID()
-            lagre(Oppgave(Ident("12345678901"), uuid, URL("https://dummyOppgave"), "oppgavetekst", søknadId))
+            val oppgaveMedSammeIdEr = giveMeOppgave(eventId = eventId, søknadId = søknadId)
+            lagre(oppgaveMedSammeIdEr)
 
             assertThrows<IllegalArgumentException> {
-                lagre(Oppgave(Ident("12345678901"), uuid, URL("https://dummyOppgave"), "oppgavetekst", søknadId))
+                lagre(oppgaveMedSammeIdEr)
             }
 
             assertEquals(1, getAntallRader("nokkel"))

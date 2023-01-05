@@ -40,19 +40,6 @@ internal data class Oppgave(
         null
     )
 
-    constructor(ident: Ident, eventId: UUID, link: URL, tekst: String, søknadId: UUID) : this(
-        ident,
-        eventId,
-        tekst,
-        LocalDateTime.now(),
-        3,
-        false,
-        link,
-        søknadId,
-        null,
-        true
-    )
-
     override fun getNøkkel() = Nøkkel(eventId, ident)
     override fun getMelding() = this
     override fun lagre(repository: NotifikasjonRepository) = repository.lagre(this)
