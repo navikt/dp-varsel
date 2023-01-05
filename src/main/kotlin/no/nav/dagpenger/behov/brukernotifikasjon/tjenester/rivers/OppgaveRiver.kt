@@ -48,7 +48,8 @@ internal class OppgaveRiver(
         val søknadId = packet.søknadUUID()
 
         withLoggingContext(
-            "behovId" to behovId.toString()
+            "behovId" to behovId.toString(),
+            "søknadId" to søknadId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon: oppgave" }
 
