@@ -52,6 +52,7 @@ internal data class Oppgave(
             withPrefererteKanaler(PreferertKanal.SMS)
         }
         withLink(link)
+        // TODO: Spesifiser synlig fram til
     }.build()
 
     fun getSnapshot() = OppgaveSnapshot(this)
