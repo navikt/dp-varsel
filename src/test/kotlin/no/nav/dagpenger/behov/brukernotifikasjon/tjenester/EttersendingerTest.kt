@@ -13,16 +13,16 @@ import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
-class EttersendelserTest {
+class EttersendingerTest {
 
     @Test
     fun `Skal opprette ny oppgave kun hvis det ikke finnes en oppgave for søknaden fra før`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
-        val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
-        ettersendelser.opprettOppgave(nyOppgave)
+        ettersendinger.opprettOppgave(nyOppgave)
 
         verify { notifikasjoner.send(any<Oppgave>()) }
     }
@@ -32,10 +32,10 @@ class EttersendelserTest {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(giveMeOppgave())
-        val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
-        ettersendelser.opprettOppgave(nyOppgave)
+        ettersendinger.opprettOppgave(nyOppgave)
 
         verify(exactly = 0) { notifikasjoner.send(any<Oppgave>()) }
     }
@@ -52,9 +52,9 @@ class EttersendelserTest {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave)
-        val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
-        ettersendelser.markerOppgaveSomUtført(utførtEvent)
+        ettersendinger.markerOppgaveSomUtført(utførtEvent)
 
         val verifisertParameter = slot<Done>()
         verify { notifikasjoner.send(capture(verifisertParameter)) }
@@ -77,9 +77,9 @@ class EttersendelserTest {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave1, oppgave2)
-        val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
-        ettersendelser.markerOppgaveSomUtført(utførtEvent)
+        ettersendinger.markerOppgaveSomUtført(utførtEvent)
 
         verify { notifikasjoner.send(any<Done>()) }
     }
@@ -93,9 +93,9 @@ class EttersendelserTest {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns emptyList()
-        val ettersendelser = Ettersendelser(notifikasjoner, notifikasjonRepo)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
-        ettersendelser.markerOppgaveSomUtført(utførtEvent)
+        ettersendinger.markerOppgaveSomUtført(utførtEvent)
 
         verify(exactly = 0) { notifikasjoner.send(any<Done>()) }
     }

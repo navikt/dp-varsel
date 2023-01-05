@@ -4,7 +4,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
@@ -14,10 +14,10 @@ import java.util.*
 import kotlin.test.assertContains
 
 internal class EttersendingOppgaveRiverTest {
-    private val ettersendelser = mockk<Ettersendelser>(relaxed = true)
+    private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingOppgaveRiver(this, ettersendelser, URL("https://dummyUrl"))
+            EttersendingOppgaveRiver(this, ettersendinger, URL("https://dummyUrl"))
         }
     }
 
@@ -37,7 +37,7 @@ internal class EttersendingOppgaveRiverTest {
         val opprettetOppgave = slot<Oppgave>()
 
         verify {
-            ettersendelser.opprettOppgave(capture(opprettetOppgave))
+            ettersendinger.opprettOppgave(capture(opprettetOppgave))
         }
 
         assertContains(opprettetOppgave.captured.getSnapshot().link.toString(), søknadId.toString())

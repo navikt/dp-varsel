@@ -8,7 +8,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import java.time.LocalDateTime
 import java.util.*
 
-internal class Ettersendelser(
+internal class Ettersendinger(
     private val notifikasjoner: Notifikasjoner,
     private val notifikasjonRepository: NotifikasjonRepository
 ) {

@@ -2,7 +2,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test
 import java.util.*
 
 class EttersendingDoneRiverTest {
-    private val ettersendelser = mockk<Ettersendelser>(relaxed = true)
+    private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingDoneRiver(this, ettersendelser)
+            EttersendingDoneRiver(this, ettersendinger)
         }
     }
 
@@ -31,7 +31,7 @@ class EttersendingDoneRiverTest {
         rapid.sendTestMessage(ettersendelseoppgaveUtførtBehov.toJson())
 
         verify {
-            ettersendelser.markerOppgaveSomUtført(any())
+            ettersendinger.markerOppgaveSomUtført(any())
         }
     }
 }

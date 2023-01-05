@@ -3,7 +3,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.helse.rapids_rivers.*
 import java.net.URL
@@ -11,7 +11,7 @@ import java.util.*
 
 internal class EttersendingOppgaveRiver(
     rapidsConnection: RapidsConnection,
-    private val ettersendelser: Ettersendelser,
+    private val ettersendinger: Ettersendinger,
     private val soknadsdialogensUrl: URL
 ) : River.PacketListener {
 
@@ -54,7 +54,7 @@ internal class EttersendingOppgaveRiver(
         ) {
             logger.info { "Løser behov for brukernotifikasjon: ettersending_oppgave" }
 
-            ettersendelser.opprettOppgave(
+            ettersendinger.opprettOppgave(
                 Oppgave(
                     eventId = behovId,
                     ident = Ident(ident),

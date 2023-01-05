@@ -2,14 +2,14 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import mu.KotlinLogging
 import mu.withLoggingContext
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendelser
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.EttersendingUtført
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.helse.rapids_rivers.*
 
 internal class EttersendingDoneRiver(
     rapidsConnection: RapidsConnection,
-    private val ettersendelser: Ettersendelser
+    private val ettersendinger: Ettersendinger
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -42,7 +42,7 @@ internal class EttersendingDoneRiver(
             "søknadId" to søknadId.toString()
         ) {
             logger.info { "Løser behov for brukernotifikasjon: ettersending_done" }
-            ettersendelser.markerOppgaveSomUtført(
+            ettersendinger.markerOppgaveSomUtført(
                 EttersendingUtført(
                     søknadId = søknadId,
                     ident = ident,
