@@ -11,7 +11,8 @@ import java.util.*
 
 internal class EttersendingOppgaveRiver(
     rapidsConnection: RapidsConnection,
-    private val ettersendelser: Ettersendelser
+    private val ettersendelser: Ettersendelser,
+    private val soknadsdialogensUrl: URL
 ) : River.PacketListener {
 
     init {
@@ -40,7 +41,6 @@ internal class EttersendingOppgaveRiver(
         val logger = KotlinLogging.logger { }
     }
 
-    private val ingressForSøknadsdialogen = "https://arbeid.dev.nav.no/dagpenger/dialog/soknad"
     private val oppgavetekst = "Du må ettersende et eller flere vedlegg til din søknad om Dagpenger"
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
@@ -67,6 +67,6 @@ internal class EttersendingOppgaveRiver(
         }
     }
 
-    private fun urlTilEttersendingssiden(søknadId: UUID) = URL("$ingressForSøknadsdialogen/$søknadId/ettersending")
+    private fun urlTilEttersendingssiden(søknadId: UUID) = URL("$soknadsdialogensUrl/soknad/$søknadId/ettersending")
 
 }

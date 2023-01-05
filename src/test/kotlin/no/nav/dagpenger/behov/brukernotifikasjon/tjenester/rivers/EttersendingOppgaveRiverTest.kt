@@ -9,6 +9,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import java.net.URL
 import java.util.*
 import kotlin.test.assertContains
 
@@ -16,7 +17,7 @@ internal class EttersendingOppgaveRiverTest {
     private val ettersendelser = mockk<Ettersendelser>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingOppgaveRiver(this, ettersendelser)
+            EttersendingOppgaveRiver(this, ettersendelser, URL("https://dummyUrl"))
         }
     }
 

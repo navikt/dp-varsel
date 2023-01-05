@@ -15,3 +15,4 @@ val nais_namespace by stringType
 val brukernotifikasjon_beskjed_topic by stringType
 val brukernotifikasjon_oppgave_topic by stringType
 val brukernotifikasjon_done_topic by stringType
+val soknadsdialogens_url by uriType
