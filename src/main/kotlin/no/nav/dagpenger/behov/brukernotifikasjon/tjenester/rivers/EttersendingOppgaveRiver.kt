@@ -41,7 +41,7 @@ internal class EttersendingOppgaveRiver(
         val logger = KotlinLogging.logger { }
     }
 
-    private val oppgavetekst = "Du må ettersende et eller flere vedlegg til din søknad om Dagpenger"
+    private val oppgavetekst = "Vi mangler dokumentasjon for å kunne behandle søknaden din om dagpenger. Ettersend her."
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val behovId = packet["@behovId"].asUUID()
