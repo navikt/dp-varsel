@@ -18,8 +18,7 @@ internal class EttersendingOppgaveRiver(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
-            validate { it.requireValue("type", "ettersending_oppgave") }
+            validate { it.demandAllOrAny("@behov", listOf("OppgaveOmEttersending")) }
             validate {
                 it.requireKey(
                     "@behovId",
@@ -52,7 +51,7 @@ internal class EttersendingOppgaveRiver(
             "behovId" to behovId.toString(),
             "søknadId" to søknadId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: ettersending_oppgave" }
+            logger.info { "Løser behov for brukernotifikasjon: OppgaveOmEttersending" }
 
             ettersendinger.opprettOppgave(
                 Oppgave(
