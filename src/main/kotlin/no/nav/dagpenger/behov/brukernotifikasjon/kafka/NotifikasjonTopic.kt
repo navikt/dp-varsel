@@ -17,12 +17,12 @@ internal class NotifikasjonTopic<T : SpecificRecord> constructor(
     private val topic: String
 ) {
     companion object {
-        private val logger = KotlinLogging.logger {}
+        private val sikkerLogger = KotlinLogging.logger("tjenestekall")
     }
 
     fun publiser(nøkkel: Nøkkel, melding: NotifikasjonMelding<T>) {
         producer.send(ProducerRecord(topic, nøkkel.somInput(), melding.somInput()))
-            .also { logger.info { "Sender ut $melding til $nøkkel" } }
+            .also { sikkerLogger.info { "Sender ut $melding til $nøkkel" } }
     }
 }
 
