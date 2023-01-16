@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import java.net.URL
 import java.util.*
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 
 internal class EttersendingOppgaveRiverTest {
     private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
@@ -40,7 +41,12 @@ internal class EttersendingOppgaveRiverTest {
             ettersendinger.opprettOppgave(capture(opprettetOppgave))
         }
 
-        assertContains(opprettetOppgave.captured.getSnapshot().link.toString(), søknadId.toString())
+        val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
+        assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
+
+        val løsning = rapid.inspektør.message(0)["@løsning"]
+        val eventIdForOpprettetOppgave = løsning["OppgaveOmEttersending"]["eventId"]
+        assertEquals(snapshotAvOpprettetOppgave.eventId.toString(), eventIdForOpprettetOppgave.asText())
     }
 
     @Test

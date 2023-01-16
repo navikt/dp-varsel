@@ -15,10 +15,12 @@ internal class EttersendingOppgaveRiver(
     private val soknadsdialogensUrl: URL
 ) : River.PacketListener {
 
+    private val behov = "OppgaveOmEttersending"
+
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf("OppgaveOmEttersending")) }
+            validate { it.demandAllOrAny("@behov", listOf(behov)) }
             validate {
                 it.requireKey(
                     "@behovId",
@@ -52,18 +54,24 @@ internal class EttersendingOppgaveRiver(
             "behovId" to behovId.toString(),
             "søknadId" to søknadId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: OppgaveOmEttersending" }
+            logger.info { "Løser behov for brukernotifikasjon: $behov" }
 
-            ettersendinger.opprettOppgave(
-                Oppgave(
-                    eventId = behovId,
-                    ident = Ident(ident),
-                    tekst = oppgavetekst,
-                    opprettet = packet["@opprettet"].asLocalDateTime(),
-                    link = urlTilEttersendingssiden(søknadId),
-                    søknadId = søknadId
+            val nyOppgave = Oppgave(
+                eventId = behovId,
+                ident = Ident(ident),
+                tekst = oppgavetekst,
+                opprettet = packet["@opprettet"].asLocalDateTime(),
+                link = urlTilEttersendingssiden(søknadId),
+                søknadId = søknadId
+            )
+            ettersendinger.opprettOppgave(nyOppgave)
+
+            packet["@løsning"] = mapOf(
+                behov to mapOf(
+                    "eventId" to nyOppgave.getSnapshot().eventId
                 )
             )
+            context.publish(packet.toJson())
         }
     }
 

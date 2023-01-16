@@ -11,10 +11,13 @@ internal class EttersendingDoneRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger
 ) : River.PacketListener {
+
+    private val behov = "OppgaveOmEttersendingLøst"
+
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf("OppgaveOmEttersendingLøst")) }
+            validate { it.demandAllOrAny("@behov", listOf(behov)) }
             validate {
                 it.requireKey(
                     "@behovId",
@@ -40,14 +43,21 @@ internal class EttersendingDoneRiver(
             "behovId" to behovId.toString(),
             "søknadId" to søknadId.toString()
         ) {
-            logger.info { "Løser behov for brukernotifikasjon: OppgaveOmEttersendingLøst" }
-            ettersendinger.markerOppgaveSomUtført(
-                EttersendingUtført(
-                    søknadId = søknadId,
-                    ident = ident,
-                    deaktiveringstidspunkt = packet["@opprettet"].asLocalDateTime(),
+            logger.info { "Løser behov for brukernotifikasjon: $behov" }
+
+            val doneEvent = EttersendingUtført(
+                søknadId = søknadId,
+                ident = ident,
+                deaktiveringstidspunkt = packet["@opprettet"].asLocalDateTime(),
+            )
+            val deaktiverteOppgaver = ettersendinger.markerOppgaveSomUtført(doneEvent)
+
+            packet["@løsning"] = mapOf(
+                behov to mapOf(
+                    "deaktiverteOppgaver" to deaktiverteOppgaver
                 )
             )
+            context.publish(packet.toJson())
         }
     }
 }

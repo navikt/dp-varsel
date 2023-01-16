@@ -35,26 +35,29 @@ internal class Ettersendinger(
         return notifikasjonRepository.hentAktiveOppgaver(snapshotAvNyOppgave.ident, snapshotAvNyOppgave.søknadId)
     }
 
-    fun markerOppgaveSomUtført(utførtEttersending: EttersendingUtført) {
+    fun markerOppgaveSomUtført(utførtEttersending: EttersendingUtført): List<UUID> {
         val aktiveOppgaverForSøknaden = notifikasjonRepository.hentAktiveOppgaver(
             utførtEttersending.ident,
             utførtEttersending.søknadId
         )
         if (aktiveOppgaverForSøknaden.isEmpty()) {
             logger.warn { "Det finnes ingen aktive oppgaver for søknadId=${utførtEttersending.søknadId}" }
-            return
+            return emptyList()
         }
 
         if (aktiveOppgaverForSøknaden.erFlereEnnEn()) {
             logger.info { "Det finnes mer enn en aktiv oppgave for denne søknaden. Antall ${aktiveOppgaverForSøknaden.size}. Alle vil bli markert som utført." }
         }
+        val deaktiverteOppgaver = mutableListOf<UUID>()
         aktiveOppgaverForSøknaden.forEach { oppgave: Oppgave ->
             val eventId = oppgave.getSnapshot().eventId
             logger.info { "Skal deaktivere oppgaven med eventId=$eventId" }
             withLoggingContext("eventId" to eventId.toString()) {
                 notifikasjoner.send(utførtEttersending.somDoneEvent(eventId))
+                deaktiverteOppgaver.add(eventId)
             }
         }
+        return deaktiverteOppgaver.toList()
     }
 
     private fun List<Oppgave>.erFlereEnnEn() = size > 1
