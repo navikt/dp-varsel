@@ -42,6 +42,16 @@ internal class EttersendingOppgaveRiverTest {
 
         assertContains(opprettetOppgave.captured.getSnapshot().link.toString(), søknadId.toString())
     }
+
+    @Test
+    fun `skal ignorere behov som har løsning fra før`() {
+        rapid.sendTestMessage(ettersendelseoppgaveBehovMedLøsning.toJson())
+
+        verify(exactly = 0) {
+            ettersendinger.opprettOppgave(any())
+        }
+    }
+
 }
 
 private val søknadId = UUID.randomUUID()
@@ -51,5 +61,14 @@ val ettersendelseoppgaveBehov = JsonMessage.newNeed(
     map = mapOf(
         "ident" to "12312312312",
         "søknad_uuid" to søknadId
+    )
+)
+
+val ettersendelseoppgaveBehovMedLøsning = JsonMessage.newNeed(
+    behov = listOf("OppgaveOmEttersending"),
+    map = mapOf(
+        "ident" to "12312312312",
+        "søknad_uuid" to UUID.randomUUID(),
+        "@løsning" to """{"dummy": "løsning"}"""
     )
 )

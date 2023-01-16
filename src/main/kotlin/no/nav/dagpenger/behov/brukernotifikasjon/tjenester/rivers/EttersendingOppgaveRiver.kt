@@ -27,6 +27,7 @@ internal class EttersendingOppgaveRiver(
                     "søknad_uuid"
                 )
             }
+            validate { it.rejectKey("@løsning") }
 
             validate {
                 it.interestedIn(
