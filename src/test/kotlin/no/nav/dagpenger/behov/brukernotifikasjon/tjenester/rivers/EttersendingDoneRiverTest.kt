@@ -42,6 +42,16 @@ class EttersendingDoneRiverTest {
         assertEquals(1, deaktiverteOppgaver.size())
         assertEquals(expectedDeaktiverteOppgaver[0].toString(), deaktiverteOppgaver[0].asText())
     }
+
+    @Test
+    fun `skal ignorere behov som har løsning fra før`() {
+        rapid.sendTestMessage(ettersendelseoppgaveUtførtBehovMedLøsning.toJson())
+
+        verify(exactly = 0) {
+            ettersendinger.markerOppgaveSomUtført(any())
+        }
+    }
+
 }
 
 val ettersendelseoppgaveUtførtBehov = JsonMessage.newNeed(
@@ -49,5 +59,14 @@ val ettersendelseoppgaveUtførtBehov = JsonMessage.newNeed(
     map = mapOf(
         "ident" to "12312312312",
         "søknad_uuid" to UUID.randomUUID()
+    )
+)
+
+val ettersendelseoppgaveUtførtBehovMedLøsning = JsonMessage.newNeed(
+    behov = listOf("OppgaveOmEttersendingLøst"),
+    map = mapOf(
+        "ident" to "12312312312",
+        "søknad_uuid" to UUID.randomUUID(),
+        "@løsning" to """{"dummy": "løsning"}"""
     )
 )

@@ -26,6 +26,7 @@ internal class EttersendingDoneRiver(
                     "søknad_uuid"
                 )
             }
+            validate { it.rejectKey("@løsning") }
 
         }.register(this)
     }
