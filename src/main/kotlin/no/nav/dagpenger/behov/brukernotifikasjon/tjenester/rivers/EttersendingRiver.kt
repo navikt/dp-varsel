@@ -58,12 +58,12 @@ internal class EttersendingRiver(
             if (kravene.venterPåEttersendinger()) {
                 logger.info { "Fant kandidat for å opprette oppgave om ettersending" }
                 val nyOppgave = lagOppgave(hendelseId, ident, opprettet, søknadId)
-                ettersendinger.opprettOppgave(nyOppgave)
+//                ettersendinger.opprettOppgave(nyOppgave)
 
             } else {
                 logger.info { "Fant kandidat for å deaktivere oppgave om ettersending" }
                 val doneEvent = lagDoneEvent(søknadId, ident, opprettet)
-                ettersendinger.markerOppgaveSomUtført(doneEvent)
+                //ettersendinger.markerOppgaveSomUtført(doneEvent)
             }
 
         }

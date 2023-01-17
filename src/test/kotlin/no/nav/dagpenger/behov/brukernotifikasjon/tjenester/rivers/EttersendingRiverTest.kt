@@ -9,6 +9,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.net.URL
 import java.util.*
@@ -31,6 +32,7 @@ internal class EttersendingRiverTest {
         rapid.reset()
     }
 
+    @Disabled
     @Test
     fun `skal publisere oppgave hvis minst et dokumentkrav skal sendes senere`() {
         val event = dokumentkravInnsendtEventMedKrav(
@@ -48,6 +50,7 @@ internal class EttersendingRiverTest {
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
     }
 
+    @Disabled
     @Test
     fun `skal publisere deaktivere oppgave hvis ingen flere av dokumentkravene skal sendes senere`() {
         val eventUtenUteståendeKrav = dokumentkravInnsendtEventMedKrav(
