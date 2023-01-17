@@ -1,29 +1,28 @@
 @startuml
 
 autonumber
-
-"dp-soknadsdialog" -> "dp-soknad": En søknad er utfylt, men mangler vedlegg
-"dp-soknad" -> "dp-behov-brukernotifikasjon": **behov: OppgaveOmEttersending**
-"dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon-db": Finnes det alt en ettersendingsoppgave for denne søknaden?
-
-opt Det finnes ikke en oppgave fra før
-    "dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon-db": lagrer oppgave i egen db
-    "dp-behov-brukernotifikasjon" -> "Min Side": sender oppgave
-end
-
-|||
-alt Bruker fullfører selv søknaden ved å sende inn alle vedlegg
-    |||
-    loop
-        "dp-soknadsdialog" -> "dp-soknad": laster opp vedlegg
-        "dp-soknad" -> "dp-soknad": er alle vedlegg lastet opp for denne søknaden?
-        opt "Alle vedlegg er faktisk lastet opp"
-            "dp-soknad" -> "dp-behov-brukernotifikasjon": **behov: OppgaveOmEttersendingLøst**
+alt Bruker fullfører søknaden selv, ved å sende inn alle vedlegg
+loop
+    "dp-soknad" -> "dp-behov-brukernotifikasjon": DokumentkravInnsendtEvent
+    "dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon": Har eventet dokumentkrav som skal sendes senere?
+    alt "Ja, har dokumentkrav som skal sendes senrere"
+        "dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon-db": Finnes det alt en ettersendingsoppgave for denne søknaden?
+        |||
+        opt "Nei, det finnes ikke en oppgave fra før"
+            "dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon-db": lagrer oppgave i egen db
+            "dp-behov-brukernotifikasjon" -> "Min Side": sender oppgave
+        end
+        |||
+    else "Nei, har ikke dokumentkrav som skal ettersendes"
+        |||
+        "dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon-db": Finnes det en ettersendingsoppgave for denne søknaden?
+        opt "Ja, har en aktiv oppgave fra før"
             "dp-behov-brukernotifikasjon" -> "dp-behov-brukernotifikasjon-db": marker som done
             "dp-behov-brukernotifikasjon" -> "Min Side": sender done for oppgaven
         end
     end
-    |||
+end
+|||
 else Det kommer et avslag eller vedtak, før alle vedlegg er sendt inn for en av søknadene til bruker
     "Arena" -> "dp-behov-brukernotifikasjon": **behov AlleOppgaverOmEttersendingLøst**, deaktiver alle oppgaver for denne brukeren
     loop Deaktiver alle aktive oppgaver for denne brukeren

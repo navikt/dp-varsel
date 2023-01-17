@@ -16,8 +16,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.KubernetesScretsMotta
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcaster
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.EttersendingDoneRiver
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.EttersendingOppgaveRiver
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.EttersendingRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -83,8 +82,7 @@ fun main() {
             BeskjedRiver(rapidsConnection, notifikasjoner)
             if(runningInDev()) {
                 logger.info { "Appen kjører i dev, aktiverer rivers for ettersending" }
-                EttersendingDoneRiver(rapidsConnection, ettersendinger)
-                EttersendingOppgaveRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
+                EttersendingRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
             }
         }.start()
 }
