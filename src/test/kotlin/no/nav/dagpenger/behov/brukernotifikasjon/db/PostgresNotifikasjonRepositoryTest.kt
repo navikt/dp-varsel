@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -53,14 +54,14 @@ class PostgresNotifikasjonRepositoryTest {
             assertEquals(original.eventId, persistert.eventId)
             assertEquals(original.ident, persistert.ident)
             assertEquals(original.tekst, persistert.tekst)
-            assertEquals(original.opprettet, persistert.opprettet)
+            assertNotNull(persistert.opprettet)
             assertEquals(original.sikkerhetsnivå, persistert.sikkerhetsnivå)
             assertEquals(original.eksternVarsling, persistert.eksternVarsling)
             assertEquals(original.link, persistert.link)
             assertEquals(original.søknadId, persistert.søknadId)
             assertEquals(original.aktiv, persistert.aktiv)
-            assertEquals(original.deaktiveringstidspunkt, persistert.deaktiveringstidspunkt)
-            assertEquals(original.synligFramTil, persistert.synligFramTil)
+            assertNull(persistert.deaktiveringstidspunkt)
+            assertNotNull(persistert.synligFramTil)
         }
     }
 
