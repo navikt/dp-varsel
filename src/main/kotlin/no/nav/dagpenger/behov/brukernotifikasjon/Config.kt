@@ -6,7 +6,7 @@ import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 val config = EnvironmentVariables() overriding
     systemProperties() overriding
     ConfigurationMap(
-        "nais_app_name" to "dp-behov-brukernotifikasjon",
+        "nais_app_name" to "dp-varsel",
         "nais_namespace" to "teamdagpenger"
     )
 

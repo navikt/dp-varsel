@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: dp-behov-brukernotifikasjon
+  name: dp-varsel
   namespace: teamdagpenger
   labels:
     team: teamdagpenger
@@ -13,7 +13,7 @@ spec:
     enabled: true
   env:
     - name: KAFKA_CONSUMER_GROUP_ID
-      value: dp-behov-brukernotifikasjon
+      value: dp-varsel
     - name: KAFKA_RAPID_TOPIC
       value: teamdagpenger.rapid.v1
     - name: KAFKA_RESET_POLICY
@@ -28,7 +28,7 @@ spec:
       value: {{soknadsdialogens_url}}
   gcp:
     sqlInstances:
-      - name: dp-brukernotifikasjoner
+      - name: dp-varseler
         type: POSTGRES_14
         tier: db-custom-1-3840
         cascadingDelete: false
@@ -36,7 +36,7 @@ spec:
         autoBackupHour: 1
         databases:
           - envVarPrefix: DB
-            name: brukernotifikasjoner
+            name: varsler
         diskAutoresize: true
         diskSize: 10
         diskType: SSD

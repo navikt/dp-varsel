@@ -1,4 +1,4 @@
-# dp-behov-brukernotifkasjon
+# dp-varsel
 
 Denne appen kan produsere brukernotifikasjoner som vises på Min Side og i Dekoratøren.
 
@@ -26,7 +26,7 @@ Denne beskjeden går ut til alle brukere som er definert i kubernetes secret-en
    ```
    F.eks. i dev kan de gjøres slik:
    ```bash
-   curl --location --request POST 'https://dp-behov-brukernotifikasjon.dev.intern.nav.no/internal/broadcast' \
+   curl --location --request POST 'https://dp-varsel.dev.intern.nav.no/internal/broadcast' \
     --header 'Content-Type: application/json' \
     --data-raw '{ "dryRun": true }'
    ```

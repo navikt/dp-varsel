@@ -1,1 +1,1 @@
-rootProject.name = "dp-behov-brukernotifikasjon"
+rootProject.name = "dp-varsel"
