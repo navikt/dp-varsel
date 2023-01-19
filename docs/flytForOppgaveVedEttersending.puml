@@ -2,26 +2,31 @@
 
 autonumber
 alt Bruker fullfører søknaden selv, ved å sende inn alle vedlegg
-loop
-    "dp-soknad" -> "dp-varsel": DokumentkravInnsendtEvent
-    "dp-varsel" -> "dp-varsel": Har eventet dokumentkrav som skal sendes senere?
-    alt "Ja, har dokumentkrav som skal sendes senrere"
-        "dp-varsel" -> "dp-varsel-db": Finnes det alt en ettersendingsoppgave for denne søknaden?
-        |||
-        opt "Nei, det finnes ikke en oppgave fra før"
-            "dp-varsel" -> "dp-varsel-db": lagrer oppgave i egen db
-            "dp-varsel" -> "Min Side": sender oppgave
-        end
-        |||
-    else "Nei, har ikke dokumentkrav som skal ettersendes"
-        |||
-        "dp-varsel" -> "dp-varsel-db": Finnes det en ettersendingsoppgave for denne søknaden?
-        opt "Ja, har en aktiv oppgave fra før"
-            "dp-varsel" -> "dp-varsel-db": marker som done
-            "dp-varsel" -> "Min Side": sender done for oppgaven
+    loop
+        "dp-soknad" -> "dp-varsel": DokumentkravInnsendtEvent
+        "dp-varsel" -> "dp-varsel": Har eventet dokumentkrav som skal sendes senere?
+        alt "Ja, har dokumentkrav som skal sendes senrere"
+            "dp-varsel" -> "dp-varsel-db": Finnes det alt en ettersendingsoppgave for denne søknaden?
+            |||
+            opt "Nei, det finnes ikke en oppgave fra før"
+                "dp-varsel" -> "dp-varsel-db": lagrer oppgave i egen db
+                "dp-varsel" -> "Min Side": sender oppgave
+            end
+            |||
+        else "Nei, har ikke dokumentkrav som skal ettersendes"
+            |||
+            "dp-varsel" -> "dp-varsel-db": Finnes det en ettersendingsoppgave for denne søknaden?
+            opt "Ja, har en aktiv oppgave fra før"
+                "dp-varsel" -> "dp-varsel-db": marker som done
+                "dp-varsel" -> "Min Side": sender done for oppgaven
+            end
         end
     end
-end
+|||
+else Automatisk avslag
+    "AvslagPåMinsteInntekt" -> "dp-varsel": Avslag, send done-event for konkret søknad
+    "dp-varsel" -> "dp-varsel-db": marker oppgaven som done
+    "dp-varsel" -> "Min Side": sender done for oppgaven til denne brukeren
 |||
 else Det kommer et avslag eller vedtak, før alle vedlegg er sendt inn for en av søknadene til bruker
     "Arena" -> "dp-varsel": **behov AlleOppgaverOmEttersendingLøst**, deaktiver alle oppgaver for denne brukeren
