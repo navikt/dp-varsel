@@ -24,7 +24,7 @@ alt Bruker fullfører søknaden selv, ved å sende inn alle vedlegg
     end
 |||
 else Automatisk avslag
-    "AvslagPåMinsteInntekt" -> "dp-varsel": Avslag, send done-event for konkret søknad
+    "AutomatiskAvslag" -> "dp-varsel": Avslag basert på minsteinntekt eller alder, send done-event for konkret søknad
     "dp-varsel" -> "dp-varsel-db": marker oppgaven som done
     "dp-varsel" -> "Min Side": sender done for oppgaven til denne brukeren
 |||
