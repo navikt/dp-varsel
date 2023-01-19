@@ -53,6 +53,7 @@ internal class Ettersendinger(
             logger.info { "Skal deaktivere oppgaven med eventId=$eventId" }
             withLoggingContext("eventId" to eventId.toString()) {
                 notifikasjoner.send(utførtEttersending.somDoneEvent(eventId))
+                logger.info { "Oppgaven har blitt deaktivert." }
             }
         }
     }
