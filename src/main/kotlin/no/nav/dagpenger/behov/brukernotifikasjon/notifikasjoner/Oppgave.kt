@@ -25,10 +25,19 @@ internal data class Oppgave(
     private val link: URL,
     private val søknadId: UUID,
     private val deaktiveringstidspunkt: LocalDateTime?,
+    private val synligFramTil : LocalDateTime,
     private val aktiv: Boolean = true
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
 
-    constructor(ident: Ident, eventId: UUID, tekst: String, opprettet: LocalDateTime, link: URL, søknadId: UUID) : this(
+    constructor(
+        ident: Ident,
+        eventId: UUID,
+        tekst: String,
+        opprettet: LocalDateTime,
+        link: URL,
+        søknadId: UUID,
+        synligFramTil: LocalDateTime
+    ) : this(
         ident,
         eventId,
         tekst,
@@ -37,7 +46,8 @@ internal data class Oppgave(
         false,
         link,
         søknadId,
-        null
+        null,
+        synligFramTil
     )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
@@ -52,7 +62,7 @@ internal data class Oppgave(
             withPrefererteKanaler(PreferertKanal.SMS)
         }
         withLink(link)
-        // TODO: Spesifiser synlig fram til
+        withSynligFremTil(synligFramTil)
     }.build()
 
     fun getSnapshot() = OppgaveSnapshot(this)
@@ -67,7 +77,8 @@ internal data class Oppgave(
         val link: URL,
         val søknadId: UUID,
         val aktiv: Boolean,
-        val deaktiveringstidspunkt: LocalDateTime?
+        val deaktiveringstidspunkt: LocalDateTime?,
+        val synligFramTil: LocalDateTime
     ) {
         constructor(oppgave: Oppgave) : this(
             oppgave.eventId,
@@ -79,7 +90,8 @@ internal data class Oppgave(
             oppgave.link,
             oppgave.søknadId,
             oppgave.aktiv,
-            oppgave.deaktiveringstidspunkt
+            oppgave.deaktiveringstidspunkt,
+            oppgave.synligFramTil
         )
     }
 

@@ -127,7 +127,8 @@ internal class PostgresNotifikasjonRepository(
         eksternVarsling = boolean("ekstern_varsling"),
         link = URL(string("link")),
         aktiv = boolean("aktiv"),
-        deaktiveringstidspunkt = localDateTimeOrNull("deaktiveringstidspunkt")
+        deaktiveringstidspunkt = localDateTimeOrNull("deaktiveringstidspunkt"),
+        synligFramTil = localDateTime("synligFramTil")
     )
 
     private fun lagreNøkkelQuery(nøkkel: Nøkkel) = queryOf( //language=PostgreSQL
@@ -164,8 +165,8 @@ internal class PostgresNotifikasjonRepository(
         oppgave: OppgaveSnapshot
     ) = queryOf( //language=PostgreSQL
         """
-        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId, aktiv)
-        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId, :aktiv)
+        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId, aktiv, synligFramTil)
+        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId, :aktiv, :synligFramTil)
         ON CONFLICT DO NOTHING
         """.trimIndent(),
         mapOf(
@@ -176,7 +177,8 @@ internal class PostgresNotifikasjonRepository(
             "eksternVarsling" to oppgave.eksternVarsling,
             "link" to oppgave.link.toString(),
             "soknadId" to oppgave.søknadId,
-            "aktiv" to oppgave.aktiv
+            "aktiv" to oppgave.aktiv,
+            "synligFramTil" to oppgave.synligFramTil
         )
     )
 

@@ -15,6 +15,7 @@ internal object OppgaveObjectMother {
         tekst: String = "Dette er en oppgave",
         aktiv: Boolean = true,
         søknadId: UUID = UUID.randomUUID(),
+        synligFramTil: LocalDateTime = LocalDateTime.now().plusWeeks(3)
     ) = Oppgave(
         ident = ident,
         eventId = eventId,
@@ -24,7 +25,8 @@ internal object OppgaveObjectMother {
         eksternVarsling = false,
         link = link,
         søknadId = søknadId,
-        deaktiveringstidspunkt = LocalDateTime.now(),
+        deaktiveringstidspunkt = null,
+        synligFramTil = synligFramTil,
         aktiv = aktiv
     )
 

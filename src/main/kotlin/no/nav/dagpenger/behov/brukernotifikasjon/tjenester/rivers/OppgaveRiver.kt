@@ -8,6 +8,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.helse.rapids_rivers.*
 import java.net.URL
+import java.time.LocalDateTime
 import java.util.*
 
 internal class OppgaveRiver(
@@ -60,7 +61,8 @@ internal class OppgaveRiver(
                     tekst = packet["tekst"].asText(),
                     opprettet = packet["@opprettet"].asLocalDateTime(),
                     link = packet["link"].asUrl(),
-                    søknadId = søknadId
+                    søknadId = søknadId,
+                    synligFramTil = LocalDateTime.now().plusWeeks(3)
                 )
             )
         }

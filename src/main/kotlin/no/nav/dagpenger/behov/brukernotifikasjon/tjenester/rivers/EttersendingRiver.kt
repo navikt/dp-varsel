@@ -80,7 +80,8 @@ internal class EttersendingRiver(
         tekst = oppgavetekst,
         opprettet = opprettet,
         link = urlTilEttersendingssiden(søknadId),
-        søknadId = søknadId
+        søknadId = søknadId,
+        synligFramTil = LocalDateTime.now().plusWeeks(3)
     )
 
     private fun urlTilEttersendingssiden(søknadId: UUID) = URL("$soknadsdialogensUrl/soknad/$søknadId/ettersending")

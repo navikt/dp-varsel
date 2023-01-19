@@ -40,11 +40,27 @@ class PostgresNotifikasjonRepositoryTest {
     @Test
     fun `Lagre oppgave`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
-            lagre(giveMeOppgave())
+            val originalOppgave = giveMeOppgave()
+            lagre(originalOppgave)
 
             assertEquals(1, getAntallRader("nokkel"))
             assertEquals(1, getAntallRader("oppgave"))
             assertEquals(0, getAntallRader("beskjed"))
+
+            val original = originalOppgave.getSnapshot()
+            val aktiveOppgaver = hentAktiveOppgaver(original.ident, original.søknadId)
+            val persistert = aktiveOppgaver[0].getSnapshot()
+            assertEquals(original.eventId, persistert.eventId)
+            assertEquals(original.ident, persistert.ident)
+            assertEquals(original.tekst, persistert.tekst)
+            assertEquals(original.opprettet, persistert.opprettet)
+            assertEquals(original.sikkerhetsnivå, persistert.sikkerhetsnivå)
+            assertEquals(original.eksternVarsling, persistert.eksternVarsling)
+            assertEquals(original.link, persistert.link)
+            assertEquals(original.søknadId, persistert.søknadId)
+            assertEquals(original.aktiv, persistert.aktiv)
+            assertEquals(original.deaktiveringstidspunkt, persistert.deaktiveringstidspunkt)
+            assertEquals(original.synligFramTil, persistert.synligFramTil)
         }
     }
 
