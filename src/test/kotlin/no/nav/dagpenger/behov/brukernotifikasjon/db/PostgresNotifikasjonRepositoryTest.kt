@@ -14,6 +14,7 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -111,8 +112,9 @@ class PostgresNotifikasjonRepositoryTest {
             val doneEventForOppgave = Done(ident = ident, eventId = eventId, Done.Eventtype.OPPGAVE)
             lagre(doneEventForOppgave)
 
-            val oppgaverEtterDeaktivering = hentAktiveOppgaver(ident, søknadId)
-            assertEquals(0, oppgaverEtterDeaktivering.size)
+            val oppgaverEtterDeaktivering = hentInaktiveOppgaver(ident, søknadId)
+            assertEquals(1, oppgaverEtterDeaktivering.size)
+            assertNotNull(oppgaverEtterDeaktivering[0].getSnapshot().deaktiveringstidspunkt)
         }
     }
 

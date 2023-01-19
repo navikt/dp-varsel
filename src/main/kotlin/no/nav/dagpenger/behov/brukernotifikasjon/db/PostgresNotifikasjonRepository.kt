@@ -71,7 +71,7 @@ internal class PostgresNotifikasjonRepository(
         val tabell = done.eventtype.name.lowercase()
         return queryOf( //language=PostgreSQL
             """
-        UPDATE $tabell SET aktiv = false, deaktiveringstidspunkt = :sistOppdatert WHERE nokkel = :nokkel
+        UPDATE $tabell SET aktiv = false, deaktiveringstidspunkt = :deaktiveringstidspunkt WHERE nokkel = :nokkel
         """.trimIndent(),
             mapOf(
                 "nokkel" to nøkkelPK,
@@ -90,21 +90,30 @@ internal class PostgresNotifikasjonRepository(
 
     override fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
-            aktiveOppgaverForKonkretSøknadQuery(ident, søknadId).map {
+            oppgaverForKonkretSøknadQuery(ident, søknadId, true).map {
                 it.toOppgave()
             }.asList
         )
     }
 
-    private fun aktiveOppgaverForKonkretSøknadQuery(ident: Ident, søknadId: UUID) = queryOf( //language=PostgreSQL
+    internal fun hentInaktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
+        session.run(
+            oppgaverForKonkretSøknadQuery(ident, søknadId, false).map {
+                it.toOppgave()
+            }.asList
+        )
+    }
+
+    private fun oppgaverForKonkretSøknadQuery(ident: Ident, søknadId: UUID, aktiv : Boolean = true) = queryOf( //language=PostgreSQL
         """SELECT * 
             FROM oppgave o 
             JOIN nokkel n ON n.id = o.nokkel
-            WHERE n.ident = :ident AND o.soknadId = :soknadId AND aktiv = true
+            WHERE n.ident = :ident AND o.soknadId = :soknadId AND aktiv = :aktiv
             """.trimIndent(),
         mapOf(
             "ident" to ident.ident,
-            "soknadId" to søknadId
+            "soknadId" to søknadId,
+            "aktiv" to aktiv
         )
     )
 
