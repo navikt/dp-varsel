@@ -47,3 +47,6 @@ spec:
     - secret: brukernotifikasjon-broadcast-beskjed
       mountPath: /var/run/secrets/brukernotifikasjon-broadcast-beskjed
       optional: true
+  replicas:
+    min: 2
+    max: 2
