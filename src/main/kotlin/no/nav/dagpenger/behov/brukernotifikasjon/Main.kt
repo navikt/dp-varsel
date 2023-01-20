@@ -2,7 +2,6 @@ package no.nav.dagpenger.behov.brukernotifikasjon
 
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
-import mu.KotlinLogging
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.runMigration
@@ -21,8 +20,6 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import java.util.*
-
-private val logger = KotlinLogging.logger {}
 
 private val aivenKafka: AivenConfig = AivenConfig.default
 private val avroProducerConfig = Properties().apply {
@@ -80,10 +77,7 @@ fun main() {
         }
         .build { _, rapidsConnection ->
             BeskjedRiver(rapidsConnection, notifikasjoner)
-            if(runningInDev()) {
-                logger.info { "Appen kjører i dev, aktiverer rivers for ettersending" }
-                EttersendingRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
-            }
+            EttersendingRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
         }.start()
 }
 
