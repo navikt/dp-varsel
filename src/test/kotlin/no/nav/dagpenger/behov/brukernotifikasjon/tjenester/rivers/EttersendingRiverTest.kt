@@ -11,8 +11,10 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.net.URL
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertContains
+import kotlin.test.assertTrue
 
 internal class EttersendingRiverTest {
     private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
@@ -46,6 +48,10 @@ internal class EttersendingRiverTest {
 
         val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
+        val omTreUkerMinusEtMinutt = LocalDateTime.now().plusWeeks(3).minusMinutes(1)
+        val omTreUkerPlusEtMinutt = LocalDateTime.now().plusWeeks(3).plusMinutes(1)
+        assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isAfter(omTreUkerMinusEtMinutt))
+        assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isBefore(omTreUkerPlusEtMinutt))
     }
 
     @Test
