@@ -3,7 +3,8 @@
 autonumber
 alt Bruker fullfører søknaden selv, ved å sende inn alle vedlegg
     loop
-        "dp-soknad" -> "dp-varsel": DokumentkravInnsendtEvent
+        "dp-soknad" -> "Rapid": DokumentkravInnsendtEvent
+        "Rapid" -> "dp-varsel": DokumentkravInnsendtEvent
         "dp-varsel" -> "dp-varsel": Har eventet dokumentkrav som skal sendes senere?
         alt "Ja, har dokumentkrav som skal sendes senrere"
             "dp-varsel" -> "dp-varsel-db": Finnes det alt en ettersendingsoppgave for denne søknaden?
@@ -23,13 +24,15 @@ alt Bruker fullfører søknaden selv, ved å sende inn alle vedlegg
         end
     end
 |||
-else Automatisk avslag
-    "AutomatiskAvslag" -> "dp-varsel": Avslag basert på minsteinntekt eller alder, send done-event for konkret søknad
+else Automatisk avslag, fra oss, på konkret søknad
+    "Quiz" -> "Rapid": prosess_resultat for AvslagPåMinsteinntekt
+    "Rapid" -> "dp-varsel": prosess_resultat for AvslagPåMinsteinntekt
     "dp-varsel" -> "dp-varsel-db": marker oppgaven som done
     "dp-varsel" -> "Min Side": sender done for oppgaven til denne brukeren
 |||
-else Det kommer et avslag eller vedtak, før alle vedlegg er sendt inn for en av søknadene til bruker
-    "Arena" -> "dp-varsel": **behov AlleOppgaverOmEttersendingLøst**, deaktiver alle oppgaver for denne brukeren
+else Avslag eller vedtak, fra Arena, før alle vedlegg er sendt inn for en av søknadene til bruker
+    "Arena" -> "Rapid": behov AlleOppgaverOmEttersendingLøst, deaktiver alle oppgaver for denne brukeren
+    "Rapid" -> "dp-varsel": behov AlleOppgaverOmEttersendingLøst, deaktiver alle oppgaver for denne brukeren
     loop Deaktiver alle aktive oppgaver for denne brukeren
         "dp-varsel" -> "dp-varsel-db": marker alle oppgaver som done
         "dp-varsel" -> "Min Side": sender done for alle oppgavene til denne brukeren
