@@ -8,7 +8,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.helse.rapids_rivers.*
 
-internal class AutoAvslagFraQuizRiver(
+internal class AvslagPåMinsteinntektRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger
 ) : River.PacketListener {
@@ -43,12 +43,12 @@ internal class AutoAvslagFraQuizRiver(
         withLoggingContext(
             "søknadId" to søknadId.toString(),
         ) {
-            logger.info { "Fant event av typen '$eventnavn'" }
+            logger.info { "Fant event av typen '$eventnavn' for AvslagPåMinsteinntekt" }
 
             val ident = packet["identer"].hentAktivIdent()
             val opprettet = packet["@opprettet"].asLocalDateTime()
 
-            logger.info { "Avslag på minsteinntekt, kan dermed deaktivere oppgaven om ettersending" }
+            logger.info { "Eventuell tilhørende oppgave om ettersending kan deaktiveres" }
             val doneEvent = EttersendingUtført(
                 søknadId = søknadId,
                 ident = ident,
@@ -57,9 +57,10 @@ internal class AutoAvslagFraQuizRiver(
             ettersendinger.markerOppgaveSomUtført(doneEvent)
         }
     }
-}
 
-private fun JsonNode.hentAktivIdent() =
-    filter { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }
-        .map { Ident(it["id"].asText()) }
-        .singleOrNull() ?: throw IllegalArgumentException("Mottokk ingen qyldig id")
+    private fun JsonNode.hentAktivIdent() =
+        filter { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }
+            .map { Ident(it["id"].asText()) }
+            .singleOrNull() ?: throw IllegalArgumentException("Mottokk ingen qyldig id")
+
+}

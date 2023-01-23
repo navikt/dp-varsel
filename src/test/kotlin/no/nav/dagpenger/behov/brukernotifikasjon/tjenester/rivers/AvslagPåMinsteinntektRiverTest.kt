@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertEquals
 
-class AutoAvslagFraQuizRiverTest {
+class AvslagPåMinsteinntektRiverTest {
     private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            AutoAvslagFraQuizRiver(this, ettersendinger)
+            AvslagPåMinsteinntektRiver(this, ettersendinger)
         }
     }
 
