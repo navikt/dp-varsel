@@ -41,7 +41,7 @@ internal class Ettersendinger(
             utførtEttersending.søknadId
         )
         if (aktiveOppgaverForSøknaden.isEmpty()) {
-            logger.info { "Det finnes ingen aktive oppgaver for søknadId=${utførtEttersending.søknadId}" }
+            logger.info { "Det finnes ingen aktive oppgaver for søknaden, dermed er det ikke noe å deaktivere." }
             return
         }
 
