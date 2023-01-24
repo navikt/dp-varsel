@@ -60,8 +60,22 @@ internal class Ettersendinger(
 
     private fun List<Oppgave>.erFlereEnnEn() = size > 1
 
-    fun markerAlleOppgaverSomUtført(ident: Ident) {
-        TODO("Not yet implemented")
+    fun deaktiverAlleOppgaver(deaktivering: Deaktivering) {
+        val aktiveOppgaver = notifikasjonRepository.hentAlleAktiveOppgaver(deaktivering.ident)
+        logger.info { "Fant ${aktiveOppgaver.size} aktive oppgaver" }
+
+        if (aktiveOppgaver.isEmpty()) {
+            logger.info { "Det finnes ingen aktive oppgaver for brukeren, dermed er det ikke noe å deaktivere." }
+            return
+        }
+
+        aktiveOppgaver.forEach { aktivOppgave ->
+            val eventId = aktivOppgave.getSnapshot().eventId
+            withLoggingContext("eventId" to eventId.toString()) {
+                notifikasjoner.send(deaktivering.somDoneEvent(eventId))
+                logger.info { "Oppgaven har blitt deaktivert." }
+            }
+        }
     }
 
 }
@@ -76,6 +90,20 @@ internal data class EttersendingUtført(
             eventId = eventId,
             ident = ident,
             deaktiveringstidspunkt = deaktiveringstidspunkt,
+            eventtype = Done.Eventtype.OPPGAVE
+        )
+    }
+}
+
+internal data class Deaktivering(
+    val ident: Ident,
+    val tidspunkt: LocalDateTime
+) {
+    fun somDoneEvent(eventId: UUID): Done {
+        return Done(
+            eventId = eventId,
+            ident = ident,
+            deaktiveringstidspunkt = tidspunkt,
             eventtype = Done.Eventtype.OPPGAVE
         )
     }

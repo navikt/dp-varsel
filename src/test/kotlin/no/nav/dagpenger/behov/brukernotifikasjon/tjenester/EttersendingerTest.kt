@@ -100,4 +100,39 @@ class EttersendingerTest {
         verify(exactly = 0) { notifikasjoner.send(any<Done>()) }
     }
 
+    @Test
+    fun `Skal deaktivere alle oppgaver for en bestemt bruker`() {
+        val ident = Ident("56478965481")
+        val deaktivering = Deaktivering(ident, LocalDateTime.now())
+        val oppgave1 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+        val oppgave2 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.hentAlleAktiveOppgaver(ident) } returns listOf(oppgave1, oppgave2)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.deaktiverAlleOppgaver(deaktivering)
+
+        verify(exactly = 2) {
+            notifikasjoner.send(any<Done>())
+        }
+    }
+
+    @Test
+    fun `Skal ikke gjøre noe hvis bruker ikke har noen oppgaver`() {
+        val ident = Ident("56478965481")
+        val deaktivering = Deaktivering(ident, LocalDateTime.now())
+
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.deaktiverAlleOppgaver(deaktivering)
+
+        verify(exactly = 0) {
+            notifikasjoner.send(any<Done>())
+        }
+    }
+
 }
