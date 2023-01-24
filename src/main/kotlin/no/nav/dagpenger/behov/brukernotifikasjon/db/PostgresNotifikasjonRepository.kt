@@ -96,6 +96,14 @@ internal class PostgresNotifikasjonRepository(
         )
     }
 
+    override fun hentAlleAktiveOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
+        session.run(
+            alleOppgaverForKonkretBrukerQuery(ident).map {
+                it.toOppgave()
+            }.asList
+        )
+    }
+
     internal fun hentInaktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
             oppgaverForKonkretSøknadQuery(ident, søknadId, false).map {
@@ -113,6 +121,18 @@ internal class PostgresNotifikasjonRepository(
         mapOf(
             "ident" to ident.ident,
             "soknadId" to søknadId,
+            "aktiv" to aktiv
+        )
+    )
+
+    private fun alleOppgaverForKonkretBrukerQuery(ident: Ident, aktiv : Boolean = true) = queryOf( //language=PostgreSQL
+        """SELECT * 
+            FROM oppgave o 
+            JOIN nokkel n ON n.id = o.nokkel
+            WHERE n.ident = :ident AND aktiv = :aktiv
+            """.trimIndent(),
+        mapOf(
+            "ident" to ident.ident,
             "aktiv" to aktiv
         )
     )

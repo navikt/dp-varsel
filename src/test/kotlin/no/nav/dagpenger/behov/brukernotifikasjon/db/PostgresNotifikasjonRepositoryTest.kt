@@ -13,9 +13,7 @@ import org.junit.jupiter.api.assertThrows
 import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -66,20 +64,41 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Hente aktive oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
+    fun `Hente aktive oppgaver knyttet til en konkret søknad og bruker`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")
             val expectedSøknadId = UUID.randomUUID()
 
             val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
-            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId, aktiv = false)
+            val inaktivOppgave = giveMeOppgave(ident = ident, søknadId = expectedSøknadId, aktiv = false)
+            val oppgaveKnyttetTilAnnenSøknad = giveMeOppgave(ident)
             lagre(expectedOppgave1)
-            lagre(expectedOppgave2)
-            lagre(giveMeOppgave(ident))
+            lagre(inaktivOppgave)
+            lagre(oppgaveKnyttetTilAnnenSøknad)
 
             val aktiveOppgaverTilknyttetSøknaden = hentAktiveOppgaver(ident, expectedSøknadId)
             assertEquals(1, aktiveOppgaverTilknyttetSøknaden.size)
             assertEquals(expectedOppgave1.getSnapshot().eventId, aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId)
+        }
+    }
+
+    @Test
+    fun `Hente alle aktive oppgaver for en bruker`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("12345678901")
+
+            val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+            val inaktivOppgave = giveMeOppgave(ident = ident, aktiv = false)
+            val oppgaveTilAnnenBruker = giveMeOppgave(ident = Ident("45678901234"))
+            lagre(expectedOppgave1)
+            lagre(expectedOppgave2)
+            lagre(inaktivOppgave)
+            lagre(oppgaveTilAnnenBruker)
+
+            val aktiveOppgaverTilknyttetSøknaden = hentAlleAktiveOppgaver(ident)
+            assertEquals(2, aktiveOppgaverTilknyttetSøknaden.size)
+            assertTrue(aktiveOppgaverTilknyttetSøknaden.containsAll(listOf(expectedOppgave1, expectedOppgave2)))
         }
     }
 
