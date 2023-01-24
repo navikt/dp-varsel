@@ -17,6 +17,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.AvslagPåMinsteinntektRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.DokumentInnsendtRiver
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.VedtakFraArenaRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -80,6 +81,7 @@ fun main() {
             BeskjedRiver(rapidsConnection, notifikasjoner)
             DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
             AvslagPåMinsteinntektRiver(rapidsConnection, ettersendinger)
+            VedtakFraArenaRiver(rapidsConnection, ettersendinger)
         }.start()
 }
 
