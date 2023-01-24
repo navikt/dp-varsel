@@ -135,7 +135,7 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Et done-event skal deaktivere et korresponderende aktivt oppgave-event`() {
+    fun `Et done-event skal deaktivere et korresponderende aktivt oppgave-event`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("98765432101")
             val eventId = UUID.randomUUID()
