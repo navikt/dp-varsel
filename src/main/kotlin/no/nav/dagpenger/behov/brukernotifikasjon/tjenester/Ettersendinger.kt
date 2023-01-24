@@ -60,6 +60,10 @@ internal class Ettersendinger(
 
     private fun List<Oppgave>.erFlereEnnEn() = size > 1
 
+    fun markerAlleOppgaverSomUtført(ident: Ident) {
+        TODO("Not yet implemented")
+    }
+
 }
 
 internal data class EttersendingUtført(
