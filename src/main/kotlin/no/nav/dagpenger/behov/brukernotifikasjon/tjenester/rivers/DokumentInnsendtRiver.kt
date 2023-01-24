@@ -12,7 +12,7 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
 
-internal class EttersendingRiver(
+internal class DokumentInnsendtRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger,
     private val soknadsdialogensUrl: URL

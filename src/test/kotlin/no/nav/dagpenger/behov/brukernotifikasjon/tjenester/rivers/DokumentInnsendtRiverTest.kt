@@ -16,11 +16,11 @@ import java.util.*
 import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
-internal class EttersendingRiverTest {
+internal class DokumentInnsendtRiverTest {
     private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
-            EttersendingRiver(this, ettersendinger, URL("https://dummyUrl"))
+            DokumentInnsendtRiver(this, ettersendinger, URL("https://dummyUrl"))
         }
     }
 
