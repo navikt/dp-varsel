@@ -63,8 +63,10 @@ class VedtakFraArenaRiverTest {
         }
     }
 
-    private enum class Vedtaktypekode {
-        E, G, O
+    private enum class Vedtaktypekode(val kode : String) {
+        ENDRING("E"),
+        GJENNOPPTAK("G"),
+        ORDINÆR("O")
     }
 
     //language=JSON
@@ -85,7 +87,7 @@ class VedtakFraArenaRiverTest {
         "VEDTAK_ID": 29501880,
         "SAK_ID": 123,
         "VEDTAKSTATUSKODE": "IVERK",
-        "VEDTAKTYPEKODE": "${vedtaktypekode.name}",
+        "VEDTAKTYPEKODE": "${vedtaktypekode.kode}",
         "UTFALLKODE": "JA",
         "RETTIGHETKODE": "DAGO",
         "PERSON_ID": 4124685,
@@ -112,7 +114,7 @@ class VedtakFraArenaRiverTest {
             "VEDTAK_ID": 29501880,
             "SAK_ID": 123,
             "VEDTAKSTATUSKODE": "IVERK",
-            "VEDTAKTYPEKODE": "${vedtaktypekode.name}",
+            "VEDTAKTYPEKODE": "${vedtaktypekode.kode}",
             "UTFALLKODE": "JA",
             "RETTIGHETKODE": "DAGO",
             "PERSON_ID": 4124685,
