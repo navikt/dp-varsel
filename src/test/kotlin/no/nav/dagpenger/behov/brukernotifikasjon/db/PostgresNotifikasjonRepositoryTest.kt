@@ -78,7 +78,10 @@ class PostgresNotifikasjonRepositoryTest {
 
             val aktiveOppgaverTilknyttetSøknaden = hentAktiveOppgaver(ident, expectedSøknadId)
             assertEquals(1, aktiveOppgaverTilknyttetSøknaden.size)
-            assertEquals(expectedOppgave1.getSnapshot().eventId, aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId)
+            assertEquals(
+                expectedOppgave1.getSnapshot().eventId,
+                aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId
+            )
         }
     }
 
@@ -87,18 +90,19 @@ class PostgresNotifikasjonRepositoryTest {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")
 
-            val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
-            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+            val expectedEventId1 = UUID.randomUUID()
+            val expectedEventId2 = UUID.randomUUID()
             val inaktivOppgave = giveMeOppgave(ident = ident, aktiv = false)
             val oppgaveTilAnnenBruker = giveMeOppgave(ident = Ident("45678901234"))
-            lagre(expectedOppgave1)
-            lagre(expectedOppgave2)
+            lagre(giveMeOppgave(ident = ident, søknadId = expectedEventId1))
+            lagre(giveMeOppgave(ident = ident, søknadId = expectedEventId2))
             lagre(inaktivOppgave)
             lagre(oppgaveTilAnnenBruker)
 
-            val aktiveOppgaverTilknyttetSøknaden = hentAlleAktiveOppgaver(ident)
-            assertEquals(2, aktiveOppgaverTilknyttetSøknaden.size)
-            assertTrue(aktiveOppgaverTilknyttetSøknaden.containsAll(listOf(expectedOppgave1, expectedOppgave2)))
+            val aktiveOppgaver = hentAlleAktiveOppgaver(ident)
+            assertEquals(2, aktiveOppgaver.size)
+            assertNotNull(aktiveOppgaver.find { it.getSnapshot().søknadId == expectedEventId1 })
+            assertNotNull(aktiveOppgaver.find { it.getSnapshot().søknadId == expectedEventId2 })
         }
     }
 
