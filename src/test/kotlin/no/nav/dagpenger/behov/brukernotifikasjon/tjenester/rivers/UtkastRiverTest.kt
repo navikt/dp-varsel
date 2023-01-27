@@ -1,6 +1,7 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import no.nav.dagpenger.behov.brukernotifikasjon.helpers.TestTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.soknadsdialogens_url
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -23,7 +24,7 @@ internal class UtkastRiverTest {
     private val testUrl = "https://nav.no/soknad"
 
     init {
-        System.setProperty(soknad_url.name, testUrl)
+        System.setProperty(soknadsdialogens_url.name, testUrl)
     }
 
     @AfterEach

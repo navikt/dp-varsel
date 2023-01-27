@@ -26,6 +26,8 @@ spec:
       value: min-side.aapen-brukernotifikasjon-done-v1
     - name: SOKNADSDIALOGENS_URL
       value: {{soknadsdialogens_url}}
+    - name: TMS_UTKAST_TOPIC
+      value: min-side.aapen-utkast-v1
   gcp:
     sqlInstances:
       - name: dp-varsler

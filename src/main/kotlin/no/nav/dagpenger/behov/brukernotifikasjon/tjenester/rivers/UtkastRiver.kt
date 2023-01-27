@@ -1,12 +1,11 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import com.natpryce.konfig.getValue
-import com.natpryce.konfig.stringType
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.config
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Topic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.asUUID
+import no.nav.dagpenger.behov.brukernotifikasjon.soknadsdialogens_url
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -15,9 +14,6 @@ import no.nav.tms.utkast.builder.UtkastJsonBuilder
 import java.net.URI
 
 internal typealias UtkastTopic = Topic<String, String>
-
-internal val soknad_url by stringType
-internal val tms_utkast_topic by stringType
 
 internal class UtkastRiver(
     rapidsConnection: RapidsConnection,
@@ -86,7 +82,7 @@ class SøknadEndretTilstand(packet: JsonMessage) {
 
     companion object {
         private val søknadUrl: URI
-            get() = URI(config[soknad_url]).also {
+            get() = config[soknadsdialogens_url].also {
                 require(it.isAbsolute) { "URL til søknad må være absolutt" }
             }
     }

@@ -19,13 +19,13 @@ val config = EnvironmentVariables() overriding
         "nais_app_name" to "dp-varsel",
         "nais_namespace" to "teamdagpenger"
     )
-
 val nais_app_name by stringType
 val nais_namespace by stringType
 val brukernotifikasjon_beskjed_topic by stringType
 val brukernotifikasjon_oppgave_topic by stringType
 val brukernotifikasjon_done_topic by stringType
 val soknadsdialogens_url by uriType
+val tms_utkast_topic by stringType
 
 internal val stringProducerConfig by lazy {
     Properties().apply {
@@ -33,7 +33,6 @@ internal val stringProducerConfig by lazy {
         put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
     }
 }
-
 internal val avroProducerConfig by lazy {
     Properties().apply {
         val schemaRegistryUser =

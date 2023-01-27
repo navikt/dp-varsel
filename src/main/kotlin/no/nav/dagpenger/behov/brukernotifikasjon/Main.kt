@@ -1,6 +1,5 @@
 package no.nav.dagpenger.behov.brukernotifikasjon
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.runMigration
@@ -17,7 +16,6 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.DokumentInnsendtRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.UtkastRiver
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.tms_utkast_topic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.VedtakFraArenaRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -84,4 +82,3 @@ private fun <K, V> createProducer(producerConfig: Properties = Properties()) =
             }
         )
     }
-
