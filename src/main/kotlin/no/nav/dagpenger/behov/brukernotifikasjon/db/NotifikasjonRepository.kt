@@ -12,4 +12,5 @@ internal interface NotifikasjonRepository {
     fun lagre(done: Done): Boolean
 
     fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave>
+    fun hentAlleAktiveOppgaver(ident: Ident): List<Oppgave>
 }

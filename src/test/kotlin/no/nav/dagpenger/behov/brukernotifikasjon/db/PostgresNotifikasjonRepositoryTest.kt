@@ -13,9 +13,7 @@ import org.junit.jupiter.api.assertThrows
 import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -66,20 +64,45 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Hente aktive oppgaver knyttet til en konkret søknad og en ident`() = withMigratedDb {
+    fun `Hente aktive oppgaver knyttet til en konkret søknad og bruker`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")
             val expectedSøknadId = UUID.randomUUID()
 
             val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
-            val expectedOppgave2 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId, aktiv = false)
+            val inaktivOppgave = giveMeOppgave(ident = ident, søknadId = expectedSøknadId, aktiv = false)
+            val oppgaveKnyttetTilAnnenSøknad = giveMeOppgave(ident)
             lagre(expectedOppgave1)
-            lagre(expectedOppgave2)
-            lagre(giveMeOppgave(ident))
+            lagre(inaktivOppgave)
+            lagre(oppgaveKnyttetTilAnnenSøknad)
 
             val aktiveOppgaverTilknyttetSøknaden = hentAktiveOppgaver(ident, expectedSøknadId)
             assertEquals(1, aktiveOppgaverTilknyttetSøknaden.size)
-            assertEquals(expectedOppgave1.getSnapshot().eventId, aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId)
+            assertEquals(
+                expectedOppgave1.getSnapshot().eventId,
+                aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId
+            )
+        }
+    }
+
+    @Test
+    fun `Hente alle aktive oppgaver for en bruker`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("12345678901")
+
+            val expectedEventId1 = UUID.randomUUID()
+            val expectedEventId2 = UUID.randomUUID()
+            val inaktivOppgave = giveMeOppgave(ident = ident, aktiv = false)
+            val oppgaveTilAnnenBruker = giveMeOppgave(ident = Ident("45678901234"))
+            lagre(giveMeOppgave(ident = ident, søknadId = expectedEventId1))
+            lagre(giveMeOppgave(ident = ident, søknadId = expectedEventId2))
+            lagre(inaktivOppgave)
+            lagre(oppgaveTilAnnenBruker)
+
+            val aktiveOppgaver = hentAlleAktiveOppgaver(ident)
+            assertEquals(2, aktiveOppgaver.size)
+            assertNotNull(aktiveOppgaver.find { it.getSnapshot().søknadId == expectedEventId1 })
+            assertNotNull(aktiveOppgaver.find { it.getSnapshot().søknadId == expectedEventId2 })
         }
     }
 
@@ -116,7 +139,7 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
-    fun `Et done-event skal deaktivere et korresponderende aktivt oppgave-event`() {
+    fun `Et done-event skal deaktivere et korresponderende aktivt oppgave-event`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("98765432101")
             val eventId = UUID.randomUUID()
@@ -126,12 +149,15 @@ class PostgresNotifikasjonRepositoryTest {
             val oppgaver = hentAktiveOppgaver(ident, søknadId)
             assertEquals(1, oppgaver.size)
 
-            val doneEventForOppgave = Done(ident = ident, eventId = eventId, Done.Eventtype.OPPGAVE)
+            val grunn = Done.Grunn.FERDIG
+            val doneEventForOppgave = Done(ident, eventId, grunn, Done.Eventtype.OPPGAVE)
             lagre(doneEventForOppgave)
 
             val oppgaverEtterDeaktivering = hentInaktiveOppgaver(ident, søknadId)
             assertEquals(1, oppgaverEtterDeaktivering.size)
-            assertNotNull(oppgaverEtterDeaktivering[0].getSnapshot().deaktiveringstidspunkt)
+            val deaktivertOppgave = oppgaverEtterDeaktivering[0].getSnapshot()
+            assertNotNull(deaktivertOppgave.deaktiveringstidspunkt)
+            assertEquals(grunn, deaktivertOppgave.deaktiveringsgrunn)
         }
     }
 

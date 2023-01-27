@@ -26,6 +26,7 @@ internal object OppgaveObjectMother {
         link = link,
         søknadId = søknadId,
         deaktiveringstidspunkt = null,
+        deaktiveringsgrunn = null,
         synligFramTil = synligFramTil,
         aktiv = aktiv
     )

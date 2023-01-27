@@ -17,13 +17,15 @@ internal data class Done(
     private val ident: Ident,
     override val eventId: UUID,
     private val deaktiveringstidspunkt: LocalDateTime,
+    private val grunn: Grunn,
     private val eventtype: Eventtype
 ) : NotifikasjonKommando(), NotifikasjonMelding<DoneInput> {
 
-    constructor(ident: Ident, eventId: UUID, eventtype: Eventtype) : this(
+    constructor(ident: Ident, eventId: UUID, grunn: Grunn, eventtype: Eventtype) : this(
         ident,
         eventId,
         LocalDateTime.now(),
+        grunn,
         eventtype
     )
 
@@ -38,14 +40,21 @@ internal data class Done(
     fun getSnapshot() = DoneSnapshot(this)
 
     internal data class DoneSnapshot(
-        val deaktiveringstidspunkt: LocalDateTime,
+        val tidspunkt: LocalDateTime,
+        val grunn: Grunn,
         val eventtype: Eventtype
     ) {
-        constructor(done: Done) : this(done.deaktiveringstidspunkt, done.eventtype)
+        constructor(done: Done) : this(done.deaktiveringstidspunkt, done.grunn, done.eventtype)
     }
 
     internal enum class Eventtype {
         BESKJED, OPPGAVE
+    }
+
+    internal enum class Grunn {
+        FERDIG,
+        VEDTAK_ELLER_AVSLAG,
+        UTLOPT
     }
 
 }

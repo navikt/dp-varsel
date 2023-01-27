@@ -48,8 +48,9 @@ internal class DokumentInnsendtRiverTest {
 
         val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
-        val omTreUkerMinusEtMinutt = LocalDateTime.now().plusWeeks(3).minusMinutes(1)
-        val omTreUkerPlusEtMinutt = LocalDateTime.now().plusWeeks(3).plusMinutes(1)
+        val nå = LocalDateTime.now()
+        val omTreUkerMinusEtMinutt = nå.plusWeeks(3).minusMinutes(1)
+        val omTreUkerPlusEtMinutt = nå.plusWeeks(3).plusMinutes(1)
         assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isAfter(omTreUkerMinusEtMinutt))
         assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isBefore(omTreUkerPlusEtMinutt))
     }

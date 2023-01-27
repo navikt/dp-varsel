@@ -71,11 +71,16 @@ internal class PostgresNotifikasjonRepository(
         val tabell = done.eventtype.name.lowercase()
         return queryOf( //language=PostgreSQL
             """
-        UPDATE $tabell SET aktiv = false, deaktiveringstidspunkt = :deaktiveringstidspunkt WHERE nokkel = :nokkel
+        UPDATE $tabell SET 
+            aktiv = false, 
+            deaktiveringstidspunkt = :deaktiveringstidspunkt,
+            deaktiveringsgrunn = :deaktiveringsgrunn 
+            WHERE nokkel = :nokkel
         """.trimIndent(),
             mapOf(
                 "nokkel" to nøkkelPK,
-                "deaktiveringstidspunkt" to done.deaktiveringstidspunkt
+                "deaktiveringstidspunkt" to done.tidspunkt,
+                "deaktiveringsgrunn" to done.grunn.toString()
             )
         )
     }
@@ -91,6 +96,14 @@ internal class PostgresNotifikasjonRepository(
     override fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
             oppgaverForKonkretSøknadQuery(ident, søknadId, true).map {
+                it.toOppgave()
+            }.asList
+        )
+    }
+
+    override fun hentAlleAktiveOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
+        session.run(
+            alleOppgaverForKonkretBrukerQuery(ident).map {
                 it.toOppgave()
             }.asList
         )
@@ -117,6 +130,18 @@ internal class PostgresNotifikasjonRepository(
         )
     )
 
+    private fun alleOppgaverForKonkretBrukerQuery(ident: Ident, aktiv : Boolean = true) = queryOf( //language=PostgreSQL
+        """SELECT * 
+            FROM oppgave o 
+            JOIN nokkel n ON n.id = o.nokkel
+            WHERE n.ident = :ident AND aktiv = :aktiv
+            """.trimIndent(),
+        mapOf(
+            "ident" to ident.ident,
+            "aktiv" to aktiv
+        )
+    )
+
     private fun Row.toOppgave() = Oppgave(
         ident = Ident(string("ident")),
         søknadId = uuid("soknadId"),
@@ -128,6 +153,7 @@ internal class PostgresNotifikasjonRepository(
         link = URL(string("link")),
         aktiv = boolean("aktiv"),
         deaktiveringstidspunkt = localDateTimeOrNull("deaktiveringstidspunkt"),
+        deaktiveringsgrunn = stringOrNull("deaktiveringsgrunn")?.let { Done.Grunn.valueOf(it) },
         synligFramTil = localDateTime("synligFramTil")
     )
 
