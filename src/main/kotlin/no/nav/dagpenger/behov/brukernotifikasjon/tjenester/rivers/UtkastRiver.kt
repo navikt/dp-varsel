@@ -12,6 +12,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.tms.utkast.builder.UtkastJsonBuilder
 import java.net.URI
+import java.net.URL
 
 internal typealias UtkastTopic = Topic<String, String>
 
@@ -58,7 +59,7 @@ class SøknadEndretTilstand(packet: JsonMessage) {
     private val søknadId = packet["søknad_uuid"].asUUID()
     private val ident = packet["ident"].asText()
     private val tittel = "Søknad om dagpenger"
-    private val link = søknadUrl.resolve("${søknadUrl.path}/$søknadId")
+    private val link = søknadUrl.resolve("${søknadUrl.path}/soknad/$søknadId")
     private val tilstand = packet["gjeldendeTilstand"].asText()
     private val prosessnavn = packet["prosessnavn"].asText()
     val nøkkel get() = søknadId.toString()
