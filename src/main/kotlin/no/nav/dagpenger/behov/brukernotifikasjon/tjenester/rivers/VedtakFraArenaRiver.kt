@@ -2,6 +2,7 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Deaktivering
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
@@ -52,7 +53,8 @@ internal class VedtakFraArenaRiver(
             sikkerLogger.info { "Mottok nytt vedtak for person ${ident.ident}: ${packet.toJson()}" }
             val deaktivering = Deaktivering(
                 ident,
-                opprettet
+                opprettet,
+                Done.Grunn.VEDTAK_ELLER_AVSLAG
             )
             ettersendinger.deaktiverAlleOppgaver(deaktivering)
         }

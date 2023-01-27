@@ -90,6 +90,7 @@ internal data class EttersendingUtført(
             eventId = eventId,
             ident = ident,
             deaktiveringstidspunkt = deaktiveringstidspunkt,
+            grunn = Done.Grunn.FERDIG,
             eventtype = Done.Eventtype.OPPGAVE
         )
     }
@@ -97,13 +98,15 @@ internal data class EttersendingUtført(
 
 internal data class Deaktivering(
     val ident: Ident,
-    val tidspunkt: LocalDateTime
+    val tidspunkt: LocalDateTime,
+    val grunn : Done.Grunn
 ) {
     fun somDoneEvent(eventId: UUID): Done {
         return Done(
             eventId = eventId,
             ident = ident,
             deaktiveringstidspunkt = tidspunkt,
+            grunn = grunn,
             eventtype = Done.Eventtype.OPPGAVE
         )
     }

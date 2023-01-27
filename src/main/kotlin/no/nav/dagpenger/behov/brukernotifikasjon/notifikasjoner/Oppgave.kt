@@ -25,6 +25,7 @@ internal data class Oppgave(
     private val link: URL,
     private val søknadId: UUID,
     private val deaktiveringstidspunkt: LocalDateTime?,
+    private val deaktiveringsgrunn: Done.Grunn?,
     private val synligFramTil : LocalDateTime,
     private val aktiv: Boolean = true
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
@@ -46,6 +47,7 @@ internal data class Oppgave(
         false,
         link,
         søknadId,
+        null,
         null,
         synligFramTil
     )
@@ -78,6 +80,7 @@ internal data class Oppgave(
         val søknadId: UUID,
         val aktiv: Boolean,
         val deaktiveringstidspunkt: LocalDateTime?,
+        val deaktiveringsgrunn: Done.Grunn?,
         val synligFramTil: LocalDateTime
     ) {
         constructor(oppgave: Oppgave) : this(
@@ -91,6 +94,7 @@ internal data class Oppgave(
             oppgave.søknadId,
             oppgave.aktiv,
             oppgave.deaktiveringstidspunkt,
+            oppgave.deaktiveringsgrunn,
             oppgave.synligFramTil
         )
     }

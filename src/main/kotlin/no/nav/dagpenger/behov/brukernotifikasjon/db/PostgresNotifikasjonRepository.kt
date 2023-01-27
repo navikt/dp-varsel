@@ -71,11 +71,16 @@ internal class PostgresNotifikasjonRepository(
         val tabell = done.eventtype.name.lowercase()
         return queryOf( //language=PostgreSQL
             """
-        UPDATE $tabell SET aktiv = false, deaktiveringstidspunkt = :deaktiveringstidspunkt WHERE nokkel = :nokkel
+        UPDATE $tabell SET 
+            aktiv = false, 
+            deaktiveringstidspunkt = :deaktiveringstidspunkt,
+            deaktiveringsgrunn = :deaktiveringsgrunn 
+            WHERE nokkel = :nokkel
         """.trimIndent(),
             mapOf(
                 "nokkel" to nøkkelPK,
-                "deaktiveringstidspunkt" to done.deaktiveringstidspunkt
+                "deaktiveringstidspunkt" to done.tidspunkt,
+                "deaktiveringsgrunn" to done.grunn.toString()
             )
         )
     }
@@ -148,6 +153,7 @@ internal class PostgresNotifikasjonRepository(
         link = URL(string("link")),
         aktiv = boolean("aktiv"),
         deaktiveringstidspunkt = localDateTimeOrNull("deaktiveringstidspunkt"),
+        deaktiveringsgrunn = stringOrNull("deaktiveringsgrunn")?.let { Done.Grunn.valueOf(it) },
         synligFramTil = localDateTime("synligFramTil")
     )
 

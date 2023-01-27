@@ -149,12 +149,15 @@ class PostgresNotifikasjonRepositoryTest {
             val oppgaver = hentAktiveOppgaver(ident, søknadId)
             assertEquals(1, oppgaver.size)
 
-            val doneEventForOppgave = Done(ident = ident, eventId = eventId, Done.Eventtype.OPPGAVE)
+            val grunn = Done.Grunn.FERDIG
+            val doneEventForOppgave = Done(ident, eventId, grunn, Done.Eventtype.OPPGAVE)
             lagre(doneEventForOppgave)
 
             val oppgaverEtterDeaktivering = hentInaktiveOppgaver(ident, søknadId)
             assertEquals(1, oppgaverEtterDeaktivering.size)
-            assertNotNull(oppgaverEtterDeaktivering[0].getSnapshot().deaktiveringstidspunkt)
+            val deaktivertOppgave = oppgaverEtterDeaktivering[0].getSnapshot()
+            assertNotNull(deaktivertOppgave.deaktiveringstidspunkt)
+            assertEquals(grunn, deaktivertOppgave.deaktiveringsgrunn)
         }
     }
 

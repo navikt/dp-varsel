@@ -63,7 +63,7 @@ class EttersendingerTest {
         assertEquals(expectedIdent, sendtKommando.getNøkkel().ident)
         assertEquals(expectedEventId, sendtKommando.getNøkkel().eventId)
         assertEquals(Done.Eventtype.OPPGAVE, sendtKommando.getSnapshot().eventtype)
-        assertEquals(expectedTidspunkt, sendtKommando.getSnapshot().deaktiveringstidspunkt)
+        assertEquals(expectedTidspunkt, sendtKommando.getSnapshot().tidspunkt)
     }
 
     @Test
@@ -103,7 +103,8 @@ class EttersendingerTest {
     @Test
     fun `Skal deaktivere alle oppgaver for en bestemt bruker`() {
         val ident = Ident("56478965481")
-        val deaktivering = Deaktivering(ident, LocalDateTime.now())
+        val grunn = Done.Grunn.VEDTAK_ELLER_AVSLAG
+        val deaktivering = Deaktivering(ident, LocalDateTime.now(), grunn)
         val oppgave1 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
         val oppgave2 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
 
@@ -114,15 +115,20 @@ class EttersendingerTest {
 
         ettersendinger.deaktiverAlleOppgaver(deaktivering)
 
+        val sendteKommandoer = mutableListOf<Done>()
+
         verify(exactly = 2) {
-            notifikasjoner.send(any<Done>())
+            notifikasjoner.send(capture(sendteKommandoer))
+        }
+        sendteKommandoer.forEach { kommando ->
+            assertEquals(grunn, kommando.getSnapshot().grunn)
         }
     }
 
     @Test
     fun `Skal ikke gjøre noe hvis bruker ikke har noen oppgaver`() {
         val ident = Ident("56478965481")
-        val deaktivering = Deaktivering(ident, LocalDateTime.now())
+        val deaktivering = Deaktivering(ident, LocalDateTime.now(), Done.Grunn.VEDTAK_ELLER_AVSLAG)
 
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
