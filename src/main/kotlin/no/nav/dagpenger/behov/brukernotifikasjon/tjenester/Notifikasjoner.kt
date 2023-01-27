@@ -1,12 +1,15 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
+import no.nav.brukernotifikasjon.schemas.input.NokkelInput
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.KafkaTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.*
 import org.apache.avro.specific.SpecificRecord
 import java.util.*
+
+internal typealias NotifikasjonTopic<T> = KafkaTopic<NokkelInput, T>
 
 internal data class Ident(val ident: String)
 
@@ -38,7 +41,7 @@ internal abstract class NotifikasjonKommando {
     protected abstract fun getMelding(): NotifikasjonMelding<*>
     fun <T : SpecificRecord> send(topic: NotifikasjonTopic<T>) =
         @Suppress("UNCHECKED_CAST")
-        topic.publiser(getNøkkel(), getMelding() as NotifikasjonMelding<T>)
+        topic.publiser(getNøkkel().somInput(), getMelding().somInput() as T)
 
     abstract fun lagre(repository: NotifikasjonRepository): Boolean
 }

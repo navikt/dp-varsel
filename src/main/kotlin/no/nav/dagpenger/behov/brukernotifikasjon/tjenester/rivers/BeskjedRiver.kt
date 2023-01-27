@@ -1,13 +1,16 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.asUUID
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
-import no.nav.helse.rapids_rivers.*
-import java.util.*
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class BeskjedRiver(
     rapidsConnection: RapidsConnection,
@@ -53,11 +56,9 @@ internal class BeskjedRiver(
                     eventId = behovId,
                     ident = Ident(ident),
                     tekst = packet["tekst"].asText(),
-                    opprettet = packet["@opprettet"].asLocalDateTime(),
+                    opprettet = packet["@opprettet"].asLocalDateTime()
                 )
             )
         }
     }
 }
-
-internal fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }

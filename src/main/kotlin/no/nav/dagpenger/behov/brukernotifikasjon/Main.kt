@@ -1,12 +1,12 @@
 package no.nav.dagpenger.behov.brukernotifikasjon
 
-import io.confluent.kafka.serializers.KafkaAvroSerializer
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
+import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.KafkaTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.DoneTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
@@ -16,28 +16,14 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcast
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.DokumentInnsendtRiver
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.UtkastRiver
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.tms_utkast_topic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.VedtakFraArenaRiver
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerConfig
-import java.util.*
+import java.util.Properties
 
 private val aivenKafka: AivenConfig = AivenConfig.default
-private val avroProducerConfig = Properties().apply {
-    val schemaRegistryUser =
-        requireNotNull(System.getenv("KAFKA_SCHEMA_REGISTRY_USER")) { "Expected KAFKA_SCHEMA_REGISTRY_USER" }
-    val schemaRegistryPassword =
-        requireNotNull(System.getenv("KAFKA_SCHEMA_REGISTRY_PASSWORD")) { "Expected KAFKA_SCHEMA_REGISTRY_PASSWORD" }
-
-    put(
-        KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG,
-        requireNotNull(System.getenv("KAFKA_SCHEMA_REGISTRY")) { "Expected KAFKA_SCHEMA_REGISTRY" }
-    )
-    put(KafkaAvroSerializerConfig.USER_INFO_CONFIG, "$schemaRegistryUser:$schemaRegistryPassword")
-    put(KafkaAvroSerializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO")
-    put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer::class.java)
-    put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer::class.java)
-}
 
 fun main() {
     val env = System.getenv()
@@ -60,6 +46,12 @@ fun main() {
             config[brukernotifikasjon_done_topic]
         )
     }
+    val utkastTopic by lazy {
+        KafkaTopic<String, String>(
+            createProducer(aivenKafka.producerConfig(stringProducerConfig)),
+            config[tms_utkast_topic]
+        )
+    }
     val notifikasjonRepository = PostgresNotifikasjonRepository(dataSource)
     val notifikasjoner = Notifikasjoner(
         notifikasjonRepository,
@@ -69,7 +61,6 @@ fun main() {
     )
     val mottakereFraKubernetesSecret = KubernetesScretsMottakerkilde()
     val notifikasjonBroadcaster = NotifikasjonBroadcaster(mottakereFraKubernetesSecret, notifikasjoner)
-
     val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepository)
 
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(env))
@@ -80,6 +71,7 @@ fun main() {
             BeskjedRiver(rapidsConnection, notifikasjoner)
             DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
             VedtakFraArenaRiver(rapidsConnection, ettersendinger)
+            UtkastRiver(rapidsConnection, utkastTopic)
         }.start()
 }
 
@@ -92,3 +84,4 @@ private fun <K, V> createProducer(producerConfig: Properties = Properties()) =
             }
         )
     }
+

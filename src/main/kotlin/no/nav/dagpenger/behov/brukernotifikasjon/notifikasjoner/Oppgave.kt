@@ -5,13 +5,13 @@ import no.nav.brukernotifikasjon.schemas.builders.domain.PreferertKanal
 import no.nav.brukernotifikasjon.schemas.input.OppgaveInput
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonKommando
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonTopic
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal typealias OppgaveTopic = NotifikasjonTopic<OppgaveInput>
 
@@ -26,10 +26,9 @@ internal data class Oppgave(
     private val søknadId: UUID,
     private val deaktiveringstidspunkt: LocalDateTime?,
     private val deaktiveringsgrunn: Done.Grunn?,
-    private val synligFramTil : LocalDateTime,
+    private val synligFramTil: LocalDateTime,
     private val aktiv: Boolean = true
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
-
     constructor(
         ident: Ident,
         eventId: UUID,
@@ -98,5 +97,4 @@ internal data class Oppgave(
             oppgave.synligFramTil
         )
     }
-
 }

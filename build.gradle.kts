@@ -24,6 +24,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:7.2.2")
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
+    implementation("com.github.navikt:tms-utkast:20221202105132-7dd3f10")
 
     implementation("org.flywaydb:flyway-core:9.8.2")
     implementation("com.zaxxer:HikariCP:5.0.1")
@@ -35,6 +36,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.17.6")
     testImplementation("org.testcontainers:postgresql:1.17.6")
     testImplementation("io.ktor:ktor-client-content-negotiation:2.1.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
 }
 
 tasks.test {

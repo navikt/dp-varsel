@@ -3,16 +3,20 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.asUUID
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.EttersendingUtført
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import no.nav.helse.rapids_rivers.*
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class AvslagPåMinsteinntektRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger
 ) : River.PacketListener {
-
     private val eventnavn = "prosess_resultat"
 
     init {
@@ -38,13 +42,12 @@ internal class AvslagPåMinsteinntektRiver(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val søknadId = packet.søknadUUID()
+        val søknadId = packet["søknad_uuid"].asUUID()
 
         withLoggingContext(
-            "søknadId" to søknadId.toString(),
+            "søknadId" to søknadId.toString()
         ) {
             logger.info { "Fant event av typen '$eventnavn' for AvslagPåMinsteinntekt" }
-
             val ident = packet["identer"].hentAktivIdent()
             val opprettet = packet["@opprettet"].asLocalDateTime()
 
@@ -52,7 +55,7 @@ internal class AvslagPåMinsteinntektRiver(
             val doneEvent = EttersendingUtført(
                 søknadId = søknadId,
                 ident = ident,
-                deaktiveringstidspunkt = opprettet,
+                deaktiveringstidspunkt = opprettet
             )
             ettersendinger.markerOppgaveSomUtført(doneEvent)
         }
@@ -62,5 +65,4 @@ internal class AvslagPåMinsteinntektRiver(
         filter { it["type"].asText() == "folkeregisterident" && !it["historisk"].asBoolean() }
             .map { Ident(it["id"].asText()) }
             .singleOrNull() ?: throw IllegalArgumentException("Mottokk ingen qyldig id")
-
 }
