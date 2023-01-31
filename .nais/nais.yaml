@@ -28,6 +28,8 @@ spec:
       value: {{soknadsdialogens_url}}
     - name: TMS_UTKAST_TOPIC
       value: min-side.aapen-utkast-v1
+    - name: KAFKA_EXTRA_TOPIC
+      value: {{kafka_extra_topic}}
   gcp:
     sqlInstances:
       - name: dp-varsler

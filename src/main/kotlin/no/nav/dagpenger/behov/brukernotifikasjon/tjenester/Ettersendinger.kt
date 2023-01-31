@@ -62,11 +62,12 @@ internal class Ettersendinger(
 
     fun deaktiverAlleOppgaver(deaktivering: Deaktivering) {
         val aktiveOppgaver = notifikasjonRepository.hentAlleAktiveOppgaver(deaktivering.ident)
-        logger.info { "Fant ${aktiveOppgaver.size} aktive oppgaver" }
 
         if (aktiveOppgaver.isEmpty()) {
             logger.info { "Det finnes ingen aktive oppgaver for brukeren, dermed er det ikke noe å deaktivere." }
             return
+        } else {
+            logger.info { "Fant ${aktiveOppgaver.size} aktive oppgaver" }
         }
 
         aktiveOppgaver.forEach { aktivOppgave ->
