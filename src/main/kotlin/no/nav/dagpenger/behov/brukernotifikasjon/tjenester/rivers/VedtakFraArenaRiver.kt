@@ -7,7 +7,6 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Deaktivering
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.helse.rapids_rivers.*
-import java.time.LocalDateTime
 
 internal class VedtakFraArenaRiver(
     rapidsConnection: RapidsConnection,
@@ -46,10 +45,6 @@ internal class VedtakFraArenaRiver(
         val sakId = packet["after"]["SAK_ID"].asText()
         val opprettet = packet["@opprettet"].asLocalDateTime()
 
-        if(forGammeltVedtak(opprettet)) {
-            return
-        }
-
         withLoggingContext(
             "fagsakId" to sakId,
             "vedtakId" to vedtakId
@@ -64,9 +59,6 @@ internal class VedtakFraArenaRiver(
             ettersendinger.deaktiverAlleOppgaver(deaktivering)
         }
     }
-
-    private val produksjonsstartAvOppgaver = LocalDateTime.of(2023, 1, 20, 9, 30)
-    private fun forGammeltVedtak(opprettet: LocalDateTime) = opprettet.isBefore(produksjonsstartAvOppgaver)
 
 }
 
