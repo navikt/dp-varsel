@@ -63,7 +63,22 @@ class VedtakFraArenaRiverTest {
         }
     }
 
-    private enum class Vedtaktypekode(val kode : String) {
+    @Test
+    fun `Skal kun behandle vedtak som har kommet etter at vi begyte å produsere oppgaver om ettersending`() {
+        val tidspunktFørGrensen = LocalDateTime.of(2023, 1, 20, 9, 29)
+        val vedtaktypekode = Vedtaktypekode.ORDINÆR
+        val ident = Ident("12345678901")
+        val forGammeltVedtakVersjon1 = vedtakJsonV1(ident, vedtaktypekode, tidspunktFørGrensen)
+        val forGammeltVedtakVersjon2 = vedtakJsonV2(ident, vedtaktypekode, tidspunktFørGrensen)
+        rapid.sendTestMessage(forGammeltVedtakVersjon1)
+        rapid.sendTestMessage(forGammeltVedtakVersjon2)
+
+        verify(exactly = 0) {
+            ettersendinger.deaktiverAlleOppgaver(any())
+        }
+    }
+
+    private enum class Vedtaktypekode(val kode: String) {
         ENDRING("E"),
         GJENNOPPTAK("G"),
         ORDINÆR("O")
