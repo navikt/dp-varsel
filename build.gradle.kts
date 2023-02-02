@@ -24,7 +24,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:7.2.2")
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
-    implementation("com.github.navikt:tms-utkast:20221202105132-7dd3f10")
+    implementation("com.github.navikt:tms-utkast:20230130150035-6de4eb2")
 
     implementation("org.flywaydb:flyway-core:9.8.2")
     implementation("com.zaxxer:HikariCP:5.0.1")

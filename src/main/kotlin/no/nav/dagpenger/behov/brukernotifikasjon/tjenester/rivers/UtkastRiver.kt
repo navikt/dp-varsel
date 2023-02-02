@@ -12,7 +12,6 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.tms.utkast.builder.UtkastJsonBuilder
 import java.net.URI
-import java.net.URL
 
 internal typealias UtkastTopic = Topic<String, String>
 
@@ -71,6 +70,7 @@ class SøknadEndretTilstand(packet: JsonMessage) {
         withIdent(ident)
         withTittel(tittel)
         withLink(link.toASCIIString())
+        withMetrics("dagpenger", søknadId.toString())
     }
 
     val utkastJson
