@@ -64,6 +64,21 @@ class PostgresNotifikasjonRepositoryTest {
     }
 
     @Test
+    fun `Skal kunne lagre flere aktive oppgaver for en bruker`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val oppgave1 = giveMeOppgave(søknadId = UUID.randomUUID())
+            val oppgave2 = giveMeOppgave(søknadId = UUID.randomUUID())
+            lagre(oppgave1)
+            lagre(oppgave2)
+
+            assertEquals(2, getAntallRader("nokkel"))
+            assertEquals(2, getAntallRader("oppgave"))
+            assertEquals(0, getAntallRader("beskjed"))
+        }
+    }
+
+
+    @Test
     fun `Hente aktive oppgaver knyttet til en konkret søknad og bruker`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val ident = Ident("12345678901")

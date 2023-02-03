@@ -28,7 +28,7 @@ class EttersendingerTest {
     }
 
     @Test
-    fun `Skal ikke opprette ny oppgave kun hvis det finnes en oppgave for søknaden fra før`() {
+    fun `Skal ikke opprette ny oppgave hvis det finnes en oppgave for søknaden fra før`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>()
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(giveMeOppgave())
@@ -38,6 +38,23 @@ class EttersendingerTest {
         ettersendinger.opprettOppgave(nyOppgave)
 
         verify(exactly = 0) { notifikasjoner.send(any<Oppgave>()) }
+    }
+
+    @Test
+    fun `Skal kunne har flere oppgaver, hvis søker har flere innsendte søknader`() {
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>()
+        val ident = Ident("***********")
+        val oppgave1 = giveMeOppgave(ident = ident)
+        val oppgave2 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+        every { notifikasjonRepo.hentAktiveOppgaver(ident, oppgave1.getSnapshot().søknadId) } returns emptyList() andThen listOf(oppgave1)
+        every { notifikasjonRepo.hentAktiveOppgaver(ident, oppgave2.getSnapshot().søknadId) } returns emptyList() andThen listOf(oppgave2)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.opprettOppgave(oppgave1)
+        ettersendinger.opprettOppgave(oppgave2)
+
+        verify(exactly = 2) { notifikasjoner.send(any<Oppgave>()) }
     }
 
     @Test
