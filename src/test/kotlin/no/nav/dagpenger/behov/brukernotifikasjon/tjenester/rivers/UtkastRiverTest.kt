@@ -44,6 +44,13 @@ internal class UtkastRiverTest {
             assertTrue(message(0).has("ident"))
             assertTrue(message(0).has("tittel"))
             assertContains(field(0, "link").asText(), testUrl)
+
+            assertTrue(message(0).has("metrics"))
+            with(message(0).get("metrics")) {
+                assertTrue(isContainerNode)
+                assertTrue(has("skjemanavn"))
+                assertTrue(has("skjemakode"))
+            }
         }
     }
 
