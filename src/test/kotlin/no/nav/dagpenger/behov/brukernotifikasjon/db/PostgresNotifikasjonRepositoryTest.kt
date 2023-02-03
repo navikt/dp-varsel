@@ -22,7 +22,7 @@ class PostgresNotifikasjonRepositoryTest {
             lagre(
                 Beskjed(
                     eventId = UUID.randomUUID(),
-                    ident = Ident("12345678901"),
+                    ident = Ident("***********"),
                     tekst = "tekst",
                     opprettet = LocalDateTime.now(),
                     sikkerhetsnivå = 3,
@@ -81,7 +81,7 @@ class PostgresNotifikasjonRepositoryTest {
     @Test
     fun `Hente aktive oppgaver knyttet til en konkret søknad og bruker`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
-            val ident = Ident("12345678901")
+            val ident = Ident("***********")
             val expectedSøknadId = UUID.randomUUID()
 
             val expectedOppgave1 = giveMeOppgave(ident = ident, søknadId = expectedSøknadId)
@@ -103,7 +103,7 @@ class PostgresNotifikasjonRepositoryTest {
     @Test
     fun `Hente alle aktive oppgaver for en bruker`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
-            val ident = Ident("12345678901")
+            val ident = Ident("***********")
 
             val expectedEventId1 = UUID.randomUUID()
             val expectedEventId2 = UUID.randomUUID()
@@ -125,10 +125,10 @@ class PostgresNotifikasjonRepositoryTest {
     fun `duplikate nøkler feiler for beskjed`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
             val uuid = UUID.randomUUID()
-            lagre(Beskjed(Ident("12345678901"), uuid, "tekst"))
+            lagre(Beskjed(Ident("***********"), uuid, "tekst"))
 
             assertThrows<IllegalArgumentException> {
-                lagre(Beskjed(Ident("12345678901"), uuid, "tekst"))
+                lagre(Beskjed(Ident("***********"), uuid, "tekst"))
             }
 
             assertEquals(1, getAntallRader("nokkel"))

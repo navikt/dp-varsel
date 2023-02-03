@@ -9,7 +9,7 @@ import java.util.*
 internal object OppgaveObjectMother {
 
     fun giveMeOppgave(
-        ident: Ident = Ident("12345678901"),
+        ident: Ident = Ident("***********"),
         eventId: UUID = UUID.randomUUID(),
         link: URL = URL("https://dummyOppgave/123"),
         tekst: String = "Dette er en oppgave",

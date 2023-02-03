@@ -27,7 +27,7 @@ class VedtakFraArenaRiverTest {
 
     @Test
     fun `Skal deaktivere alle oppgaver som brukeren har, for versjon 1 av formatet fra Arena`() {
-        val expectedIdent = Ident("12345678901")
+        val expectedIdent = Ident("***********")
         val expectedTidspunkt = LocalDateTime.now()
         Vedtaktypekode.values().forEach { kode ->
             rapid.sendTestMessage(vedtakJsonV1(expectedIdent, kode, expectedTidspunkt))
@@ -46,7 +46,7 @@ class VedtakFraArenaRiverTest {
 
     @Test
     fun `Skal deaktivere alle oppgaver som brukeren har, for versjon 2 av formatet fra Arena`() {
-        val expectedIdent = Ident("12345678901")
+        val expectedIdent = Ident("***********")
         val expectedTidspunkt = LocalDateTime.now()
         Vedtaktypekode.values().forEach { vedtaktypekode ->
             rapid.sendTestMessage(vedtakJsonV2(expectedIdent, vedtaktypekode, expectedTidspunkt))
