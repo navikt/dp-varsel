@@ -6,7 +6,11 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Deaktivering
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import no.nav.helse.rapids_rivers.*
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class VedtakFraArenaRiver(
     rapidsConnection: RapidsConnection,
@@ -22,15 +26,14 @@ internal class VedtakFraArenaRiver(
                     "after.VEDTAK_ID",
                     "after.SAK_ID",
                     "after.FRA_DATO",
-                    "@opprettet"
+                    "@opprettet",
+                    "FODSELSNR"
                 )
             }
             validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G", "E")) }
             validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
             validate { it.interestedIn("after", "tokens") }
             validate { it.interestedIn("after.TIL_DATO") }
-            validate { it.interestedIn("tokens.FODSELSNR") }
-            validate { it.interestedIn("FODSELSNR") }
         }.register(this)
     }
 
@@ -40,7 +43,7 @@ internal class VedtakFraArenaRiver(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val ident = Ident(packet.fødselsnummer())
+        val ident = Ident(packet["FODSELSNR"].asText())
         val vedtakId = packet["after"]["VEDTAK_ID"].asText()
         val sakId = packet["after"]["SAK_ID"].asText()
         val opprettet = packet["@opprettet"].asLocalDateTime()
@@ -59,8 +62,4 @@ internal class VedtakFraArenaRiver(
             ettersendinger.deaktiverAlleOppgaver(deaktivering)
         }
     }
-
 }
-
-internal fun JsonMessage.fødselsnummer(): String =
-    if (this["tokens"].isMissingOrNull()) this["FODSELSNR"].asText() else this["tokens"]["FODSELSNR"].asText()
