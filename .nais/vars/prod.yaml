@@ -1,4 +1,4 @@
 kafka:
   pool: nav-prod
 soknadsdialogens_url: https://www.nav.no/dagpenger/dialog
-kafka_extra_topic: teamarenanais.gg-arena-vedtak-dagpenger-v2-p
+kafka_extra_topic: teamarenanais.gg-arena-vedtak-dagpenger-v2-p, min-side.aapen-varsel-hendelse-v1
