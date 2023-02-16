@@ -20,13 +20,6 @@ internal data class Done(
     private val grunn: Grunn,
     private val eventtype: Eventtype
 ) : NotifikasjonKommando(), NotifikasjonMelding<DoneInput> {
-    constructor(ident: Ident, eventId: UUID, grunn: Grunn, eventtype: Eventtype) : this(
-        ident,
-        eventId,
-        LocalDateTime.now(),
-        grunn,
-        eventtype
-    )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
     override fun getMelding() = this
@@ -54,5 +47,4 @@ internal data class Done(
         VEDTAK_ELLER_AVSLAG,
         UTLOPT
     }
-
 }

@@ -4,7 +4,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import java.util.*
+import java.util.UUID
 
 internal interface NotifikasjonRepository {
     fun lagre(beskjed: Beskjed): Boolean
@@ -13,4 +13,5 @@ internal interface NotifikasjonRepository {
 
     fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave>
     fun hentAlleAktiveOppgaver(ident: Ident): List<Oppgave>
+    fun hentOppgave(eventId: UUID): Oppgave
 }

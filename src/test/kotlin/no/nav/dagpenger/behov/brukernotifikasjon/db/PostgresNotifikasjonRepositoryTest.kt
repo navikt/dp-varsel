@@ -12,8 +12,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.*
-import kotlin.test.*
+import java.util.UUID
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -77,7 +79,6 @@ class PostgresNotifikasjonRepositoryTest {
         }
     }
 
-
     @Test
     fun `Hente aktive oppgaver knyttet til en konkret søknad og bruker`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
@@ -97,6 +98,40 @@ class PostgresNotifikasjonRepositoryTest {
                 expectedOppgave1.getSnapshot().eventId,
                 aktiveOppgaverTilknyttetSøknaden[0].getSnapshot().eventId
             )
+        }
+    }
+
+    @Test
+    fun `Hente oppgave knyttet til en konkret eventId`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("***********")
+            val expectedEventId = UUID.randomUUID()
+
+            val oppgave1 = giveMeOppgave(ident = ident, eventId = expectedEventId)
+            val annenOppgave = giveMeOppgave(ident)
+            lagre(oppgave1)
+            lagre(annenOppgave)
+
+            val hentetOppgave = hentOppgave(expectedEventId)
+            assertNotNull(hentetOppgave)
+            assertEquals(expectedEventId, hentetOppgave.getSnapshot().eventId)
+        }
+    }
+
+    @Test
+    fun `Kast feil hvis det ikke finnes en oppgave med den angitte eventId-en`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("***********")
+            val expectedEventId = UUID.randomUUID()
+
+            val aktivOppgave = giveMeOppgave(ident = ident)
+            val inaktivOppgave = giveMeOppgave(ident = ident, aktiv = false)
+            lagre(aktivOppgave)
+            lagre(inaktivOppgave)
+
+            assertThrows<IllegalArgumentException> {
+                hentOppgave(expectedEventId)
+            }
         }
     }
 
@@ -165,7 +200,7 @@ class PostgresNotifikasjonRepositoryTest {
             assertEquals(1, oppgaver.size)
 
             val grunn = Done.Grunn.FERDIG
-            val doneEventForOppgave = Done(ident, eventId, grunn, Done.Eventtype.OPPGAVE)
+            val doneEventForOppgave = Done(ident, eventId, LocalDateTime.now(), grunn, Done.Eventtype.OPPGAVE)
             lagre(doneEventForOppgave)
 
             val oppgaverEtterDeaktivering = hentInaktiveOppgaver(ident, søknadId)

@@ -6,7 +6,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal class Ettersendinger(
     private val notifikasjoner: Notifikasjoner,
@@ -23,11 +23,9 @@ internal class Ettersendinger(
         if (aktiveOppgaverForSøknadId.isEmpty()) {
             notifikasjoner.send(nyOppgave)
             logger.info { "Ny oppgave opprettet." }
-
         } else {
             logger.info { "Søknaden har alt en eller flere aktive oppgaver knyttet til seg. Antall: ${aktiveOppgaverForSøknadId.size}" }
         }
-
     }
 
     private fun eksisterendeAktiveOppgaverForSammeSøknadId(nyOppgave: Oppgave): List<Oppgave> {
@@ -79,6 +77,23 @@ internal class Ettersendinger(
         }
     }
 
+    fun markerSomUtløpt(eventId: UUID) {
+        val oppgaven = notifikasjonRepository.hentOppgave(eventId)
+        val snapshot = oppgaven.getSnapshot()
+        if (snapshot.aktiv) {
+            notifikasjonRepository.lagre(
+                Done(
+                    ident = snapshot.ident,
+                    eventId = snapshot.eventId,
+                    grunn = Done.Grunn.UTLOPT,
+                    eventtype = Done.Eventtype.OPPGAVE,
+                    deaktiveringstidspunkt = LocalDateTime.now()
+                )
+            )
+        } else {
+            logger.info { "Oppgaven har alt blitt markert som deaktivert" }
+        }
+    }
 }
 
 internal data class EttersendingUtført(
@@ -100,7 +115,7 @@ internal data class EttersendingUtført(
 internal data class Deaktivering(
     val ident: Ident,
     val tidspunkt: LocalDateTime,
-    val grunn : Done.Grunn
+    val grunn: Done.Grunn
 ) {
     fun somDoneEvent(eventId: UUID): Done {
         return Done(

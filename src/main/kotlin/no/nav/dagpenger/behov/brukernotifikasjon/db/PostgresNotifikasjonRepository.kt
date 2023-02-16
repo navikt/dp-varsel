@@ -13,7 +13,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave.OppgaveS
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import java.math.BigInteger
 import java.net.URL
-import java.util.*
+import java.util.UUID
 import javax.sql.DataSource
 
 internal class PostgresNotifikasjonRepository(
@@ -64,6 +64,26 @@ internal class PostgresNotifikasjonRepository(
         }
     }
 
+    override fun hentOppgave(eventId: UUID): Oppgave = sessionOf(dataSource).use { session ->
+        session.run(
+            oppgaveMedIdQuery(eventId).map {
+                it.toOppgave()
+            }.asSingle
+        )
+    } ?: throw IllegalArgumentException("Fant ikke noe oppgave tilknyttet den aktuelle eventId-en.")
+
+    private fun oppgaveMedIdQuery(eventId: UUID) = queryOf( //language=PostgreSQL
+        """
+        SELECT * 
+            FROM oppgave o 
+            JOIN nokkel n ON n.id = o.nokkel
+            WHERE n.eventId = :eventId
+        """.trimIndent(),
+        mapOf(
+            "eventId" to eventId
+        )
+    )
+
     private fun lagreDoneQuery(
         nøkkelPK: BigInteger,
         done: Done.DoneSnapshot
@@ -71,12 +91,12 @@ internal class PostgresNotifikasjonRepository(
         val tabell = done.eventtype.name.lowercase()
         return queryOf( //language=PostgreSQL
             """
-        UPDATE $tabell SET 
-            aktiv = false, 
-            deaktiveringstidspunkt = :deaktiveringstidspunkt,
-            deaktiveringsgrunn = :deaktiveringsgrunn 
-            WHERE nokkel = :nokkel
-        """.trimIndent(),
+            UPDATE $tabell SET 
+                aktiv = false, 
+                deaktiveringstidspunkt = :deaktiveringstidspunkt,
+                deaktiveringsgrunn = :deaktiveringsgrunn 
+                WHERE nokkel = :nokkel
+            """.trimIndent(),
             mapOf(
                 "nokkel" to nøkkelPK,
                 "deaktiveringstidspunkt" to done.tidspunkt,
@@ -93,13 +113,14 @@ internal class PostgresNotifikasjonRepository(
         )
     )
 
-    override fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
-        session.run(
-            oppgaverForKonkretSøknadQuery(ident, søknadId, true).map {
-                it.toOppgave()
-            }.asList
-        )
-    }
+    override fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> =
+        sessionOf(dataSource).use { session ->
+            session.run(
+                oppgaverForKonkretSøknadQuery(ident, søknadId, true).map {
+                    it.toOppgave()
+                }.asList
+            )
+        }
 
     override fun hentAlleAktiveOppgaver(ident: Ident): List<Oppgave> = sessionOf(dataSource).use { session ->
         session.run(
@@ -109,33 +130,35 @@ internal class PostgresNotifikasjonRepository(
         )
     }
 
-    internal fun hentInaktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> = sessionOf(dataSource).use { session ->
-        session.run(
-            oppgaverForKonkretSøknadQuery(ident, søknadId, false).map {
-                it.toOppgave()
-            }.asList
-        )
-    }
+    internal fun hentInaktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave> =
+        sessionOf(dataSource).use { session ->
+            session.run(
+                oppgaverForKonkretSøknadQuery(ident, søknadId, false).map {
+                    it.toOppgave()
+                }.asList
+            )
+        }
 
-    private fun oppgaverForKonkretSøknadQuery(ident: Ident, søknadId: UUID, aktiv : Boolean = true) = queryOf( //language=PostgreSQL
-        """SELECT * 
+    private fun oppgaverForKonkretSøknadQuery(ident: Ident, søknadId: UUID, aktiv: Boolean = true) =
+        queryOf( //language=PostgreSQL
+            """SELECT * 
             FROM oppgave o 
             JOIN nokkel n ON n.id = o.nokkel
             WHERE n.ident = :ident AND o.soknadId = :soknadId AND aktiv = :aktiv
             """.trimIndent(),
-        mapOf(
-            "ident" to ident.ident,
-            "soknadId" to søknadId,
-            "aktiv" to aktiv
+            mapOf(
+                "ident" to ident.ident,
+                "soknadId" to søknadId,
+                "aktiv" to aktiv
+            )
         )
-    )
 
-    private fun alleOppgaverForKonkretBrukerQuery(ident: Ident, aktiv : Boolean = true) = queryOf( //language=PostgreSQL
+    private fun alleOppgaverForKonkretBrukerQuery(ident: Ident, aktiv: Boolean = true) = queryOf( //language=PostgreSQL
         """SELECT * 
             FROM oppgave o 
             JOIN nokkel n ON n.id = o.nokkel
             WHERE n.ident = :ident AND aktiv = :aktiv
-            """.trimIndent(),
+        """.trimIndent(),
         mapOf(
             "ident" to ident.ident,
             "aktiv" to aktiv
@@ -207,5 +230,4 @@ internal class PostgresNotifikasjonRepository(
             "synligFramTil" to oppgave.synligFramTil
         )
     )
-
 }
