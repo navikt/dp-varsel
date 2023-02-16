@@ -15,6 +15,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcast
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.DokumentInnsendtRiver
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.OppgaveSynligFramTilUtløptRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.UtkastRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.VedtakFraArenaRiver
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -70,6 +71,7 @@ fun main() {
             DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
             VedtakFraArenaRiver(rapidsConnection, ettersendinger)
             UtkastRiver(rapidsConnection, utkastTopic)
+            OppgaveSynligFramTilUtløptRiver(rapidsConnection, ettersendinger)
         }.start()
 }
 
