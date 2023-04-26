@@ -12,9 +12,11 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:2.1.3")
-    implementation("io.ktor:ktor-server-core-jvm:2.1.3")
-    implementation("io.ktor:ktor-serialization-jackson-jvm:2.1.3")
+    val ktorVersion = "2.3.0"
+        
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson-jvm:$ktorVersion")
     testImplementation(kotlin("test"))
 
     implementation("com.github.navikt:rapids-and-rivers:2022112407251669271100.df879df951cf")
@@ -32,10 +34,10 @@ dependencies {
     implementation("com.github.seratch:kotliquery:1.9.0")
 
     testImplementation("io.mockk:mockk:1.13.5")
-    testImplementation("io.ktor:ktor-server-tests-jvm:2.1.3")
+    testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.testcontainers:testcontainers:1.17.6")
     testImplementation("org.testcontainers:postgresql:1.17.6")
-    testImplementation("io.ktor:ktor-client-content-negotiation:2.1.3")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
 }
 
