@@ -26,7 +26,7 @@ dependencies {
     implementation("org.apache.avro:avro:1.11.1")
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
-    implementation("com.github.navikt:tms-utkast:20230203100430-ecf5208")
+    implementation("com.github.navikt:tms-utkast:20230417133736-c707818")
 
     implementation("org.flywaydb:flyway-core:9.16.3")
     implementation("com.zaxxer:HikariCP:5.0.1")
