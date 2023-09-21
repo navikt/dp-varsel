@@ -24,7 +24,7 @@ jobs:
         id: build
         with:
           dependency-graph: generate-and-submit
-          arguments: --configuration-cache build installDist
+          arguments: build installDist
 
       - name: Publish results (unit test)
         uses: EnricoMi/publish-unit-test-result-action@v2
