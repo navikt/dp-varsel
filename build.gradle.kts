@@ -36,7 +36,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.17.6")
     testImplementation("org.testcontainers:postgresql:1.17.6")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
 }
 
 tasks {
