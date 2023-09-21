@@ -2,4 +2,4 @@
 **
 
 # Except shadow jar
-!build/install
+!build/libs

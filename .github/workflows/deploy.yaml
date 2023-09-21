@@ -24,7 +24,7 @@ jobs:
         id: build
         with:
           dependency-graph: generate-and-submit
-          arguments: build installDist
+          arguments: build
 
       - name: Publish results (unit test)
         uses: EnricoMi/publish-unit-test-result-action@v2
