@@ -9,6 +9,13 @@ repositories {
     maven("https://jitpack.io")
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Sårbar versjon av snappy-java i kafka-avro-serializer:7.5.0 via kafka-clients:3.5.0
+        force("org.xerial.snappy:snappy-java:1.1.10.1")
+    }
+}
+
 dependencies {
     val ktorVersion = "2.3.4"
 
