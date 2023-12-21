@@ -24,7 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-jackson-jvm:$ktorVersion")
     testImplementation(kotlin("test"))
 
-    implementation("com.github.navikt:rapids-and-rivers:2023093008351696055717.ffdec6aede3d")
+    implementation("com.github.navikt:rapids-and-rivers:2023101613431697456627.0cdd93eb696f")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.11.3")
