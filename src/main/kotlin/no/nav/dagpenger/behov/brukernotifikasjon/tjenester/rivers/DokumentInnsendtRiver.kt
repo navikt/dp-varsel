@@ -20,7 +20,7 @@ import java.util.UUID
 internal class DokumentInnsendtRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger,
-    private val soknadsdialogensUrl: URL
+    private val soknadsdialogensUrl: URL,
 ) : River.PacketListener {
     private val eventnavn = "dokumentkrav_innsendt"
 
@@ -44,6 +44,7 @@ internal class DokumentInnsendtRiver(
     }
 
     private val oppgavetekst = "Vi mangler dokumentasjon for å kunne behandle søknaden din om dagpenger. Ettersend her."
+    private val meldingtekst = "Hei! Vi har fått søknaden din. Husk å ettersende dokumenter innen 14 dager. Du kan logge inn på NAV for å se saksbehandlingstid, status i saken din og ettersende dokumenter. Vennlig hilsen NAV"
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val søknadId = packet["søknad_uuid"].asUUID()
@@ -74,15 +75,17 @@ internal class DokumentInnsendtRiver(
         hendelseId: UUID,
         ident: Ident,
         opprettet: LocalDateTime,
-        søknadId: UUID
+        søknadId: UUID,
     ) = Oppgave(
-        eventId = hendelseId,
         ident = ident,
+        eventId = hendelseId,
         tekst = oppgavetekst,
         opprettet = opprettet,
         link = urlTilEttersendingssiden(søknadId),
         søknadId = søknadId,
-        synligFramTil = LocalDateTime.now().plusWeeks(3)
+        synligFramTil = LocalDateTime.now().plusWeeks(3),
+        eksternVarsling = true,
+        eksternVarslingTekst = meldingtekst
     )
 
     private fun urlTilEttersendingssiden(søknadId: UUID) = URL("$soknadsdialogensUrl/soknad/$søknadId/ettersending")
@@ -90,7 +93,7 @@ internal class DokumentInnsendtRiver(
     private fun lagDoneEvent(
         søknadId: UUID,
         ident: Ident,
-        opprettet: LocalDateTime
+        opprettet: LocalDateTime,
     ) = EttersendingUtført(
         søknadId = søknadId,
         ident = ident,
