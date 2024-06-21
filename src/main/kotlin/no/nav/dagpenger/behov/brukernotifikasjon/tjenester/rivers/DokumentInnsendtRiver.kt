@@ -44,7 +44,7 @@ internal class DokumentInnsendtRiver(
     }
 
     private val oppgavetekst = "Vi mangler dokumentasjon for å kunne behandle søknaden din om dagpenger. Ettersend her."
-    private val meldingtekst = "Hei! Vi har fått søknaden din. Husk å ettersende dokumenter innen 14 dager. Du kan logge inn på NAV for å se saksbehandlingstid, status i saken din og ettersende dokumenter. Vennlig hilsen NAV"
+    private val meldingtekst = "Hei! Vi har fått søknaden din. Logg inn på NAV for å ettersende dokumenter, vi må ha dokumentene innen 14 dager for å vurdere søknaden. Vennlig hilsen NAV"
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val søknadId = packet["søknad_uuid"].asUUID()
