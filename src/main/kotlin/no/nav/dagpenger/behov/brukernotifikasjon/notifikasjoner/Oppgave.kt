@@ -27,7 +27,8 @@ internal data class Oppgave(
     private val deaktiveringstidspunkt: LocalDateTime?,
     private val deaktiveringsgrunn: Done.Grunn?,
     private val synligFramTil: LocalDateTime,
-    private val aktiv: Boolean = true
+    private val aktiv: Boolean = true,
+    private val eksternVarslingTekst: String? = null,
 ) : NotifikasjonKommando(), NotifikasjonMelding<OppgaveInput> {
     constructor(
         ident: Ident,
@@ -36,19 +37,22 @@ internal data class Oppgave(
         opprettet: LocalDateTime,
         link: URL,
         søknadId: UUID,
-        synligFramTil: LocalDateTime
+        synligFramTil: LocalDateTime,
+        eksternVarsling: Boolean = false,
+        eksternVarslingTekst: String? = null,
     ) : this(
-        ident,
-        eventId,
-        tekst,
-        opprettet,
-        3,
-        false,
-        link,
-        søknadId,
-        null,
-        null,
-        synligFramTil
+        ident = ident,
+        eventId = eventId,
+        tekst = tekst,
+        opprettet = opprettet,
+        sikkerhetsnivå = 3,
+        eksternVarsling = eksternVarsling,
+        link = link,
+        søknadId = søknadId,
+        deaktiveringstidspunkt = null,
+        deaktiveringsgrunn = null,
+        synligFramTil = synligFramTil,
+        eksternVarslingTekst = eksternVarslingTekst
     )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
@@ -61,6 +65,7 @@ internal data class Oppgave(
         withEksternVarsling(eksternVarsling)
         if (eksternVarsling) {
             withPrefererteKanaler(PreferertKanal.SMS)
+            withSmsVarslingstekst(eksternVarslingTekst)
         }
         withLink(link)
         withSynligFremTil(synligFramTil)
@@ -80,7 +85,7 @@ internal data class Oppgave(
         val aktiv: Boolean,
         val deaktiveringstidspunkt: LocalDateTime?,
         val deaktiveringsgrunn: Done.Grunn?,
-        val synligFramTil: LocalDateTime
+        val synligFramTil: LocalDateTime,
     ) {
         constructor(oppgave: Oppgave) : this(
             oppgave.eventId,
