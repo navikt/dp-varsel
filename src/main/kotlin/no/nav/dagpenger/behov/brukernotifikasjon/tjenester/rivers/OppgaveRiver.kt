@@ -60,8 +60,8 @@ internal class OppgaveRiver(
 
             notifikasjoner.send(
                 Oppgave(
-                    eventId = behovId,
                     ident = Ident(ident),
+                    eventId = behovId,
                     tekst = packet["tekst"].asText(),
                     opprettet = packet["@opprettet"].asLocalDateTime(),
                     link = packet["link"].asUrl(),
