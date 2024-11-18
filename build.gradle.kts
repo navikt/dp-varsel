@@ -34,7 +34,7 @@ dependencies {
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
 
     implementation("org.flywaydb:flyway-core:9.22.2")
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("com.zaxxer:HikariCP:6.2.0")
     implementation("org.postgresql:postgresql:42.7.4")
     implementation("com.github.seratch:kotliquery:1.9.0")
 
