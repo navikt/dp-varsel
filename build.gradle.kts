@@ -17,7 +17,7 @@ configurations.all {
 }
 
 dependencies {
-    val ktorVersion = "2.3.12"
+    val ktorVersion = "2.3.13"
 
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
