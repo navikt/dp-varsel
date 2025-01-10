@@ -36,7 +36,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:9.22.2")
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation("org.postgresql:postgresql:42.7.4")
-    implementation("com.github.seratch:kotliquery:1.9.0")
+    implementation("com.github.seratch:kotliquery:1.9.1")
 
     testImplementation("io.mockk:mockk:1.13.14")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
