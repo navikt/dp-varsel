@@ -30,7 +30,7 @@ dependencies {
     implementation("org.apache.avro:avro:1.12.0")
     implementation("io.confluent:kafka-avro-serializer:7.9.0")
 
-    implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
+    implementation("com.github.navikt:brukernotifikasjon-schemas:3.0.0")
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
 
     implementation("org.flywaydb:flyway-core:9.22.2")
