@@ -6,9 +6,9 @@ metadata:
   labels:
     team: teamdagpenger
 spec:
-  image: {{image}}
+  image: "{{image}}"
   kafka:
-    pool: {{kafka.pool}}
+    pool: "{{kafka.pool}}"
   secureLogs:
     enabled: true
   env:
@@ -25,11 +25,11 @@ spec:
     - name: BRUKERNOTIFIKASJON_DONE_TOPIC
       value: min-side.aapen-brukernotifikasjon-done-v1
     - name: SOKNADSDIALOGENS_URL
-      value: {{soknadsdialogens_url}}
+      value: "{{soknadsdialogens_url}}"
     - name: TMS_UTKAST_TOPIC
       value: min-side.aapen-utkast-v1
     - name: KAFKA_EXTRA_TOPIC
-      value: {{kafka_extra_topic}}
+      value: "{{kafka_extra_topic}}"
   gcp:
     sqlInstances:
       - name: dp-varsler
