@@ -53,3 +53,11 @@ spec:
   replicas:
     min: 2
     max: 2
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
