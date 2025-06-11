@@ -35,7 +35,7 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core:9.22.2")
     implementation("com.zaxxer:HikariCP:6.3.0")
-    implementation("org.postgresql:postgresql:42.7.6")
+    implementation("org.postgresql:postgresql:42.7.7")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     testImplementation("io.mockk:mockk:1.14.2")
