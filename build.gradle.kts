@@ -40,8 +40,8 @@ dependencies {
 
     testImplementation("io.mockk:mockk:1.14.4")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
-    testImplementation("org.testcontainers:testcontainers:1.21.2")
-    testImplementation("org.testcontainers:postgresql:1.21.2")
+    testImplementation("org.testcontainers:testcontainers:1.21.3")
+    testImplementation("org.testcontainers:postgresql:1.21.3")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.2")
 }
