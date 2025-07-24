@@ -33,7 +33,7 @@ dependencies {
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
 
-    implementation("org.flywaydb:flyway-core:9.22.2")
+    implementation("org.flywaydb:flyway-core:11.10.3")
     implementation("com.zaxxer:HikariCP:6.3.2")
     implementation("org.postgresql:postgresql:42.7.7")
     implementation("com.github.seratch:kotliquery:1.9.1")
