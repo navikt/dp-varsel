@@ -1,7 +1,5 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
-import no.nav.brukernotifikasjon.schemas.builders.BeskjedInputBuilder
-import no.nav.brukernotifikasjon.schemas.builders.domain.PreferertKanal.SMS
 import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
@@ -9,6 +7,11 @@ import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonKommando
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonTopic
+import no.nav.tms.varsel.action.EksternKanal
+import no.nav.tms.varsel.action.Sensitivitet
+import no.nav.tms.varsel.action.Tekst
+import no.nav.tms.varsel.action.Varseltype
+import no.nav.tms.varsel.builder.VarselActionBuilder
 import java.net.URL
 import java.time.LocalDateTime
 import java.util.UUID
@@ -22,8 +25,8 @@ internal data class Beskjed constructor(
     private val opprettet: LocalDateTime,
     private val sikkerhetsnivå: Int,
     private val eksternVarsling: Boolean,
-    private val link: URL?
-) : NotifikasjonKommando(), NotifikasjonMelding<BeskjedInput> {
+    private val link: URL? // TODO: Ta inn String
+) : NotifikasjonKommando(), NotifikasjonMelding<String> {
     constructor(ident: Ident, tekst: String, eksternVarsling: Boolean = false) : this(
         ident,
         UUID.randomUUID(),
@@ -68,16 +71,29 @@ internal data class Beskjed constructor(
     override fun getMelding() = this
     fun getSnapshot() = BeskjedSnapshot(this)
     override fun lagre(repository: NotifikasjonRepository) = repository.lagre(this)
-    override fun somInput(): BeskjedInput = BeskjedInputBuilder().apply {
-        withTekst(tekst)
-        withTidspunkt(opprettet)
-        withSikkerhetsnivaa(sikkerhetsnivå)
-        withLink(link)
-        withEksternVarsling(eksternVarsling)
-        if (eksternVarsling) {
-            withPrefererteKanaler(SMS)
+
+    override fun somInput() = VarselActionBuilder.opprett {
+        type = Varseltype.Beskjed
+        varselId = eventId.toString()
+        sensitivitet = sikkerhetsnivåTilSensitivitet()
+        ident = this@Beskjed.ident.ident
+        tekst = Tekst(
+            spraakkode = "nb",
+            tekst = this@Beskjed.tekst,
+            default = true
+        )
+        link = this@Beskjed.link?.toString()
+        if (this@Beskjed.eksternVarsling) eksternVarsling {
+            preferertKanal = EksternKanal.SMS
         }
-    }.build()
+    }
+
+    private fun sikkerhetsnivåTilSensitivitet (): Sensitivitet = when (sikkerhetsnivå) {
+        4 -> Sensitivitet.High
+        3 -> Sensitivitet.Substantial
+        else -> throw IllegalArgumentException("Ugyldig sikkerhetsnivå: $sikkerhetsnivå")
+    }
+
 
     internal data class BeskjedSnapshot(
         val eventId: UUID,

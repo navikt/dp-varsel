@@ -6,10 +6,11 @@ import no.nav.dagpenger.behov.brukernotifikasjon.config
 import no.nav.dagpenger.behov.brukernotifikasjon.nais_app_name
 import no.nav.dagpenger.behov.brukernotifikasjon.nais_namespace
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import org.apache.avro.specific.SpecificRecord
 import java.util.UUID
 
-internal interface NotifikasjonMelding<T : SpecificRecord> {
+// TODO: Er nå Any for å funke med ny String-input fra Beskjed og SpecificRecord fra de andre typene
+//  Denne kan sikkert endres mer, eller fjernes helt når alle typene er oppdatert
+internal interface NotifikasjonMelding<T : Any> {
     fun somInput(): T
 }
 

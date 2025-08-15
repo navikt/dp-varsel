@@ -6,6 +6,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.DoneTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
+import no.nav.tms.varsel.builder.BuilderEnvironment
 import org.junit.jupiter.api.Test
 
 internal class NotifikasjonerTest {
@@ -21,6 +22,12 @@ internal class NotifikasjonerTest {
 
     @Test
     fun test() {
+        BuilderEnvironment.extend(mapOf(
+            "NAIS_CLUSTER_NAME" to "dev-fss",
+            "NAIS_APP_NAME" to "dp-varsel",
+            "NAIS_NAMESPACE" to "teamdagpenger",
+        ))
+
         notifikasjoner.send(
             Beskjed(
                 Ident("12312312311"),

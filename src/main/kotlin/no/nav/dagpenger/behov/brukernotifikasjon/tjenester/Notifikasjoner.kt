@@ -39,7 +39,9 @@ internal abstract class NotifikasjonKommando {
     protected abstract val eventId: UUID
     abstract fun getNøkkel(): Nøkkel
     protected abstract fun getMelding(): NotifikasjonMelding<*>
-    fun <T : SpecificRecord> send(topic: NotifikasjonTopic<T>) =
+
+    // TODO: Er nå Any for å funke med ny String-input fra Beskjed og SpecificRecord fra de andre typene
+    fun <T : Any> send(topic: NotifikasjonTopic<T>) =
         @Suppress("UNCHECKED_CAST")
         topic.publiser(getNøkkel().somInput(), getMelding().somInput() as T)
 
