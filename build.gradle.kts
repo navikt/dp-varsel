@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     maven("https://packages.confluent.io/maven")
     maven("https://jitpack.io")
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 configurations.all {
@@ -32,6 +33,7 @@ dependencies {
 
     implementation("com.github.navikt:brukernotifikasjon-schemas:v2.5.2")
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
+    implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
 
     implementation("org.flywaydb:flyway-core:9.22.2")
     implementation("com.zaxxer:HikariCP:6.3.2")
