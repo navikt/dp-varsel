@@ -6,12 +6,10 @@ import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.ru
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.AivenConfig
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.KafkaTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.DoneTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.KubernetesScretsMottakerkilde
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcaster
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.DokumentInnsendtRiver
@@ -27,36 +25,24 @@ private val aivenKafka: AivenConfig = AivenConfig.default
 fun main() {
     val env = System.getenv()
     runMigration()
-    val beskjedTopic by lazy {
-        BeskjedTopic(
-            createProducer(aivenKafka.producerConfig(avroProducerConfig)),
-            config[brukernotifikasjon_beskjed_topic]
-        )
-    }
-    val oppgaveTopic: OppgaveTopic by lazy {
-        OppgaveTopic(
-            createProducer(aivenKafka.producerConfig(avroProducerConfig)),
-            config[brukernotifikasjon_oppgave_topic]
-        )
-    }
-    val doneTopic: DoneTopic by lazy {
-        DoneTopic(
-            createProducer(aivenKafka.producerConfig(avroProducerConfig)),
-            config[brukernotifikasjon_done_topic]
-        )
-    }
     val utkastTopic by lazy {
         KafkaTopic<String, String>(
             createProducer(aivenKafka.producerConfig(stringProducerConfig)),
             config[tms_utkast_topic]
         )
     }
+
+    val brukervarselTopic by lazy {
+        NotifikasjonTopic<String>(
+            createProducer(aivenKafka.producerConfig(stringProducerConfig)),
+            config[brukervarsel_topic]
+        )
+    }
+
     val notifikasjonRepository = PostgresNotifikasjonRepository(dataSource)
     val notifikasjoner = Notifikasjoner(
         notifikasjonRepository,
-        beskjedTopic,
-        oppgaveTopic,
-        doneTopic
+        brukervarselTopic
     )
     val mottakereFraKubernetesSecret = KubernetesScretsMottakerkilde()
     val notifikasjonBroadcaster = NotifikasjonBroadcaster(mottakereFraKubernetesSecret, notifikasjoner)
