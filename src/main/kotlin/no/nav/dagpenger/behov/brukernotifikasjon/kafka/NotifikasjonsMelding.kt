@@ -14,6 +14,7 @@ internal interface NotifikasjonMelding<T : Any> {
     fun somInput(): T
 }
 
+// TODO: Denne kan fjernes etter hvert, siden ny løsning kun bruker varselId som nøkkel
 internal data class Nøkkel(internal val eventId: UUID, internal val ident: Ident) {
     constructor(ident: Ident) : this(UUID.randomUUID(), ident)
 
