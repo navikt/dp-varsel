@@ -1,12 +1,10 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
-import no.nav.brukernotifikasjon.schemas.input.BeskjedInput
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonKommando
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonTopic
 import no.nav.tms.varsel.action.EksternKanal
 import no.nav.tms.varsel.action.Sensitivitet
 import no.nav.tms.varsel.action.Tekst
@@ -16,8 +14,6 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.util.UUID
 
-internal typealias BeskjedTopic = NotifikasjonTopic<BeskjedInput>
-
 internal data class Beskjed constructor(
     private val ident: Ident,
     override val eventId: UUID,
@@ -25,8 +21,8 @@ internal data class Beskjed constructor(
     private val opprettet: LocalDateTime,
     private val sikkerhetsnivå: Int,
     private val eksternVarsling: Boolean,
-    private val link: URL? // TODO: Ta inn String
-) : NotifikasjonKommando(), NotifikasjonMelding<String> {
+    private val link: URL?
+) : NotifikasjonKommando(), NotifikasjonMelding {
     constructor(ident: Ident, tekst: String, eksternVarsling: Boolean = false) : this(
         ident,
         UUID.randomUUID(),
