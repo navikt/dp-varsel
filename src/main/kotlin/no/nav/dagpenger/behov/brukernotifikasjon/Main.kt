@@ -9,7 +9,6 @@ import no.nav.dagpenger.behov.brukernotifikasjon.kafka.KafkaTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.KubernetesScretsMottakerkilde
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonBroadcaster
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.BeskjedRiver
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers.DokumentInnsendtRiver
@@ -33,7 +32,7 @@ fun main() {
     }
 
     val brukervarselTopic by lazy {
-        NotifikasjonTopic<String>(
+        KafkaTopic<String, String>(
             createProducer(aivenKafka.producerConfig(stringProducerConfig)),
             config[brukervarsel_topic]
         )

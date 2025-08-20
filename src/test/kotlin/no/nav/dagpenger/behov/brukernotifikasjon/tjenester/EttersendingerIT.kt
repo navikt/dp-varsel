@@ -3,22 +3,20 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 import io.mockk.clearAllMocks
 import io.mockk.mockk
 import io.mockk.verify
+import kotlin.test.assertEquals
 import no.nav.dagpenger.behov.brukernotifikasjon.db.OppgaveObjectMother.giveMeOppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Postgres.withMigratedDb
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.*
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.KafkaTopic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
-import kotlin.test.assertEquals
+import java.util.UUID
 
 class EttersendingerIT {
 
-    private val brukervarselTopic = mockk<NotifikasjonTopic<String>>(relaxed = true)
+    private val brukervarselTopic = mockk<KafkaTopic<String, String>>(relaxed = true)
 
     @BeforeEach
     fun reset() {
