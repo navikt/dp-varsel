@@ -10,7 +10,6 @@ import no.nav.tms.varsel.builder.BuilderEnvironment
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 
-// TODO: Bruk Jackson JsonNode/Objectmapper
 class BeskjedTest {
 
     @Test

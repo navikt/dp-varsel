@@ -1,12 +1,10 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
-import no.nav.brukernotifikasjon.schemas.input.OppgaveInput
 import no.nav.dagpenger.behov.brukernotifikasjon.db.NotifikasjonRepository
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonKommando
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonTopic
 import no.nav.tms.varsel.action.EksternKanal
 import no.nav.tms.varsel.action.Sensitivitet
 import no.nav.tms.varsel.action.Tekst
@@ -16,8 +14,6 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.UUID
-
-internal typealias OppgaveTopic = NotifikasjonTopic<OppgaveInput>
 
 internal data class Oppgave(
     private val ident: Ident,
@@ -33,7 +29,7 @@ internal data class Oppgave(
     private val synligFramTil: LocalDateTime,
     private val aktiv: Boolean = true,
     private val eksternVarslingTekst: String? = null,
-) : NotifikasjonKommando(), NotifikasjonMelding<String> {
+) : NotifikasjonKommando(), NotifikasjonMelding {
     constructor(
         ident: Ident,
         eventId: UUID,
