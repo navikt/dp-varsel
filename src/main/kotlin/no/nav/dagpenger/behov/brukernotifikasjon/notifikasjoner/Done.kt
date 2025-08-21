@@ -12,7 +12,7 @@ import java.util.UUID
 internal data class Done(
     private val ident: Ident,
     override val eventId: UUID,
-    // TODO: Denne er deprecated i ny løsning
+    // TODO: Denne er deprecated i ny løsning av brukervarsel
     private val deaktiveringstidspunkt: LocalDateTime,
     private val grunn: Grunn,
     private val eventtype: Eventtype
