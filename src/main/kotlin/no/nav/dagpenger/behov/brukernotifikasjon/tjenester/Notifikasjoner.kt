@@ -37,7 +37,6 @@ internal abstract class NotifikasjonKommando {
     protected abstract fun getMelding(): NotifikasjonMelding
 
     fun send(topic: KafkaTopic<String, String>) =
-        @Suppress("UNCHECKED_CAST")
         topic.publiser(getNøkkel().eventId.toString(), getMelding().somInput())
 
     abstract fun lagre(repository: NotifikasjonRepository): Boolean

@@ -5,10 +5,12 @@ import no.nav.dagpenger.behov.brukernotifikasjon.kafka.NotifikasjonMelding
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Nøkkel
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.NotifikasjonKommando
-import no.nav.tms.varsel.action.EksternKanal
+import no.nav.tms.varsel.action.EksternKanal.SMS
 import no.nav.tms.varsel.action.Sensitivitet
+import no.nav.tms.varsel.action.Sensitivitet.High
+import no.nav.tms.varsel.action.Sensitivitet.Substantial
 import no.nav.tms.varsel.action.Tekst
-import no.nav.tms.varsel.action.Varseltype
+import no.nav.tms.varsel.action.Varseltype.Oppgave
 import no.nav.tms.varsel.builder.VarselActionBuilder
 import java.net.URL
 import java.time.LocalDateTime
@@ -60,7 +62,7 @@ internal data class Oppgave(
     override fun lagre(repository: NotifikasjonRepository) = repository.lagre(this)
 
     override fun somInput() = VarselActionBuilder.opprett {
-        type = Varseltype.Oppgave
+        type = Oppgave
         varselId = eventId.toString()
         sensitivitet = sikkerhetsnivåTilSensitivitet()
         ident = this@Oppgave.ident.ident
@@ -72,14 +74,14 @@ internal data class Oppgave(
         link = this@Oppgave.link.toString()
         aktivFremTil = synligFramTil.atZone(ZoneId.of("Europe/Oslo"))
         if (this@Oppgave.eksternVarsling) eksternVarsling {
-            preferertKanal = EksternKanal.SMS
+            preferertKanal = SMS
             smsVarslingstekst = eksternVarslingTekst
         }
     }
 
     private fun sikkerhetsnivåTilSensitivitet(): Sensitivitet = when (sikkerhetsnivå) {
-        4 -> Sensitivitet.High
-        3 -> Sensitivitet.Substantial
+        4 -> High
+        3 -> Substantial
         else -> throw IllegalArgumentException("Ugyldig sikkerhetsnivå: $sikkerhetsnivå")
     }
 
