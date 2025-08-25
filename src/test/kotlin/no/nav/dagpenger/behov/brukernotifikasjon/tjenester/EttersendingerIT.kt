@@ -3,24 +3,20 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 import io.mockk.clearAllMocks
 import io.mockk.mockk
 import io.mockk.verify
+import kotlin.test.assertEquals
 import no.nav.dagpenger.behov.brukernotifikasjon.db.OppgaveObjectMother.giveMeOppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.db.Postgres.withMigratedDb
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresNotifikasjonRepository
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.*
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.BeskjedTopic
-import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.OppgaveTopic
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.KafkaTopic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
-import kotlin.test.assertEquals
+import java.util.UUID
 
 class EttersendingerIT {
 
-    private val doneTopic = mockk<DoneTopic>(relaxed = true)
-    private val oppgaveTopic = mockk<OppgaveTopic>(relaxed = true)
-    private val beskjedTopic = mockk<BeskjedTopic>()
+    private val brukervarselTopic = mockk<KafkaTopic<String, String>>(relaxed = true)
 
     @BeforeEach
     fun reset() {
@@ -31,7 +27,7 @@ class EttersendingerIT {
     fun `Skal kunne opprette en ny oppgave for den samme søknaden, etter at den tidligere har hatt en oppgave som har blitt løst`() =
         withMigratedDb {
             val repo = PostgresNotifikasjonRepository(PostgresDataSourceBuilder.dataSource)
-            val notifikasjoner = Notifikasjoner(repo, beskjedTopic, oppgaveTopic, doneTopic)
+            val notifikasjoner = Notifikasjoner(repo, brukervarselTopic)
             val ettersendinger = Ettersendinger(notifikasjoner, repo)
 
             val søknadId = UUID.randomUUID()
@@ -40,23 +36,23 @@ class EttersendingerIT {
             val oppgaveForSammeSøknad1 = giveMeOppgave(ident = ident, søknadId = søknadId)
             ettersendinger.opprettOppgave(oppgaveForSammeSøknad1)
             assertEquals(1, repo.hentAktiveOppgaver(ident, søknadId).size)
-            verify { oppgaveTopic.publiser(any(), any()) }
+            verify { brukervarselTopic.publiser(any(), any()) }
 
             val utførtEttersending = EttersendingUtført(ident, søknadId, LocalDateTime.now())
             ettersendinger.markerOppgaveSomUtført(utførtEttersending)
             assertEquals(0, repo.hentAktiveOppgaver(ident, søknadId).size)
-            verify { doneTopic.publiser(any(), any()) }
+            verify { brukervarselTopic.publiser(any(), any()) }
 
             val oppgaveForSammeSøknad2 = oppgaveForSammeSøknad1.copy(eventId = UUID.randomUUID())
             ettersendinger.opprettOppgave(oppgaveForSammeSøknad2)
             assertEquals(1, repo.hentAktiveOppgaver(ident, søknadId).size)
-            verify { oppgaveTopic.publiser(any(), any()) }
+            verify { brukervarselTopic.publiser(any(), any()) }
         }
 
     @Test
     fun `Skal kunne har flere oppgaver, hvis søker har flere innsendte søknader`() = withMigratedDb {
         val repo = PostgresNotifikasjonRepository(PostgresDataSourceBuilder.dataSource)
-        val notifikasjoner = Notifikasjoner(repo, beskjedTopic, oppgaveTopic, doneTopic)
+        val notifikasjoner = Notifikasjoner(repo, brukervarselTopic)
         val ettersendinger = Ettersendinger(notifikasjoner, repo)
 
         val ident = Ident("11111111111")

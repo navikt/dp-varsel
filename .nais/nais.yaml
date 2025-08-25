@@ -18,12 +18,8 @@ spec:
       value: teamdagpenger.rapid.v1
     - name: KAFKA_RESET_POLICY
       value: earliest
-    - name: BRUKERNOTIFIKASJON_BESKJED_TOPIC
-      value: min-side.aapen-brukernotifikasjon-beskjed-v1
-    - name: BRUKERNOTIFIKASJON_OPPGAVE_TOPIC
-      value: min-side.aapen-brukernotifikasjon-oppgave-v1
-    - name: BRUKERNOTIFIKASJON_DONE_TOPIC
-      value: min-side.aapen-brukernotifikasjon-done-v1
+    - name: BRUKERVARSEL_TOPIC
+      value: min-side.aapen-brukervarsel-v1
     - name: SOKNADSDIALOGENS_URL
       value: "{{soknadsdialogens_url}}"
     - name: TMS_UTKAST_TOPIC
