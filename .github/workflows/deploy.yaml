@@ -40,7 +40,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [ build ]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/migrer_fra_avro'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -53,18 +53,18 @@ jobs:
           VARS: .nais/vars/dev.yaml
           PRINT_PAYLOAD: true
 
-  deploy-prod:
-    name: Deploy to prod
-    needs: [ build ]
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: nais/deploy/actions/deploy@v2
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
-          RESOURCE: .nais/nais.yaml
-          VAR: image=${{ needs.build.outputs.image }}
-          VARS: .nais/vars/prod.yaml
-          PRINT_PAYLOAD: true
+#  deploy-prod:
+#    name: Deploy to prod
+#    needs: [ build ]
+#    if: github.ref == 'refs/heads/main'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v5
+#      - uses: nais/deploy/actions/deploy@v2
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: prod-gcp
+#          RESOURCE: .nais/nais.yaml
+#          VAR: image=${{ needs.build.outputs.image }}
+#          VARS: .nais/vars/prod.yaml
+#          PRINT_PAYLOAD: true
