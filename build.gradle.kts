@@ -35,7 +35,7 @@ dependencies {
     implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
 
     implementation("org.flywaydb:flyway-core:9.22.2")
-    implementation("com.zaxxer:HikariCP:6.3.2")
+    implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.postgresql:postgresql:42.7.7")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
