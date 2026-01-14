@@ -39,7 +39,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.7")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
-    testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.testcontainers:testcontainers:1.21.4")
     testImplementation("org.testcontainers:postgresql:1.21.4")
