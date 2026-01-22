@@ -9,8 +9,6 @@ spec:
   image: "{{image}}"
   kafka:
     pool: "{{kafka.pool}}"
-  secureLogs:
-    enabled: true
   env:
     - name: KAFKA_CONSUMER_GROUP_ID
       value: dp-varsel
@@ -26,6 +24,11 @@ spec:
       value: min-side.aapen-utkast-v1
     - name: KAFKA_EXTRA_TOPIC
       value: "{{kafka_extra_topic}}"
+  accessPolicy:
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
   gcp:
     sqlInstances:
       - name: dp-varsler
