@@ -21,6 +21,7 @@ internal class DokumentInnsendtRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger,
     private val soknadsdialogensUrl: URL,
+    private val brukerdialogUrl: URL
 ) : River.PacketListener {
     private val eventnavn = "dokumentkrav_innsendt"
 
@@ -36,6 +37,7 @@ internal class DokumentInnsendtRiver(
                     "dokumentkrav"
                 )
             }
+            validate { it.interestedIn("kilde") }
         }.register(this)
     }
 
@@ -49,6 +51,7 @@ internal class DokumentInnsendtRiver(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val søknadId = packet["søknad_uuid"].asUUID()
         val hendelseId = packet["hendelseId"].asUUID()
+        val kilde = packet["kilde"].asText()
 
         withLoggingContext(
             "søknadId" to søknadId.toString(),
@@ -61,7 +64,7 @@ internal class DokumentInnsendtRiver(
 
             if (kravene.venterPåEttersendinger()) {
                 logger.info { "Fant kandidat for å opprette oppgave om ettersending" }
-                val nyOppgave = lagOppgave(hendelseId, ident, opprettet, søknadId)
+                val nyOppgave = lagOppgave(hendelseId, ident, opprettet, søknadId, kilde)
                 ettersendinger.opprettOppgave(nyOppgave)
             } else {
                 logger.info { "Fant kandidat for å deaktivere oppgave om ettersending" }
@@ -76,19 +79,27 @@ internal class DokumentInnsendtRiver(
         ident: Ident,
         opprettet: LocalDateTime,
         søknadId: UUID,
+        kilde: String,
     ) = Oppgave(
         ident = ident,
         eventId = hendelseId,
         tekst = oppgavetekst,
         opprettet = opprettet,
-        link = urlTilEttersendingssiden(søknadId),
+        link = urlTilEttersendingssiden(søknadId, kilde),
         søknadId = søknadId,
         synligFramTil = LocalDateTime.now().plusWeeks(3),
         eksternVarsling = true,
         eksternVarslingTekst = meldingtekst
     )
 
-    private fun urlTilEttersendingssiden(søknadId: UUID) = URL("$soknadsdialogensUrl/soknad/$søknadId/ettersending")
+
+    private fun urlTilEttersendingssiden(søknadId: UUID, kilde: String): URL {
+        if(kilde == "orkestrator") {
+            return URL("$brukerdialogUrl/$søknadId/ettersending")
+        }
+
+        return URL("$soknadsdialogensUrl/soknad/$søknadId/ettersending")
+    }
 
     private fun lagDoneEvent(
         søknadId: UUID,
