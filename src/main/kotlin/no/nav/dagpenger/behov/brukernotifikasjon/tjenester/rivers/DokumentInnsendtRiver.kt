@@ -95,7 +95,9 @@ internal class DokumentInnsendtRiver(
 
     private fun urlTilEttersendingssiden(søknadId: UUID, kilde: String): URL {
         if(kilde == "orkestrator") {
-            return URL("$brukerdialogUrl/$søknadId/ettersending")
+            val url = URL("$brukerdialogUrl/$søknadId/ettersending")
+            logger.info("Det er en Orkestrator-søknad, bruker brukerdialog-url for ettersending med url: $url")
+            return url
         }
 
         return URL("$soknadsdialogensUrl/soknad/$søknadId/ettersending")
