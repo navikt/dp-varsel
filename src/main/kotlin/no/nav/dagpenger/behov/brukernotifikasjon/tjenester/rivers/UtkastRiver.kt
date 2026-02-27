@@ -12,6 +12,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.tms.utkast.builder.UtkastJsonBuilder
 import java.net.URI
+import no.nav.dagpenger.behov.brukernotifikasjon.brukerdialog_url
 
 internal typealias UtkastTopic = Topic<String, String>
 
@@ -23,7 +24,7 @@ internal class UtkastRiver(
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "søknad_endret_tilstand") }
             validate { it.requireKey("søknad_uuid", "ident", "gjeldendeTilstand") }
-            validate { it.interestedIn("prosessnavn") }
+            validate { it.interestedIn("prosessnavn", "kilde") }
         }.register(this)
     }
 
@@ -34,12 +35,13 @@ internal class UtkastRiver(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val søknadId = packet["søknad_uuid"].asUUID()
         val tilstand = packet["gjeldendeTilstand"].asText()
+        val kilde = packet["kilde"].asText()
 
         withLoggingContext(
             "søknad_uuid" to søknadId.toString(),
             "tilstand" to tilstand
         ) {
-            val utkast = SøknadEndretTilstand(packet)
+            val utkast = SøknadEndretTilstand(packet, kilde)
             if (!utkast.skalPubliseres()) {
                 logger.info { "Denne endringen skal ikke til utkast" }
                 return
@@ -54,12 +56,12 @@ internal class UtkastRiver(
     }
 }
 
-class SøknadEndretTilstand(packet: JsonMessage) {
+class SøknadEndretTilstand(packet: JsonMessage, kilde: String) {
     private val søknadId = packet["søknad_uuid"].asUUID()
     private val ident = packet["ident"].asText()
     private val tittel = "Søknad om dagpenger"
-    private val link = søknadUrl.resolve("${søknadUrl.path}/soknad/$søknadId")
     private val tilstand = packet["gjeldendeTilstand"].asText()
+    private val link = søknadLink(kilde, søknadId.toString(), tilstand)
     private val prosessnavn = packet["prosessnavn"].asText()
     val nøkkel get() = søknadId.toString()
 
@@ -80,6 +82,22 @@ class SøknadEndretTilstand(packet: JsonMessage) {
             "Slettet" -> jsonBuilder().delete()
             else -> throw IllegalArgumentException("Ukjent tilstand på søknad")
         }
+
+    fun søknadLink(kilde: String, søknadId: String, tilstand: String): URI {
+        if (kilde == "orkestrator") {
+            val brukerdialogUrl = config[brukerdialog_url]
+            if(tilstand == "Påbegynt") {
+                return brukerdialogUrl.resolve("${brukerdialogUrl.path}/$søknadId/personalia")
+            } else if(tilstand == "Innsendt") {
+                return brukerdialogUrl.resolve("${brukerdialogUrl.path}/$søknadId/kvittering")
+            } else {
+                return brukerdialogUrl.resolve("${brukerdialogUrl.path}/$søknadId")
+            }
+        }
+
+        return søknadUrl.resolve("${søknadUrl.path}/soknad/$søknadId")
+
+    }
 
     companion object {
         private val søknadUrl: URI
