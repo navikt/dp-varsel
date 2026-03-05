@@ -41,7 +41,6 @@ internal class UtkastRiver(
             "søknad_uuid" to søknadId.toString(),
             "tilstand" to tilstand
         ) {
-            logger.info { "Mottok søknad_endret_tilstand hendelse: ${packet.toJson()}" }
             val utkast = SøknadEndretTilstand(packet, kilde)
             if (!utkast.skalPubliseres()) {
                 logger.info { "Denne endringen skal ikke til utkast" }
