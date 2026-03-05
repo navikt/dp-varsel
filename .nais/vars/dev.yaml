@@ -1,4 +1,5 @@
 kafka:
   pool: nav-dev
 soknadsdialogens_url: https://arbeid.dev.nav.no/dagpenger/dialog
+brukerdialog_url: https://brukerdialog-dagpenger.ansatt.dev.nav.no
 kafka_extra_topic: teamarenanais.gg-arena-vedtak-dagpenger-v2-q1, min-side.aapen-varsel-hendelse-v1

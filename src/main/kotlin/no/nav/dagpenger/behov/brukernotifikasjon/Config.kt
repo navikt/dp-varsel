@@ -21,6 +21,7 @@ val nais_app_name by stringType
 val nais_namespace by stringType
 val brukervarsel_topic by stringType
 val soknadsdialogens_url by uriType
+val brukerdialog_url by uriType
 val tms_utkast_topic by stringType
 
 internal val stringProducerConfig by lazy {

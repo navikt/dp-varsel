@@ -18,9 +18,11 @@ import kotlin.test.assertTrue
 
 internal class DokumentInnsendtRiverTest {
     private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
+    private val soknadsdialogensUrl = URL("https://soknadsdialogsurl")
+    private val brukerdialogUrl = URL("https://brukerdialogurl")
     private val rapid by lazy {
         TestRapid().apply {
-            DokumentInnsendtRiver(this, ettersendinger, URL("https://dummyUrl"))
+            DokumentInnsendtRiver(this, ettersendinger, soknadsdialogensUrl, brukerdialogUrl)
         }
     }
 
@@ -48,6 +50,31 @@ internal class DokumentInnsendtRiverTest {
 
         val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
+        assertTrue { snapshotAvOpprettetOppgave.link.toString().startsWith(soknadsdialogensUrl.toString()) }
+        val nå = LocalDateTime.now()
+        val omTreUkerMinusEtMinutt = nå.plusWeeks(3).minusMinutes(1)
+        val omTreUkerPlusEtMinutt = nå.plusWeeks(3).plusMinutes(1)
+        assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isAfter(omTreUkerMinusEtMinutt))
+        assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isBefore(omTreUkerPlusEtMinutt))
+    }
+
+
+    @Test
+    fun `skal publisere oppgave hvis minst et dokumentkrav skal sendes senere fra orkestrator søknad`() {
+        val event = dokumentkravInnsendtEventFraOrkestratorMedKrav(
+            DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE")
+        )
+        rapid.sendTestMessage(event.toJson())
+
+        val opprettetOppgave = slot<Oppgave>()
+
+        verify {
+            ettersendinger.opprettOppgave(capture(opprettetOppgave))
+        }
+
+        val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
+        assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
+        assertTrue { snapshotAvOpprettetOppgave.link.toString().startsWith(brukerdialogUrl.toString()) }
         val nå = LocalDateTime.now()
         val omTreUkerMinusEtMinutt = nå.plusWeeks(3).minusMinutes(1)
         val omTreUkerPlusEtMinutt = nå.plusWeeks(3).plusMinutes(1)
@@ -80,6 +107,23 @@ fun dokumentkravInnsendtEventMedKrav(vararg dokumentKravInnsending: DokumentKrav
         "hendelseId" to UUID.randomUUID(),
         "ident" to "12312312312",
         "søknad_uuid" to søknadId,
+        "dokumentkrav" to dokumentKravInnsending.map {
+            mapOf(
+                "dokumentnavn" to it.dokumentnavn,
+                "skjemakode" to it.skjemakode,
+                "valg" to it.valg
+            )
+        }
+    )
+)
+
+fun dokumentkravInnsendtEventFraOrkestratorMedKrav(vararg dokumentKravInnsending: DokumentKravInnsending) = JsonMessage.newMessage(
+    eventName = "dokumentkrav_innsendt",
+    map = mapOf(
+        "hendelseId" to UUID.randomUUID(),
+        "ident" to "12312312312",
+        "søknad_uuid" to søknadId,
+        "kilde" to "orkestrator",
         "dokumentkrav" to dokumentKravInnsending.map {
             mapOf(
                 "dokumentnavn" to it.dokumentnavn,

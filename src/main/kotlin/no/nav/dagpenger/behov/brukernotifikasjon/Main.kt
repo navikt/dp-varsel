@@ -53,7 +53,7 @@ fun main() {
         }
         .build { _, rapidsConnection ->
             BeskjedRiver(rapidsConnection, notifikasjoner)
-            DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL())
+            DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL(), config[brukerdialog_url].toURL())
             VedtakFraArenaRiver(rapidsConnection, ettersendinger)
             UtkastRiver(rapidsConnection, utkastTopic)
             OppgaveSynligFramTilUtløptRiver(rapidsConnection, ettersendinger)

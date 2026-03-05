@@ -20,6 +20,8 @@ spec:
       value: min-side.aapen-brukervarsel-v1
     - name: SOKNADSDIALOGENS_URL
       value: "{{soknadsdialogens_url}}"
+    - name: BRUKERDIALOG_URL
+      value: "{{brukerdialog_url}}"
     - name: TMS_UTKAST_TOPIC
       value: min-side.aapen-utkast-v1
     - name: KAFKA_EXTRA_TOPIC
