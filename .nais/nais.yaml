@@ -45,7 +45,7 @@ spec:
         diskAutoresize: true
         diskSize: 10
         diskType: SSD
-        highAvailability: true
+        highAvailability: {{ db_high_availability }}
         pointInTimeRecovery: true
         retainedBackups: 14
   filesFrom:
