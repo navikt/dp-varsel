@@ -34,7 +34,7 @@ spec:
   gcp:
     sqlInstances:
       - name: dp-varsler
-        type: POSTGRES_15
+        type: POSTGRES_16
         tier: "{{gcp.sql.tier}}"
         cascadingDelete: false
         collation: nb_NO.UTF8
