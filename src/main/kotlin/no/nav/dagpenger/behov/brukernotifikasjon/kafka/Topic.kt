@@ -1,6 +1,6 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.kafka
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import mu.KotlinLogging
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord

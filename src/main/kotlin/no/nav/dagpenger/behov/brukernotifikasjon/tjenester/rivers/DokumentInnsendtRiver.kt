@@ -1,6 +1,6 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.asUUID
@@ -8,11 +8,13 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.EttersendingUtført
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import io.micrometer.core.instrument.MeterRegistry
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import java.net.URL
 import java.time.LocalDateTime
 import java.util.UUID
@@ -48,7 +50,7 @@ internal class DokumentInnsendtRiver(
     private val oppgavetekst = "Vi mangler dokumentasjon for å kunne behandle søknaden din om dagpenger. Ettersend her."
     private val meldingtekst = "Hei! Vi har fått søknaden din. Logg inn på Nav for å ettersende dokumenter, vi må ha dokumentene innen 14 dager for å vurdere søknaden. Vennlig hilsen Nav"
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val søknadId = packet["søknad_uuid"].asUUID()
         val hendelseId = packet["hendelseId"].asUUID()
         val kilde = packet["kilde"].asText()

@@ -4,8 +4,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.util.*

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.behov.brukernotifikasjon
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.behov.brukernotifikasjon.api.notifikasjonApi
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.behov.brukernotifikasjon.db.PostgresDataSourceBuilder.runMigration
@@ -47,17 +48,27 @@ fun main() {
     val notifikasjonBroadcaster = NotifikasjonBroadcaster(mottakereFraKubernetesSecret, notifikasjoner)
     val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepository)
 
-    RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(env))
-        .withKtorModule {
+    val rapidsConnection = RapidApplication.create(env, builder = {
+        withKtorModule {
             notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
         }
-        .build { _, rapidsConnection ->
-            BeskjedRiver(rapidsConnection, notifikasjoner)
-            DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL(), config[brukerdialog_url].toURL())
-            VedtakFraArenaRiver(rapidsConnection, ettersendinger)
-            UtkastRiver(rapidsConnection, utkastTopic)
-            OppgaveSynligFramTilUtløptRiver(rapidsConnection, ettersendinger)
-        }.start()
+    }) { engine, rapidsConnection ->
+        rapidsConnection.register(
+            object : RapidsConnection.StatusListener {
+                override fun onShutdown(rapidsConnection: RapidsConnection) {
+                    engine.stop()
+                }
+            },
+        )
+    }
+
+    BeskjedRiver(rapidsConnection, notifikasjoner)
+    DokumentInnsendtRiver(rapidsConnection, ettersendinger, config[soknadsdialogens_url].toURL(), config[brukerdialog_url].toURL())
+    VedtakFraArenaRiver(rapidsConnection, ettersendinger)
+    UtkastRiver(rapidsConnection, utkastTopic)
+    OppgaveSynligFramTilUtløptRiver(rapidsConnection, ettersendinger)
+
+    rapidsConnection.start()
 }
 
 private fun <K, V> createProducer(producerConfig: Properties = Properties()) =
