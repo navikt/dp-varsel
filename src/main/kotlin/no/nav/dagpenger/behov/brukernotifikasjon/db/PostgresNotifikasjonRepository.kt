@@ -64,6 +64,20 @@ internal class PostgresNotifikasjonRepository(
         }
     }
 
+    override fun lagreFerdigbehandletSøknad(ident: Ident, søknadId: UUID): Boolean =
+        sessionOf(dataSource).use { session ->
+            session.run(
+                lagreFerdigbehandletSøknadQuery(ident, søknadId).map { it.int(1) }.asSingle
+            ) != null
+        }
+
+    override fun harFerdigbehandletSøknad(ident: Ident, søknadId: UUID): Boolean =
+        sessionOf(dataSource).use { session ->
+            session.run(
+                harFerdigbehandletSøknadQuery(ident, søknadId).map { it.boolean(1) }.asSingle
+            ) == true
+        }
+
     override fun hentOppgave(eventId: UUID): Oppgave = sessionOf(dataSource).use { session ->
         session.run(
             oppgaveMedIdQuery(eventId).map {
@@ -228,6 +242,33 @@ internal class PostgresNotifikasjonRepository(
             "soknadId" to oppgave.søknadId,
             "aktiv" to oppgave.aktiv,
             "synligFramTil" to oppgave.synligFramTil
+        )
+    )
+
+    private fun lagreFerdigbehandletSøknadQuery(ident: Ident, søknadId: UUID) = queryOf( //language=PostgreSQL
+        """
+        INSERT INTO ferdigbehandlet_soknad (ident, soknadId)
+        VALUES (:ident, :soknadId)
+        ON CONFLICT DO NOTHING
+        RETURNING 1
+        """.trimIndent(),
+        mapOf(
+            "ident" to ident.ident,
+            "soknadId" to søknadId
+        )
+    )
+
+    private fun harFerdigbehandletSøknadQuery(ident: Ident, søknadId: UUID) = queryOf( //language=PostgreSQL
+        """
+        SELECT EXISTS (
+            SELECT 1
+            FROM ferdigbehandlet_soknad
+            WHERE ident = :ident AND soknadId = :soknadId
+        )
+        """.trimIndent(),
+        mapOf(
+            "ident" to ident.ident,
+            "soknadId" to søknadId
         )
     )
 }
