@@ -16,6 +16,7 @@ import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class PostgresNotifikasjonRepositoryTest {
     @Test
@@ -208,6 +209,33 @@ class PostgresNotifikasjonRepositoryTest {
             val deaktivertOppgave = oppgaverEtterDeaktivering[0].getSnapshot()
             assertNotNull(deaktivertOppgave.deaktiveringstidspunkt)
             assertEquals(grunn, deaktivertOppgave.deaktiveringsgrunn)
+        }
+    }
+
+    @Test
+    fun `Lagre ferdigbehandlet søknad`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("12345678901")
+            val søknadId = UUID.randomUUID()
+
+            assertTrue(lagreFerdigbehandletSøknad(ident, søknadId))
+            assertTrue(harFerdigbehandletSøknad(ident, søknadId))
+
+            assertEquals(1, getAntallRader("ferdigbehandlet_soknad"))
+        }
+    }
+
+    @Test
+    fun `Lagre ferdigbehandlet søknad er idempotent`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val ident = Ident("12345678901")
+            val søknadId = UUID.randomUUID()
+
+            assertTrue(lagreFerdigbehandletSøknad(ident, søknadId))
+            assertEquals(false, lagreFerdigbehandletSøknad(ident, søknadId))
+            assertTrue(harFerdigbehandletSøknad(ident, søknadId))
+
+            assertEquals(1, getAntallRader("ferdigbehandlet_soknad"))
         }
     }
 

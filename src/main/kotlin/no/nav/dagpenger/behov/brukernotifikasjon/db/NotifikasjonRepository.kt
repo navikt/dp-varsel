@@ -10,6 +10,8 @@ internal interface NotifikasjonRepository {
     fun lagre(beskjed: Beskjed): Boolean
     fun lagre(oppgave: Oppgave): Boolean
     fun lagre(done: Done): Boolean
+    fun lagreFerdigbehandletSøknad(ident: Ident, søknadId: UUID): Boolean
+    fun harFerdigbehandletSøknad(ident: Ident, søknadId: UUID): Boolean
 
     fun hentAktiveOppgaver(ident: Ident, søknadId: UUID): List<Oppgave>
     fun hentAlleAktiveOppgaver(ident: Ident): List<Oppgave>

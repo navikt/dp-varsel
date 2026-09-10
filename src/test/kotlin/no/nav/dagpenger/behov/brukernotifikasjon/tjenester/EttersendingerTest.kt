@@ -10,7 +10,7 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 import kotlin.test.assertEquals
 
 class EttersendingerTest {
@@ -19,6 +19,8 @@ class EttersendingerTest {
     fun `Skal opprette ny oppgave kun hvis det ikke finnes en oppgave for søknaden fra før`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
         val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.harFerdigbehandletSøknad(any(), any()) } returns false
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns emptyList()
         val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
         val nyOppgave = giveMeOppgave()
@@ -28,9 +30,22 @@ class EttersendingerTest {
     }
 
     @Test
+    fun `Skal ikke opprette ny oppgave hvis søknaden allerede er ferdigbehandlet`() {
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.harFerdigbehandletSøknad(any(), any()) } returns true
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.opprettOppgave(giveMeOppgave())
+
+        verify(exactly = 0) { notifikasjoner.send(any<Oppgave>()) }
+    }
+
+    @Test
     fun `Skal ikke opprette ny oppgave hvis det finnes en oppgave for søknaden fra før`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
-        val notifikasjonRepo = mockk<NotifikasjonRepository>()
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.harFerdigbehandletSøknad(any(), any()) } returns false
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(giveMeOppgave())
         val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
@@ -43,10 +58,11 @@ class EttersendingerTest {
     @Test
     fun `Skal kunne har flere oppgaver, hvis søker har flere innsendte søknader`() {
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
-        val notifikasjonRepo = mockk<NotifikasjonRepository>()
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
         val ident = Ident("***********")
         val oppgave1 = giveMeOppgave(ident = ident)
         val oppgave2 = giveMeOppgave(ident = ident, søknadId = UUID.randomUUID())
+        every { notifikasjonRepo.harFerdigbehandletSøknad(any(), any()) } returns false
         every { notifikasjonRepo.hentAktiveOppgaver(ident, oppgave1.getSnapshot().søknadId) } returns emptyList() andThen listOf(oppgave1)
         every { notifikasjonRepo.hentAktiveOppgaver(ident, oppgave2.getSnapshot().søknadId) } returns emptyList() andThen listOf(oppgave2)
         val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
@@ -67,7 +83,7 @@ class EttersendingerTest {
         val utførtEvent = EttersendingUtført(expectedIdent, expectedSøknadId, expectedTidspunkt)
 
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
-        val notifikasjonRepo = mockk<NotifikasjonRepository>()
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave)
         val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
@@ -98,7 +114,14 @@ class EttersendingerTest {
 
         ettersendinger.markerOppgaveSomUtført(utførtEvent)
 
-        verify { notifikasjoner.send(any<Done>()) }
+        val sendteKommandoer = mutableListOf<Done>()
+
+        verify(exactly = 2) {
+            notifikasjoner.send(capture(sendteKommandoer))
+        }
+        sendteKommandoer.forEach { kommando ->
+            assertEquals(Done.Grunn.FERDIG, kommando.getSnapshot().grunn)
+        }
     }
 
     @Test
@@ -108,13 +131,74 @@ class EttersendingerTest {
         val utførtEvent = EttersendingUtført(ident, søknadId, LocalDateTime.now())
 
         val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
-        val notifikasjonRepo = mockk<NotifikasjonRepository>()
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
         every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns emptyList()
         val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
 
         ettersendinger.markerOppgaveSomUtført(utførtEvent)
 
-        verify(exactly = 0) { notifikasjoner.send(any<Done>()) }
+        verify(exactly = 0) {
+            notifikasjoner.send(any<Done>())
+        }
+    }
+
+    @Test
+    fun `Skal lagre ferdigbehandlet søknad og deaktivere aktiv oppgave`() {
+        val søknadId = UUID.randomUUID()
+        val ident = Ident("56478965481")
+        val oppgave = giveMeOppgave(ident = ident, søknadId = søknadId)
+        val tidspunkt = LocalDateTime.now()
+
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave)
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.søknadsbehandlingFerdig(ident, søknadId, tidspunkt)
+
+        val verifisertParameter = slot<Done>()
+        verify { notifikasjoner.send(capture(verifisertParameter)) }
+        verify { notifikasjonRepo.lagreFerdigbehandletSøknad(ident, søknadId) }
+        assertEquals(Done.Grunn.VEDTAK_ELLER_AVSLAG, verifisertParameter.captured.getSnapshot().grunn)
+        assertEquals(tidspunkt, verifisertParameter.captured.getSnapshot().tidspunkt)
+    }
+
+    @Test
+    fun `Skal lagre ferdigbehandlet søknad selv uten aktiv oppgave`() {
+        val søknadId = UUID.randomUUID()
+        val ident = Ident("56478965481")
+        val tidspunkt = LocalDateTime.now()
+
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns emptyList()
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.søknadsbehandlingFerdig(ident, søknadId, tidspunkt)
+
+        verify(exactly = 0) {
+            notifikasjoner.send(any<Done>())
+        }
+        verify { notifikasjonRepo.lagreFerdigbehandletSøknad(ident, søknadId) }
+    }
+
+    @Test
+    fun `Skal ikke sende dobbelt ved duplikate ferdigbehandlings-eventer`() {
+        val søknadId = UUID.randomUUID()
+        val ident = Ident("56478965481")
+        val oppgave = giveMeOppgave(ident = ident, søknadId = søknadId)
+        val tidspunkt = LocalDateTime.now()
+
+        val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
+        val notifikasjonRepo = mockk<NotifikasjonRepository>(relaxed = true)
+        every { notifikasjonRepo.hentAktiveOppgaver(any(), any()) } returns listOf(oppgave) andThen emptyList()
+        val ettersendinger = Ettersendinger(notifikasjoner, notifikasjonRepo)
+
+        ettersendinger.søknadsbehandlingFerdig(ident, søknadId, tidspunkt)
+        ettersendinger.søknadsbehandlingFerdig(ident, søknadId, tidspunkt)
+
+        verify(exactly = 1) { notifikasjoner.send(any<Done>()) }
+        verify(exactly = 2) { notifikasjonRepo.lagreFerdigbehandletSøknad(ident, søknadId) }
     }
 
     @Test
