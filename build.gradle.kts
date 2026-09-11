@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.4.0"
+    kotlin("jvm") version "2.4.20"
     application
 }
 
@@ -14,18 +14,27 @@ configurations.all {
     resolutionStrategy {
         // Sårbar versjon av snappy-java i kafka-avro-serializer:7.5.0 via kafka-clients:3.5.0
         force("org.xerial.snappy:snappy-java:1.1.10.8")
+        // Sårbare logback-versjoner via rapids-and-rivers (GHSA-4c8g-c2f3-jvpq, GHSA-95hg-crgm-wfvg)
+        force("ch.qos.logback:logback-core:1.5.34")
+        force("ch.qos.logback:logback-classic:1.5.34")
     }
 }
 
 dependencies {
-    val ktorVersion = "2.3.13"
+    val ktorVersion = "3.4.0"
+
+    implementation(platform("tools.jackson:jackson-bom:3.2.2"))
+    implementation("tools.jackson.core:jackson-databind")
+    implementation("tools.jackson.module:jackson-module-kotlin")
 
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-jackson-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson3-jvm:$ktorVersion")
     testImplementation(kotlin("test"))
+    testImplementation("com.github.navikt.rapids-and-rivers:rapids-and-rivers-test:2026071513121784113927")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
-    implementation("com.github.navikt:rapids-and-rivers:2024020419561707073004.70bfb92c077c")
+    implementation("com.github.navikt:rapids-and-rivers:2026071513121784113927")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.12.1")
@@ -40,7 +49,7 @@ dependencies {
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     testImplementation("io.mockk:mockk:1.14.11")
-    testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("org.testcontainers:testcontainers:1.21.4")
     testImplementation("org.testcontainers:postgresql:1.21.4")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -63,7 +72,7 @@ tasks {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
 }
 
 application {

@@ -1,7 +1,7 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.helpers
 
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Topic
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 
 class TestTopic : Topic<String, String> {
     private val messages = mutableListOf<Pair<String?, String>>()

@@ -5,6 +5,7 @@ on:
   push:
     branches-ignore:
       - 'dependabot/**'
+      - 'renovate/**'
 
 jobs:
   build:
@@ -19,7 +20,7 @@ jobs:
       - uses: actions/setup-java@v6.0.0
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 25
 
       - uses: gradle/gradle-build-action@v3.5.0
         id: build

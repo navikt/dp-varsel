@@ -1,11 +1,10 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.api
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Json
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.jackson3.*
 import io.ktor.server.testing.*
 import io.mockk.mockk
 import io.mockk.slot
@@ -40,9 +39,7 @@ class NotifikasjonApiTest {
     fun testPostBeskjed() = testApplication {
         val client = createClient {
             install(ContentNegotiation) {
-                jackson {
-                    registerModule(JavaTimeModule())
-                }
+                jackson { }
             }
         }
         application {
@@ -84,9 +81,7 @@ class NotifikasjonApiTest {
     fun testBroadcastBeskjed() = testApplication {
         val client = createClient {
             install(ContentNegotiation) {
-                jackson {
-                    registerModule(JavaTimeModule())
-                }
+                jackson { }
             }
         }
         application {

@@ -3,10 +3,12 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import io.micrometer.core.instrument.MeterRegistry
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import java.util.UUID
 
 internal class OppgaveSynligFramTilUtløptRiver(
@@ -32,7 +34,7 @@ internal class OppgaveSynligFramTilUtløptRiver(
         private val logger = KotlinLogging.logger { }
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val eventId = UUID.fromString(packet["eventId"].asText())
 
         withLoggingContext(

@@ -2,9 +2,9 @@ package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
 import no.nav.dagpenger.behov.brukernotifikasjon.helpers.TestTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.soknadsdialogens_url
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -50,7 +50,7 @@ internal class UtkastRiverTest {
 
             assertTrue(message(0).has("metrics"))
             with(message(0).get("metrics")) {
-                assertTrue(isContainerNode)
+                assertTrue(isContainer)
                 assertTrue(has("skjemanavn"))
                 assertTrue(has("skjemakode"))
             }
@@ -75,7 +75,7 @@ internal class UtkastRiverTest {
 
             assertTrue(message(0).has("metrics"))
             with(message(0).get("metrics")) {
-                assertTrue(isContainerNode)
+                assertTrue(isContainer)
                 assertTrue(has("skjemanavn"))
                 assertTrue(has("skjemakode"))
             }

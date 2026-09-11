@@ -1,9 +1,10 @@
-name: Test Dependabot PRs
+name: Test bot PRs
 
 on:
   push:
     branches:
       - 'dependabot/**'
+      - 'renovate/**'
 
 jobs:
   test:
@@ -14,7 +15,7 @@ jobs:
       - uses: actions/setup-java@v6.0.0
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 25
 
       - uses: gradle/gradle-build-action@v3.5.0
         with:
