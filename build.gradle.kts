@@ -15,7 +15,7 @@ configurations.all {
         // Sårbar versjon av snappy-java i kafka-avro-serializer:7.5.0 via kafka-clients:3.5.0
         force("org.xerial.snappy:snappy-java:1.1.10.8")
         // Sårbare logback-versjoner via rapids-and-rivers (GHSA-4c8g-c2f3-jvpq, GHSA-95hg-crgm-wfvg)
-        force("ch.qos.logback:logback-core:1.5.34")
+        force("ch.qos.logback:logback-core:1.6.3")
         force("ch.qos.logback:logback-classic:1.6.3")
     }
 }
