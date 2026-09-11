@@ -16,7 +16,7 @@ configurations.all {
         force("org.xerial.snappy:snappy-java:1.1.10.8")
         // Sårbare logback-versjoner via rapids-and-rivers (GHSA-4c8g-c2f3-jvpq, GHSA-95hg-crgm-wfvg)
         force("ch.qos.logback:logback-core:1.5.34")
-        force("ch.qos.logback:logback-classic:1.5.34")
+        force("ch.qos.logback:logback-classic:1.6.3")
     }
 }
 
@@ -38,14 +38,14 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.12.1")
-    implementation("io.confluent:kafka-avro-serializer:7.9.1")
+    implementation("io.confluent:kafka-avro-serializer:7.9.9")
 
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
     implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
 
-    implementation("org.flywaydb:flyway-core:9.22.2")
+    implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("com.zaxxer:HikariCP:7.1.0")
-    implementation("org.postgresql:postgresql:42.7.12")
+    implementation("org.postgresql:postgresql:42.7.13")
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     testImplementation("io.mockk:mockk:1.14.11")
