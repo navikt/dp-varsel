@@ -11,7 +11,7 @@ internal object OppgaveObjectMother {
     fun giveMeOppgave(
         ident: Ident = Ident("***********"),
         eventId: UUID = UUID.randomUUID(),
-        link: URL = URL("https://dummyOppgave/123"),
+        link: URL = URL("https://dummyoppgave.nav.no/123"),
         tekst: String = "Dette er en oppgave",
         aktiv: Boolean = true,
         søknadId: UUID = UUID.randomUUID(),

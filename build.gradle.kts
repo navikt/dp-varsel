@@ -41,7 +41,7 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:7.9.9")
 
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
-    implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
+    implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
 
     implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("com.zaxxer:HikariCP:7.1.0")
