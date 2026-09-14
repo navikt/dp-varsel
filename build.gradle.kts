@@ -32,7 +32,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-jackson3-jvm:$ktorVersion")
     testImplementation(kotlin("test"))
     testImplementation("com.github.navikt.rapids-and-rivers:rapids-and-rivers-test:2026071513121784113927")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     implementation("com.github.navikt:rapids-and-rivers:2026071513121784113927")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
