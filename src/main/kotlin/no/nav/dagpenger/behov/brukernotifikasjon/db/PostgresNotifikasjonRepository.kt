@@ -191,7 +191,8 @@ internal class PostgresNotifikasjonRepository(
         aktiv = boolean("aktiv"),
         deaktiveringstidspunkt = localDateTimeOrNull("deaktiveringstidspunkt"),
         deaktiveringsgrunn = stringOrNull("deaktiveringsgrunn")?.let { Done.Grunn.valueOf(it) },
-        synligFramTil = localDateTime("synligFramTil")
+        synligFramTil = localDateTime("synligFramTil"),
+        eksternVarslingUtsendingstidspunkt = localDateTimeOrNull("ekstern_varsling_utsendingstidspunkt"),
     )
 
     private fun lagreNøkkelQuery(nøkkel: Nøkkel) = queryOf( //language=PostgreSQL
@@ -228,8 +229,8 @@ internal class PostgresNotifikasjonRepository(
         oppgave: OppgaveSnapshot
     ) = queryOf( //language=PostgreSQL
         """
-        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId, aktiv, synligFramTil)
-        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId, :aktiv, :synligFramTil)
+        INSERT INTO oppgave (nokkel, tekst, opprettet, sikkerhetsnivaa, ekstern_varsling, link, soknadId, aktiv, synligFramTil, ekstern_varsling_utsendingstidspunkt)
+        VALUES (:nokkel, :tekst, :opprettet, :sikkerhetsnivaa, :eksternVarsling, :link, :soknadId, :aktiv, :synligFramTil, :eksternVarslingUtsendingstidspunkt)
         ON CONFLICT DO NOTHING
         """.trimIndent(),
         mapOf(
@@ -241,7 +242,8 @@ internal class PostgresNotifikasjonRepository(
             "link" to oppgave.link.toString(),
             "soknadId" to oppgave.søknadId,
             "aktiv" to oppgave.aktiv,
-            "synligFramTil" to oppgave.synligFramTil
+            "synligFramTil" to oppgave.synligFramTil,
+            "eksternVarslingUtsendingstidspunkt" to oppgave.eksternVarslingUtsendingstidspunkt,
         )
     )
 

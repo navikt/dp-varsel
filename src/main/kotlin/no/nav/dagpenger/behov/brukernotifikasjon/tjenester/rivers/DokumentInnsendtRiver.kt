@@ -93,6 +93,7 @@ internal class DokumentInnsendtRiver(
         synligFramTil = LocalDateTime.now().plusWeeks(3),
         eksternVarsling = true,
         eksternVarslingTekst = varseltekst(opprettet),
+        eksternVarslingUtsendingstidspunkt = opprettet.fireDagerSenereKlokken14(),
     )
 
     private fun varseltekst(opprettet: LocalDateTime): String {
@@ -101,6 +102,8 @@ internal class DokumentInnsendtRiver(
 
         return "Hei! Vi mangler dokumenter fra deg for å kunne behandle søknaden din. Logg inn på Nav for å sende inn dokumentene innen $formattertDato. Vennlig hilsen Nav"
     }
+
+    private fun LocalDateTime.fireDagerSenereKlokken14(): LocalDateTime = this.toLocalDate().plusDays(4).atTime(14, 0)
 
     private fun urlTilEttersendingssiden(søknadId: UUID, kilde: String): URL {
         if(kilde == "orkestrator") {
