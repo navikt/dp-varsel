@@ -14,6 +14,7 @@ import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 internal class DokumentInnsendtRiverTest {
@@ -75,6 +76,10 @@ internal class DokumentInnsendtRiverTest {
         val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
         assertTrue { snapshotAvOpprettetOppgave.link.toString().startsWith(brukerdialogUrl.toString()) }
+        assertEquals(
+            "Hei! Vi mangler dokumenter fra deg for å kunne behandle søknaden din. Logg inn på Nav for å sende inn dokumentene innen 24. september. Vennlig hilsen Nav",
+            snapshotAvOpprettetOppgave.eksternVarslingTekst,
+        )
         val nå = LocalDateTime.now()
         val omTreUkerMinusEtMinutt = nå.plusWeeks(3).minusMinutes(1)
         val omTreUkerPlusEtMinutt = nå.plusWeeks(3).plusMinutes(1)
@@ -124,6 +129,7 @@ fun dokumentkravInnsendtEventFraOrkestratorMedKrav(vararg dokumentKravInnsending
         "ident" to "12312312312",
         "søknad_uuid" to søknadId,
         "kilde" to "orkestrator",
+        "@opprettet" to "2026-09-10T11:47:05",
         "dokumentkrav" to dokumentKravInnsending.map {
             mapOf(
                 "dokumentnavn" to it.dokumentnavn,
