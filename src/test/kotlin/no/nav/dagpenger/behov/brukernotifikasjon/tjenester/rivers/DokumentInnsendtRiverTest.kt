@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test
 import java.net.URL
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 internal class DokumentInnsendtRiverTest {
@@ -38,7 +38,9 @@ internal class DokumentInnsendtRiverTest {
 
     @Test
     fun `skal publisere oppgave hvis minst et dokumentkrav skal sendes senere`() {
+        val opprettet = LocalDateTime.of(2026, 8, 16, 10, 11, 12)
         val event = dokumentkravInnsendtEventMedKrav(
+            opprettet,
             DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE")
         )
         rapid.sendTestMessage(event.toJson())
@@ -52,6 +54,7 @@ internal class DokumentInnsendtRiverTest {
         val snapshotAvOpprettetOppgave = opprettetOppgave.captured.getSnapshot()
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
         assertTrue { snapshotAvOpprettetOppgave.link.toString().startsWith(soknadsdialogensUrl.toString()) }
+        assertEquals(opprettet.toLocalDate().plusDays(4).atTime(14, 0), snapshotAvOpprettetOppgave.eksternVarslingUtsendingstidspunkt)
         val nå = LocalDateTime.now()
         val omTreUkerMinusEtMinutt = nå.plusWeeks(3).minusMinutes(1)
         val omTreUkerPlusEtMinutt = nå.plusWeeks(3).plusMinutes(1)
@@ -62,7 +65,9 @@ internal class DokumentInnsendtRiverTest {
 
     @Test
     fun `skal publisere oppgave hvis minst et dokumentkrav skal sendes senere fra orkestrator søknad`() {
+        val opprettet = LocalDateTime.of(2026, 8, 16, 10, 11, 12)
         val event = dokumentkravInnsendtEventFraOrkestratorMedKrav(
+            opprettet,
             DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE")
         )
         rapid.sendTestMessage(event.toJson())
@@ -77,9 +82,10 @@ internal class DokumentInnsendtRiverTest {
         assertContains(snapshotAvOpprettetOppgave.link.toString(), søknadId.toString())
         assertTrue { snapshotAvOpprettetOppgave.link.toString().startsWith(brukerdialogUrl.toString()) }
         assertEquals(
-            "Hei! Vi mangler dokumenter fra deg for å kunne behandle søknaden din. Logg inn på Nav for å sende inn dokumentene innen 24. september. Vennlig hilsen Nav",
+            "Hei! Vi mangler dokumenter fra deg for å kunne behandle søknaden din. Logg inn på Nav for å sende inn dokumentene innen 30. august. Vennlig hilsen Nav",
             snapshotAvOpprettetOppgave.eksternVarslingTekst,
         )
+        assertEquals(opprettet.toLocalDate().plusDays(4).atTime(14, 0), snapshotAvOpprettetOppgave.eksternVarslingUtsendingstidspunkt)
         val nå = LocalDateTime.now()
         val omTreUkerMinusEtMinutt = nå.plusWeeks(3).minusMinutes(1)
         val omTreUkerPlusEtMinutt = nå.plusWeeks(3).plusMinutes(1)
@@ -89,7 +95,9 @@ internal class DokumentInnsendtRiverTest {
 
     @Test
     fun `skal publisere deaktivere oppgave hvis ingen flere av dokumentkravene skal sendes senere`() {
+        val opprettet = LocalDateTime.of(2026, 8, 16, 10, 11, 12)
         val eventUtenUteståendeKrav = dokumentkravInnsendtEventMedKrav(
+            opprettet,
             DokumentKravInnsending("navn1", "skjemakode", "SEND_NÅ"),
             DokumentKravInnsending("navn2", "skjemakode", "SENDER_IKKE")
         )
@@ -106,12 +114,16 @@ internal class DokumentInnsendtRiverTest {
 
 private val søknadId = UUID.randomUUID()
 
-fun dokumentkravInnsendtEventMedKrav(vararg dokumentKravInnsending: DokumentKravInnsending) = JsonMessage.newMessage(
+fun dokumentkravInnsendtEventMedKrav(
+    opprettet: LocalDateTime = LocalDateTime.now(),
+    vararg dokumentKravInnsending: DokumentKravInnsending,
+) = JsonMessage.newMessage(
     eventName = "dokumentkrav_innsendt",
     map = mapOf(
         "hendelseId" to UUID.randomUUID(),
         "ident" to "12312312312",
         "søknad_uuid" to søknadId,
+        "@opprettet" to opprettet,
         "dokumentkrav" to dokumentKravInnsending.map {
             mapOf(
                 "dokumentnavn" to it.dokumentnavn,
@@ -122,14 +134,17 @@ fun dokumentkravInnsendtEventMedKrav(vararg dokumentKravInnsending: DokumentKrav
     )
 )
 
-fun dokumentkravInnsendtEventFraOrkestratorMedKrav(vararg dokumentKravInnsending: DokumentKravInnsending) = JsonMessage.newMessage(
+fun dokumentkravInnsendtEventFraOrkestratorMedKrav(
+    opprettet: LocalDateTime,
+    vararg dokumentKravInnsending: DokumentKravInnsending,
+) = JsonMessage.newMessage(
     eventName = "dokumentkrav_innsendt",
     map = mapOf(
         "hendelseId" to UUID.randomUUID(),
         "ident" to "12312312312",
         "søknad_uuid" to søknadId,
         "kilde" to "orkestrator",
-        "@opprettet" to "2026-09-10T11:47:05",
+        "@opprettet" to opprettet,
         "dokumentkrav" to dokumentKravInnsending.map {
             mapOf(
                 "dokumentnavn" to it.dokumentnavn,
