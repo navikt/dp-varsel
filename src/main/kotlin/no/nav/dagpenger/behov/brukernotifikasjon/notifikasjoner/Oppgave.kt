@@ -100,6 +100,7 @@ internal data class Oppgave(
         val deaktiveringstidspunkt: LocalDateTime?,
         val deaktiveringsgrunn: Done.Grunn?,
         val synligFramTil: LocalDateTime,
+        val eksternVarslingTekst: String?,
     ) {
         constructor(oppgave: Oppgave) : this(
             oppgave.eventId,
@@ -113,7 +114,8 @@ internal data class Oppgave(
             oppgave.aktiv,
             oppgave.deaktiveringstidspunkt,
             oppgave.deaktiveringsgrunn,
-            oppgave.synligFramTil
+            oppgave.synligFramTil,
+            oppgave.eksternVarslingTekst,
         )
     }
 }

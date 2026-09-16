@@ -17,6 +17,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import java.net.URL
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter.ofPattern
+import java.util.Locale
 import java.util.UUID
 
 internal class DokumentInnsendtRiver(
@@ -48,7 +50,6 @@ internal class DokumentInnsendtRiver(
     }
 
     private val oppgavetekst = "Vi mangler dokumentasjon for å kunne behandle søknaden din om dagpenger. Ettersend her."
-    private val meldingtekst = "Hei! Vi har fått søknaden din. Logg inn på Nav for å ettersende dokumenter, vi må ha dokumentene innen 14 dager for å vurdere søknaden. Vennlig hilsen Nav"
 
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val søknadId = packet["søknad_uuid"].asUUID()
@@ -91,9 +92,15 @@ internal class DokumentInnsendtRiver(
         søknadId = søknadId,
         synligFramTil = LocalDateTime.now().plusWeeks(3),
         eksternVarsling = true,
-        eksternVarslingTekst = meldingtekst
+        eksternVarslingTekst = varseltekst(opprettet),
     )
 
+    private fun varseltekst(opprettet: LocalDateTime): String {
+        val toUkerEtterOpprettet = opprettet.plusWeeks(2)
+        val formattertDato = toUkerEtterOpprettet.format(ofPattern("d. MMMM", Locale.of("no", "NO")))
+
+        return "Hei! Vi mangler dokumenter fra deg for å kunne behandle søknaden din. Logg inn på Nav for å sende inn dokumentene innen $formattertDato. Vennlig hilsen Nav"
+    }
 
     private fun urlTilEttersendingssiden(søknadId: UUID, kilde: String): URL {
         if(kilde == "orkestrator") {
