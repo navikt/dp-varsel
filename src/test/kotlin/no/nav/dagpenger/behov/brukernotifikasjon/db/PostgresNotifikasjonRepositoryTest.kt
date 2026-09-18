@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.URL
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -42,7 +43,8 @@ class PostgresNotifikasjonRepositoryTest {
     @Test
     fun `Lagre oppgave`() = withMigratedDb {
         with(PostgresNotifikasjonRepository(dataSource)) {
-            val originalOppgave = giveMeOppgave()
+            val utsattTidspunkt = LocalDateTime.of(2026, 8, 20, 10, 11, 12, 987_654_321)
+            val originalOppgave = giveMeOppgave(eksternVarslingUtsendingstidspunkt = utsattTidspunkt)
             lagre(originalOppgave)
 
             assertEquals(1, getAntallRader("nokkel"))
@@ -63,6 +65,23 @@ class PostgresNotifikasjonRepositoryTest {
             assertEquals(original.aktiv, persistert.aktiv)
             assertNull(persistert.deaktiveringstidspunkt)
             assertNotNull(persistert.synligFramTil)
+            assertEquals(
+                original.eksternVarslingUtsendingstidspunkt?.truncatedTo(ChronoUnit.SECONDS),
+                persistert.eksternVarslingUtsendingstidspunkt?.truncatedTo(ChronoUnit.SECONDS)
+            )
+        }
+    }
+
+    @Test
+    fun `Lagre oppgave uten utsendingstidspunkt`() = withMigratedDb {
+        with(PostgresNotifikasjonRepository(dataSource)) {
+            val originalOppgave = giveMeOppgave()
+            lagre(originalOppgave)
+
+            val original = originalOppgave.getSnapshot()
+            val aktiveOppgaver = hentAktiveOppgaver(original.ident, original.søknadId)
+            val persistert = aktiveOppgaver[0].getSnapshot()
+            assertNull(persistert.eksternVarslingUtsendingstidspunkt)
         }
     }
 

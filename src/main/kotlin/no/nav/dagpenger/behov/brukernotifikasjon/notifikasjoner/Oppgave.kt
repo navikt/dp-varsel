@@ -31,6 +31,7 @@ internal data class Oppgave(
     private val synligFramTil: LocalDateTime,
     private val aktiv: Boolean = true,
     private val eksternVarslingTekst: String? = null,
+    private val eksternVarslingUtsendingstidspunkt: LocalDateTime? = null,
 ) : NotifikasjonKommando(), NotifikasjonMelding {
     constructor(
         ident: Ident,
@@ -42,6 +43,7 @@ internal data class Oppgave(
         synligFramTil: LocalDateTime,
         eksternVarsling: Boolean = false,
         eksternVarslingTekst: String? = null,
+        eksternVarslingUtsendingstidspunkt: LocalDateTime? = null,
     ) : this(
         ident = ident,
         eventId = eventId,
@@ -54,7 +56,8 @@ internal data class Oppgave(
         deaktiveringstidspunkt = null,
         deaktiveringsgrunn = null,
         synligFramTil = synligFramTil,
-        eksternVarslingTekst = eksternVarslingTekst
+        eksternVarslingTekst = eksternVarslingTekst,
+        eksternVarslingUtsendingstidspunkt = eksternVarslingUtsendingstidspunkt,
     )
 
     override fun getNøkkel() = Nøkkel(eventId, ident)
@@ -76,6 +79,7 @@ internal data class Oppgave(
         if (this@Oppgave.eksternVarsling) eksternVarsling {
             preferertKanal = SMS
             smsVarslingstekst = eksternVarslingTekst
+            utsettSendingTil = this@Oppgave.eksternVarslingUtsendingstidspunkt?.atZone(ZoneId.of("Europe/Oslo"))
         }
     }
 
@@ -100,6 +104,8 @@ internal data class Oppgave(
         val deaktiveringstidspunkt: LocalDateTime?,
         val deaktiveringsgrunn: Done.Grunn?,
         val synligFramTil: LocalDateTime,
+        val eksternVarslingTekst: String?,
+        val eksternVarslingUtsendingstidspunkt: LocalDateTime?,
     ) {
         constructor(oppgave: Oppgave) : this(
             oppgave.eventId,
@@ -113,7 +119,9 @@ internal data class Oppgave(
             oppgave.aktiv,
             oppgave.deaktiveringstidspunkt,
             oppgave.deaktiveringsgrunn,
-            oppgave.synligFramTil
+            oppgave.synligFramTil,
+            oppgave.eksternVarslingTekst,
+            oppgave.eksternVarslingUtsendingstidspunkt,
         )
     }
 }

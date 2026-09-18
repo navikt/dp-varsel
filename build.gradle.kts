@@ -21,7 +21,7 @@ configurations.all {
 }
 
 dependencies {
-    val ktorVersion = "3.5.2"
+    val ktorVersion = "3.6.0"
 
     implementation(platform("tools.jackson:jackson-bom:3.2.2"))
     implementation("tools.jackson.core:jackson-databind")
@@ -38,7 +38,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.12.2")
-    implementation("io.confluent:kafka-avro-serializer:7.9.9")
+    implementation("io.confluent:kafka-avro-serializer:7.9.10")
 
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
     implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
