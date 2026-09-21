@@ -9,14 +9,13 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://packages.confluent.io/maven")
     maven("https://jitpack.io")
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 configurations.all {
     resolutionStrategy {
-        // Sårbar versjon av snappy-java i kafka-avro-serializer:7.5.0 via kafka-clients:3.5.0
+        // Sårbar versjon av snappy-java i kafka-clients via rapids-and-rivers
         force("org.xerial.snappy:snappy-java:1.1.10.8")
         // Sårbare logback-versjoner via rapids-and-rivers (GHSA-4c8g-c2f3-jvpq, GHSA-95hg-crgm-wfvg)
         force("ch.qos.logback:logback-core:1.6.3")
@@ -41,8 +40,6 @@ dependencies {
     implementation("com.github.navikt:rapids-and-rivers:2026071513121784113927")
     implementation("io.github.oshai:kotlin-logging-jvm:8.0.4")
     implementation("com.natpryce:konfig:1.6.10.0")
-    implementation("org.apache.avro:avro:1.12.2")
-    implementation("io.confluent:kafka-avro-serializer:7.9.10")
 
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
     implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
