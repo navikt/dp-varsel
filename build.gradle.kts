@@ -38,7 +38,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.12.2")
-    implementation("io.confluent:kafka-avro-serializer:7.9.10")
+    implementation("io.confluent:kafka-avro-serializer:8.3.2")
 
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
     implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
