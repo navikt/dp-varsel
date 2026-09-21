@@ -1,42 +1,42 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import mu.KotlinLogging
-import mu.withLoggingContext
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Done
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Deaktivering
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
-import io.micrometer.core.instrument.MeterRegistry
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 
 internal class VedtakFraArenaRiver(
     rapidsConnection: RapidsConnection,
-    private val ettersendinger: Ettersendinger
+    private val ettersendinger: Ettersendinger,
 ) : River.PacketListener {
-
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("table", "SIAMO.VEDTAK") }
-            validate {
-                it.requireKey(
-                    "op_ts",
-                    "after.VEDTAK_ID",
-                    "after.SAK_ID",
-                    "after.FRA_DATO",
-                    "@opprettet",
-                    "FODSELSNR"
-                )
-            }
-            validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G", "E")) }
-            validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
-            validate { it.interestedIn("after", "tokens") }
-            validate { it.interestedIn("after.TIL_DATO") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("table", "SIAMO.VEDTAK") }
+                validate {
+                    it.requireKey(
+                        "op_ts",
+                        "after.VEDTAK_ID",
+                        "after.SAK_ID",
+                        "after.FRA_DATO",
+                        "@opprettet",
+                        "FODSELSNR",
+                    )
+                }
+                validate { it.requireAny("after.VEDTAKTYPEKODE", listOf("O", "G", "E")) }
+                validate { it.requireAny("after.UTFALLKODE", listOf("JA", "NEI")) }
+                validate { it.interestedIn("after", "tokens") }
+                validate { it.interestedIn("after.TIL_DATO") }
+            }.register(this)
     }
 
     private companion object {
@@ -44,7 +44,12 @@ internal class VedtakFraArenaRiver(
         private val sikkerLogger = KotlinLogging.logger("tjenestekall")
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val ident = Ident(packet["FODSELSNR"].asText())
         val vedtakId = packet["after"]["VEDTAK_ID"].asText()
         val sakId = packet["after"]["SAK_ID"].asText()
@@ -52,15 +57,16 @@ internal class VedtakFraArenaRiver(
 
         withLoggingContext(
             "fagsakId" to sakId,
-            "vedtakId" to vedtakId
+            "vedtakId" to vedtakId,
         ) {
             logger.info { "Mottok nytt vedtak" }
             sikkerLogger.info { "Mottok nytt vedtak for person ${ident.ident}: ${packet.toJson()}" }
-            val deaktivering = Deaktivering(
-                ident,
-                opprettet,
-                Done.Grunn.VEDTAK_ELLER_AVSLAG
-            )
+            val deaktivering =
+                Deaktivering(
+                    ident,
+                    opprettet,
+                    Done.Grunn.VEDTAK_ELLER_AVSLAG,
+                )
             ettersendinger.deaktiverAlleOppgaver(deaktivering)
         }
     }

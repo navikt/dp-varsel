@@ -4,10 +4,9 @@ import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal object OppgaveObjectMother {
-
     fun giveMeOppgave(
         ident: Ident = Ident("***********"),
         eventId: UUID = UUID.randomUUID(),
@@ -16,7 +15,7 @@ internal object OppgaveObjectMother {
         aktiv: Boolean = true,
         søknadId: UUID = UUID.randomUUID(),
         synligFramTil: LocalDateTime = LocalDateTime.now().plusWeeks(3),
-        eksternVarslingUtsendingstidspunkt: LocalDateTime? = null
+        eksternVarslingUtsendingstidspunkt: LocalDateTime? = null,
     ) = Oppgave(
         ident = ident,
         eventId = eventId,
@@ -30,7 +29,6 @@ internal object OppgaveObjectMother {
         deaktiveringsgrunn = null,
         synligFramTil = synligFramTil,
         aktiv = aktiv,
-        eksternVarslingUtsendingstidspunkt = eksternVarslingUtsendingstidspunkt
+        eksternVarslingUtsendingstidspunkt = eksternVarslingUtsendingstidspunkt,
     )
-
 }

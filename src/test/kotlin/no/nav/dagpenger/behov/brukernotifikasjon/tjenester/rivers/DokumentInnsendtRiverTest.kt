@@ -1,20 +1,20 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.EttersendingUtført
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.net.URL
 import java.time.LocalDateTime
-import java.util.*
-import kotlin.test.assertEquals
+import java.util.UUID
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 internal class DokumentInnsendtRiverTest {
@@ -39,10 +39,11 @@ internal class DokumentInnsendtRiverTest {
     @Test
     fun `skal publisere oppgave hvis minst et dokumentkrav skal sendes senere`() {
         val opprettet = LocalDateTime.of(2026, 8, 16, 10, 11, 12)
-        val event = dokumentkravInnsendtEventMedKrav(
-            opprettet,
-            DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE")
-        )
+        val event =
+            dokumentkravInnsendtEventMedKrav(
+                opprettet,
+                DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE"),
+            )
         rapid.sendTestMessage(event.toJson())
 
         val opprettetOppgave = slot<Oppgave>()
@@ -62,14 +63,14 @@ internal class DokumentInnsendtRiverTest {
         assertTrue(snapshotAvOpprettetOppgave.synligFramTil.isBefore(omTreUkerPlusEtMinutt))
     }
 
-
     @Test
     fun `skal publisere oppgave hvis minst et dokumentkrav skal sendes senere fra orkestrator søknad`() {
         val opprettet = LocalDateTime.of(2026, 8, 16, 10, 11, 12)
-        val event = dokumentkravInnsendtEventFraOrkestratorMedKrav(
-            opprettet,
-            DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE")
-        )
+        val event =
+            dokumentkravInnsendtEventFraOrkestratorMedKrav(
+                opprettet,
+                DokumentKravInnsending("navn1", "skjemakode", "SEND_SENERE"),
+            )
         rapid.sendTestMessage(event.toJson())
 
         val opprettetOppgave = slot<Oppgave>()
@@ -96,11 +97,12 @@ internal class DokumentInnsendtRiverTest {
     @Test
     fun `skal publisere deaktivere oppgave hvis ingen flere av dokumentkravene skal sendes senere`() {
         val opprettet = LocalDateTime.of(2026, 8, 16, 10, 11, 12)
-        val eventUtenUteståendeKrav = dokumentkravInnsendtEventMedKrav(
-            opprettet,
-            DokumentKravInnsending("navn1", "skjemakode", "SEND_NÅ"),
-            DokumentKravInnsending("navn2", "skjemakode", "SENDER_IKKE")
-        )
+        val eventUtenUteståendeKrav =
+            dokumentkravInnsendtEventMedKrav(
+                opprettet,
+                DokumentKravInnsending("navn1", "skjemakode", "SEND_NÅ"),
+                DokumentKravInnsending("navn2", "skjemakode", "SENDER_IKKE"),
+            )
         rapid.sendTestMessage(eventUtenUteståendeKrav.toJson())
 
         val ettersendingUtført = slot<EttersendingUtført>()
@@ -109,7 +111,6 @@ internal class DokumentInnsendtRiverTest {
             ettersendinger.markerOppgaveSomUtført(capture(ettersendingUtført))
         }
     }
-
 }
 
 private val søknadId = UUID.randomUUID()
@@ -119,19 +120,21 @@ fun dokumentkravInnsendtEventMedKrav(
     vararg dokumentKravInnsending: DokumentKravInnsending,
 ) = JsonMessage.newMessage(
     eventName = "dokumentkrav_innsendt",
-    map = mapOf(
-        "hendelseId" to UUID.randomUUID(),
-        "ident" to "12312312312",
-        "søknad_uuid" to søknadId,
-        "@opprettet" to opprettet,
-        "dokumentkrav" to dokumentKravInnsending.map {
-            mapOf(
-                "dokumentnavn" to it.dokumentnavn,
-                "skjemakode" to it.skjemakode,
-                "valg" to it.valg
-            )
-        }
-    )
+    map =
+        mapOf(
+            "hendelseId" to UUID.randomUUID(),
+            "ident" to "12312312312",
+            "søknad_uuid" to søknadId,
+            "@opprettet" to opprettet,
+            "dokumentkrav" to
+                dokumentKravInnsending.map {
+                    mapOf(
+                        "dokumentnavn" to it.dokumentnavn,
+                        "skjemakode" to it.skjemakode,
+                        "valg" to it.valg,
+                    )
+                },
+        ),
 )
 
 fun dokumentkravInnsendtEventFraOrkestratorMedKrav(
@@ -139,24 +142,26 @@ fun dokumentkravInnsendtEventFraOrkestratorMedKrav(
     vararg dokumentKravInnsending: DokumentKravInnsending,
 ) = JsonMessage.newMessage(
     eventName = "dokumentkrav_innsendt",
-    map = mapOf(
-        "hendelseId" to UUID.randomUUID(),
-        "ident" to "12312312312",
-        "søknad_uuid" to søknadId,
-        "kilde" to "orkestrator",
-        "@opprettet" to opprettet,
-        "dokumentkrav" to dokumentKravInnsending.map {
-            mapOf(
-                "dokumentnavn" to it.dokumentnavn,
-                "skjemakode" to it.skjemakode,
-                "valg" to it.valg
-            )
-        }
-    )
+    map =
+        mapOf(
+            "hendelseId" to UUID.randomUUID(),
+            "ident" to "12312312312",
+            "søknad_uuid" to søknadId,
+            "kilde" to "orkestrator",
+            "@opprettet" to opprettet,
+            "dokumentkrav" to
+                dokumentKravInnsending.map {
+                    mapOf(
+                        "dokumentnavn" to it.dokumentnavn,
+                        "skjemakode" to it.skjemakode,
+                        "valg" to it.valg,
+                    )
+                },
+        ),
 )
 
 data class DokumentKravInnsending(
     internal val dokumentnavn: String,
     internal val skjemakode: String,
-    internal val valg: String
+    internal val valg: String,
 )

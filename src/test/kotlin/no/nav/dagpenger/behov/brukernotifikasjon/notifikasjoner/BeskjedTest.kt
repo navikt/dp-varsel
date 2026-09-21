@@ -1,6 +1,5 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
-import kotlin.test.assertEquals
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -10,16 +9,18 @@ import no.nav.tms.varsel.builder.BuilderEnvironment
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
+import kotlin.test.assertEquals
 
 class BeskjedTest {
-
     @BeforeEach
     fun setup() {
-        BuilderEnvironment.extend(mapOf(
-            "NAIS_CLUSTER_NAME" to "dev-fss",
-            "NAIS_APP_NAME" to "dp-varsel",
-            "NAIS_NAMESPACE" to "teamdagpenger",
-        ))
+        BuilderEnvironment.extend(
+            mapOf(
+                "NAIS_CLUSTER_NAME" to "dev-fss",
+                "NAIS_APP_NAME" to "dp-varsel",
+                "NAIS_NAMESPACE" to "teamdagpenger",
+            ),
+        )
     }
 
     @Test
@@ -42,4 +43,3 @@ class BeskjedTest {
         assertEquals("\"${EksternKanal.SMS}\"", prefererteKanaler.first().toString())
     }
 }
-

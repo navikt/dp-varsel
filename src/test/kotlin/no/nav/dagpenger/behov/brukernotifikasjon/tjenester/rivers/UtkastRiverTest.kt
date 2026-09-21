@@ -1,10 +1,11 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import no.nav.dagpenger.behov.brukernotifikasjon.brukerdialog_url
 import no.nav.dagpenger.behov.brukernotifikasjon.helpers.TestTopic
 import no.nav.dagpenger.behov.brukernotifikasjon.soknadsdialogens_url
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -13,7 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.util.UUID
 import kotlin.test.assertContains
-import no.nav.dagpenger.behov.brukernotifikasjon.brukerdialog_url
 
 internal class UtkastRiverTest {
     private val topic = TestTopic()
@@ -57,7 +57,6 @@ internal class UtkastRiverTest {
         }
     }
 
-
     @Test
     fun `skal publisere opprettet for brukerdialog`() {
         val søknadId1 = UUID.randomUUID()
@@ -92,6 +91,7 @@ internal class UtkastRiverTest {
             assertTrue(message(0).has("utkastId"))
         }
     }
+
     @Test
     fun `skal publisere slettet for brukerdialog`() {
         val søknadId = UUID.randomUUID()
@@ -102,7 +102,6 @@ internal class UtkastRiverTest {
             assertEquals("deleted", field(0, "@event_name").asText())
             assertTrue(message(0).has("utkastId"))
             assertContains(field(0, "link").asText(), "$brukerdialogUrl/$søknadId")
-
         }
     }
 
@@ -113,15 +112,19 @@ internal class UtkastRiverTest {
         "Slettet, Dagpenger, true",
         "Påbegynt, Innsending, false",
         "Innsendt, Innsending, true",
-        "Slettet, Innsending, true"
+        "Slettet, Innsending, true",
     )
-    fun `sjekk om pakken skal publisers`(tilstand: String, navn: String, skalSendes: Boolean) {
-        val message = tilstandEndret(tilstand, navn).let { JsonMessage(it, MessageProblems(it)) }.apply {
-            interestedIn("søknad_uuid", "ident", "gjeldendeTilstand", "prosessnavn")
-        }
+    fun `sjekk om pakken skal publisers`(
+        tilstand: String,
+        navn: String,
+        skalSendes: Boolean,
+    ) {
+        val message =
+            tilstandEndret(tilstand, navn).let { JsonMessage(it, MessageProblems(it)) }.apply {
+                interestedIn("søknad_uuid", "ident", "gjeldendeTilstand", "prosessnavn")
+            }
         assertEquals(skalSendes, SøknadEndretTilstand(message, "").skalPubliseres())
     }
-
 
     @ParameterizedTest(name = "{0} av {1} søknad fra Brukerdialog skal sendes: {2}")
     @CsvSource(
@@ -130,36 +133,50 @@ internal class UtkastRiverTest {
         "Slettet, Dagpenger, true",
         "Påbegynt, Innsending, false",
         "Innsendt, Innsending, true",
-        "Slettet, Innsending, true"
+        "Slettet, Innsending, true",
     )
-    fun `sjekk om pakken fra brukerdialog skal publisers`(tilstand: String, navn: String, skalSendes: Boolean) {
+    fun `sjekk om pakken fra brukerdialog skal publisers`(
+        tilstand: String,
+        navn: String,
+        skalSendes: Boolean,
+    ) {
         val søknadId = UUID.randomUUID()
-        val message = tilstandEndretBrukerdialog(tilstand, navn, søknadId).let { JsonMessage(it, MessageProblems(it)) }.apply {
-            interestedIn("søknad_uuid", "ident", "gjeldendeTilstand", "prosessnavn")
-        }
+        val message =
+            tilstandEndretBrukerdialog(tilstand, navn, søknadId).let { JsonMessage(it, MessageProblems(it)) }.apply {
+                interestedIn("søknad_uuid", "ident", "gjeldendeTilstand", "prosessnavn")
+            }
         assertEquals(skalSendes, SøknadEndretTilstand(message, "orkestrator").skalPubliseres())
     }
 }
 
-private fun tilstandEndret(tilstand: String, prosessnavn: String? = null) = JsonMessage.newMessage(
-    "søknad_endret_tilstand",
-    listOfNotNull(
-        "ident" to "12312312312",
-        "søknad_uuid" to UUID.randomUUID(),
-        "forrigeTilstand" to "Opprettet",
-        "gjeldendeTilstand" to tilstand,
-        prosessnavn?.let { "prosessnavn" to prosessnavn }
-    ).toMap()
-).toJson()
+private fun tilstandEndret(
+    tilstand: String,
+    prosessnavn: String? = null,
+) = JsonMessage
+    .newMessage(
+        "søknad_endret_tilstand",
+        listOfNotNull(
+            "ident" to "12312312312",
+            "søknad_uuid" to UUID.randomUUID(),
+            "forrigeTilstand" to "Opprettet",
+            "gjeldendeTilstand" to tilstand,
+            prosessnavn?.let { "prosessnavn" to prosessnavn },
+        ).toMap(),
+    ).toJson()
 
-private fun tilstandEndretBrukerdialog(tilstand: String, prosessnavn: String? = null, søknadId: UUID) = JsonMessage.newMessage(
-    "søknad_endret_tilstand",
-    listOfNotNull(
-        "ident" to "12312312312",
-        "søknad_uuid" to søknadId,
-        "forrigeTilstand" to "Opprettet",
-        "kilde" to "orkestrator",
-        "gjeldendeTilstand" to tilstand,
-        prosessnavn?.let { "prosessnavn" to prosessnavn }
-    ).toMap()
-).toJson()
+private fun tilstandEndretBrukerdialog(
+    tilstand: String,
+    prosessnavn: String? = null,
+    søknadId: UUID,
+) = JsonMessage
+    .newMessage(
+        "søknad_endret_tilstand",
+        listOfNotNull(
+            "ident" to "12312312312",
+            "søknad_uuid" to søknadId,
+            "forrigeTilstand" to "Opprettet",
+            "kilde" to "orkestrator",
+            "gjeldendeTilstand" to tilstand,
+            prosessnavn?.let { "prosessnavn" to prosessnavn },
+        ).toMap(),
+    ).toJson()

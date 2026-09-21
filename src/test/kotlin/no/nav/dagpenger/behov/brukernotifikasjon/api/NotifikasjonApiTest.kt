@@ -1,11 +1,14 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.api
 
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType.Application.Json
-import io.ktor.serialization.jackson3.*
-import io.ktor.server.testing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.jackson3.jackson
+import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -26,81 +29,89 @@ class NotifikasjonApiTest {
 
     @Test
     @Disabled
-    fun testGetBeskjed() = testApplication {
-        application {
-            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
+    fun testGetBeskjed() =
+        testApplication {
+            application {
+                notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
+            }
+            client.get("/beskjed").apply {
+                TODO("Please write your test here")
+            }
         }
-        client.get("/beskjed").apply {
-            TODO("Please write your test here")
-        }
-    }
 
     @Test
-    fun testPostBeskjed() = testApplication {
-        val client = createClient {
-            install(ContentNegotiation) {
-                jackson { }
+    fun testPostBeskjed() =
+        testApplication {
+            val client =
+                createClient {
+                    install(ContentNegotiation) {
+                        jackson { }
+                    }
+                }
+            application {
+                notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
             }
-        }
-        application {
-            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
-        }
-        client.post("/beskjed") {
-            header("Content-Type", Json)
-            setBody(
-                PostBeskjed(
-                    ident,
-                    tekst,
-                    true
-                )
-            )
-        }.apply {
-            val kommando = slot<Beskjed>()
+            client
+                .post("/beskjed") {
+                    header("Content-Type", Json)
+                    setBody(
+                        PostBeskjed(
+                            ident,
+                            tekst,
+                            true,
+                        ),
+                    )
+                }.apply {
+                    val kommando = slot<Beskjed>()
 
-            verify {
-                notifikasjoner.send(capture(kommando))
-            }
+                    verify {
+                        notifikasjoner.send(capture(kommando))
+                    }
 
-            assertEquals(Ident(ident), kommando.captured.getSnapshot().ident)
-            assertEquals(tekst, kommando.captured.getSnapshot().tekst)
+                    assertEquals(Ident(ident), kommando.captured.getSnapshot().ident)
+                    assertEquals(tekst, kommando.captured.getSnapshot().tekst)
+                }
         }
-    }
 
     @Test
     @Disabled
-    fun testGetBeskjedId() = testApplication {
-        application {
-            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
+    fun testGetBeskjedId() =
+        testApplication {
+            application {
+                notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
+            }
+            client.get("/beskjed/{id").apply {
+                TODO("Please write your test here")
+            }
         }
-        client.get("/beskjed/{id").apply {
-            TODO("Please write your test here")
-        }
-    }
 
     @Test
-    fun testBroadcastBeskjed() = testApplication {
-        val client = createClient {
-            install(ContentNegotiation) {
-                jackson { }
+    fun testBroadcastBeskjed() =
+        testApplication {
+            val client =
+                createClient {
+                    install(ContentNegotiation) {
+                        jackson { }
+                    }
+                }
+            application {
+                notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
             }
-        }
-        application {
-            notifikasjonApi(notifikasjoner, notifikasjonBroadcaster)
-        }
-        client.post("/internal/broadcast") {
-            header("Content-Type", Json)
-            setBody(
-                PostBeskjedTilAlleIdenter(true)
-            )
-        }.apply {
-            val isDryRun = slot<Boolean>()
+            client
+                .post("/internal/broadcast") {
+                    header("Content-Type", Json)
+                    setBody(
+                        PostBeskjedTilAlleIdenter(true),
+                    )
+                }.apply {
+                    val isDryRun = slot<Boolean>()
 
-            verify {
-                notifikasjonBroadcaster.sendBeskjedTilAlleIdenterISecreten(capture(isDryRun))
-            }
+                    verify {
+                        notifikasjonBroadcaster.sendBeskjedTilAlleIdenterISecreten(capture(isDryRun))
+                    }
 
-            assertTrue(isDryRun.captured)
-            assertEquals(HttpStatusCode.OK, status)
+                    assertTrue(isDryRun.captured)
+                    assertEquals(HttpStatusCode.OK, status)
+                }
         }
-    }
 }

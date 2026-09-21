@@ -1,6 +1,5 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner
 
-import kotlin.test.assertEquals
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -16,31 +15,34 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.util.UUID
+import kotlin.test.assertEquals
 
 class OppgaveTest {
-
     @BeforeEach
     fun setup() {
-        BuilderEnvironment.extend(mapOf(
-            "NAIS_CLUSTER_NAME" to "dev-fss",
-            "NAIS_APP_NAME" to "dp-varsel",
-            "NAIS_NAMESPACE" to "teamdagpenger",
-        ))
+        BuilderEnvironment.extend(
+            mapOf(
+                "NAIS_CLUSTER_NAME" to "dev-fss",
+                "NAIS_APP_NAME" to "dp-varsel",
+                "NAIS_NAMESPACE" to "teamdagpenger",
+            ),
+        )
     }
 
     @Test
     fun `Ekstern varsling er ikke med i json-meldingen når eksterVarsling er false i Beskjed`() {
-        val utenEksternVarsling = Oppgave(
-            ident = Ident("12345678901"),
-            eventId = UUID.randomUUID(),
-            tekst = "Dette er tekst",
-            opprettet = LocalDateTime.now(),
-            link = URL("https://www.nav.no"),
-            søknadId = UUID.randomUUID(),
-            synligFramTil = LocalDateTime.now().plusWeeks(3),
-            eksternVarsling = false,
-            eksternVarslingTekst = null,
-        )
+        val utenEksternVarsling =
+            Oppgave(
+                ident = Ident("12345678901"),
+                eventId = UUID.randomUUID(),
+                tekst = "Dette er tekst",
+                opprettet = LocalDateTime.now(),
+                link = URL("https://www.nav.no"),
+                søknadId = UUID.randomUUID(),
+                synligFramTil = LocalDateTime.now().plusWeeks(3),
+                eksternVarsling = false,
+                eksternVarslingTekst = null,
+            )
 
         val somInputJson = Json.parseToJsonElement(utenEksternVarsling.somInput())
         assertNull(somInputJson.jsonObject["eksternVarsling"])
@@ -48,17 +50,18 @@ class OppgaveTest {
 
     @Test
     fun `Vi bruker SMS som preferert kanal når eksternVarsling er true`() {
-        val oppgaveMedEksernVarsling = Oppgave(
-            ident = Ident("12345678901"),
-            eventId = UUID.randomUUID(),
-            tekst = "Dette er tekst",
-            opprettet = LocalDateTime.now(),
-            link = URL("https://www.nav.no"),
-            søknadId = UUID.randomUUID(),
-            synligFramTil = LocalDateTime.now().plusWeeks(3),
-            eksternVarsling = true,
-            eksternVarslingTekst = null,
-        )
+        val oppgaveMedEksernVarsling =
+            Oppgave(
+                ident = Ident("12345678901"),
+                eventId = UUID.randomUUID(),
+                tekst = "Dette er tekst",
+                opprettet = LocalDateTime.now(),
+                link = URL("https://www.nav.no"),
+                søknadId = UUID.randomUUID(),
+                synligFramTil = LocalDateTime.now().plusWeeks(3),
+                eksternVarsling = true,
+                eksternVarslingTekst = null,
+            )
 
         val somInputJson = Json.parseToJsonElement(oppgaveMedEksernVarsling.somInput())
 
@@ -67,24 +70,24 @@ class OppgaveTest {
         assertEquals(1, prefererteKanaler.size)
         assertEquals("\"${EksternKanal.SMS}\"", prefererteKanaler.first().toString())
         assertNull(eksternVarsling.jsonObject["smsVarslingstekst"])
-
     }
 
     @Test
     fun `Ekstern varsling får utsettSendingTil når utsendingstidspunkt er satt`() {
         val utsattTidspunkt = LocalDateTime.now().plusDays(4)
-        val oppgaveMedEksernVarsling = Oppgave(
-            ident = Ident("12345678901"),
-            eventId = UUID.randomUUID(),
-            tekst = "Dette er tekst",
-            opprettet = LocalDateTime.now(),
-            link = URL("https://www.nav.no"),
-            søknadId = UUID.randomUUID(),
-            synligFramTil = LocalDateTime.now().plusWeeks(3),
-            eksternVarsling = true,
-            eksternVarslingTekst = null,
-            eksternVarslingUtsendingstidspunkt = utsattTidspunkt,
-        )
+        val oppgaveMedEksernVarsling =
+            Oppgave(
+                ident = Ident("12345678901"),
+                eventId = UUID.randomUUID(),
+                tekst = "Dette er tekst",
+                opprettet = LocalDateTime.now(),
+                link = URL("https://www.nav.no"),
+                søknadId = UUID.randomUUID(),
+                synligFramTil = LocalDateTime.now().plusWeeks(3),
+                eksternVarsling = true,
+                eksternVarslingTekst = null,
+                eksternVarslingUtsendingstidspunkt = utsattTidspunkt,
+            )
 
         val somInputJson = Json.parseToJsonElement(oppgaveMedEksernVarsling.somInput())
 
@@ -96,17 +99,18 @@ class OppgaveTest {
 
     @Test
     fun `Ekstern varsling får ikke utsettSendingTil når utsendingstidspunkt ikke er satt`() {
-        val oppgaveMedEksernVarsling = Oppgave(
-            ident = Ident("12345678901"),
-            eventId = UUID.randomUUID(),
-            tekst = "Dette er tekst",
-            opprettet = LocalDateTime.now(),
-            link = URL("https://www.nav.no"),
-            søknadId = UUID.randomUUID(),
-            synligFramTil = LocalDateTime.now().plusWeeks(3),
-            eksternVarsling = true,
-            eksternVarslingTekst = null,
-        )
+        val oppgaveMedEksernVarsling =
+            Oppgave(
+                ident = Ident("12345678901"),
+                eventId = UUID.randomUUID(),
+                tekst = "Dette er tekst",
+                opprettet = LocalDateTime.now(),
+                link = URL("https://www.nav.no"),
+                søknadId = UUID.randomUUID(),
+                synligFramTil = LocalDateTime.now().plusWeeks(3),
+                eksternVarsling = true,
+                eksternVarslingTekst = null,
+            )
 
         val somInputJson = Json.parseToJsonElement(oppgaveMedEksernVarsling.somInput())
 

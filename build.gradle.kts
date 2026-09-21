@@ -1,3 +1,7 @@
+import jdk.internal.vm.vector.VectorSupport.test
+import sun.jvmstat.monitor.MonitoredVmUtil.mainClass
+import sun.tools.jar.resources.jar
+
 plugins {
     kotlin("jvm") version "2.4.20"
     application
@@ -35,7 +39,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     implementation("com.github.navikt:rapids-and-rivers:2026071513121784113927")
-    implementation("io.github.microutils:kotlin-logging:3.0.5")
+    implementation("io.github.oshai:kotlin-logging-jvm:8.0.4")
     implementation("com.natpryce:konfig:1.6.10.0")
     implementation("org.apache.avro:avro:1.12.2")
     implementation("io.confluent:kafka-avro-serializer:7.9.10")

@@ -1,9 +1,12 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.api
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import no.nav.dagpenger.behov.brukernotifikasjon.api.plugins.configureSerialization
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
@@ -13,7 +16,7 @@ import java.net.URL
 
 internal fun Application.notifikasjonApi(
     notifikasjoner: Notifikasjoner,
-    notifikasjonBroadcaster: NotifikasjonBroadcaster
+    notifikasjonBroadcaster: NotifikasjonBroadcaster,
 ) {
     configureSerialization()
 
@@ -39,7 +42,7 @@ data class PostBeskjed(
     val ident: String,
     val tekst: String,
     val eksternVarsling: Boolean = false,
-    val link: String? = null
+    val link: String? = null,
 ) {
     internal fun somKommando() =
         Beskjed(
@@ -47,8 +50,10 @@ data class PostBeskjed(
             tekst = tekst,
             sikkerhetsnivå = 3,
             eksternVarsling = eksternVarsling,
-            link = link?.let { URL(it) }
+            link = link?.let { URL(it) },
         )
 }
 
-data class PostBeskjedTilAlleIdenter(val dryRun: Boolean = true)
+data class PostBeskjedTilAlleIdenter(
+    val dryRun: Boolean = true,
+)

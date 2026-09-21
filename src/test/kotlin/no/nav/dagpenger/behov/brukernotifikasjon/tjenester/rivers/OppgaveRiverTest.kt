@@ -1,14 +1,14 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 internal class OppgaveRiverTest {
     private val notifikasjoner = mockk<Notifikasjoner>(relaxed = true)
@@ -37,13 +37,15 @@ internal class OppgaveRiverTest {
     }
 }
 
-val oppgaveBehov = JsonMessage.newNeed(
-    behov = listOf("brukernotifikasjon"),
-    map = mapOf(
-        "type" to "oppgave",
-        "ident" to "12312312312",
-        "tekst" to "1-2-3 nå kommer en oppgave",
-        "link" to "https://url.til.oppgaven/123",
-        "søknad_uuid" to UUID.randomUUID()
+val oppgaveBehov =
+    JsonMessage.newNeed(
+        behov = listOf("brukernotifikasjon"),
+        map =
+            mapOf(
+                "type" to "oppgave",
+                "ident" to "12312312312",
+                "tekst" to "1-2-3 nå kommer en oppgave",
+                "link" to "https://url.til.oppgaven/123",
+                "søknad_uuid" to UUID.randomUUID(),
+            ),
     )
-)

@@ -1,7 +1,7 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.helpers
 
-import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Topic
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.dagpenger.behov.brukernotifikasjon.kafka.Topic
 
 class TestTopic : Topic<String, String> {
     private val messages = mutableListOf<Pair<String?, String>>()
@@ -11,7 +11,10 @@ class TestTopic : Topic<String, String> {
         messages.add(null to melding)
     }
 
-    override fun publiser(nøkkel: String, melding: String) {
+    override fun publiser(
+        nøkkel: String,
+        melding: String,
+    ) {
         messages.add(nøkkel to melding)
     }
 }

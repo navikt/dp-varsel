@@ -1,55 +1,61 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import mu.KotlinLogging
-import mu.withLoggingContext
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.asUUID
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Notifikasjoner
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
-import io.micrometer.core.instrument.MeterRegistry
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 
 internal class BeskjedRiver(
     rapidsConnection: RapidsConnection,
-    private val notifikasjoner: Notifikasjoner
+    private val notifikasjoner: Notifikasjoner,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
-            validate { it.requireValue("type", "beskjed") }
-            validate {
-                it.requireKey(
-                    "@behovId",
-                    "@opprettet",
-                    "ident",
-                    "tekst"
-                )
-            }
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", listOf("brukernotifikasjon")) }
+                validate { it.requireValue("type", "beskjed") }
+                validate {
+                    it.requireKey(
+                        "@behovId",
+                        "@opprettet",
+                        "ident",
+                        "tekst",
+                    )
+                }
 
-            validate {
-                it.interestedIn(
-                    "link"
-                )
-            }
-        }.register(this)
+                validate {
+                    it.interestedIn(
+                        "link",
+                    )
+                }
+            }.register(this)
     }
 
     private companion object {
         val logger = KotlinLogging.logger { }
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val behovId = packet["@behovId"].asUUID()
         val ident = packet["ident"].asText()
 
         withLoggingContext(
-            "behovId" to behovId.toString()
+            "behovId" to behovId.toString(),
         ) {
             logger.info { "Løser behov for brukernotifikasjon: beskjed" }
 
@@ -58,8 +64,8 @@ internal class BeskjedRiver(
                     eventId = behovId,
                     ident = Ident(ident),
                     tekst = packet["tekst"].asText(),
-                    opprettet = packet["@opprettet"].asLocalDateTime()
-                )
+                    opprettet = packet["@opprettet"].asLocalDateTime(),
+                ),
             )
         }
     }

@@ -1,20 +1,20 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import tools.jackson.databind.JsonNode
-import mu.KotlinLogging
-import mu.withLoggingContext
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.behov.brukernotifikasjon.kafka.asUUID
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Oppgave
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.EttersendingUtført
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
-import io.micrometer.core.instrument.MeterRegistry
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import com.github.navikt.tbd_libs.rapids_and_rivers.River
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import tools.jackson.databind.JsonNode
 import java.net.URL
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ofPattern
@@ -25,24 +25,25 @@ internal class DokumentInnsendtRiver(
     rapidsConnection: RapidsConnection,
     private val ettersendinger: Ettersendinger,
     private val soknadsdialogensUrl: URL,
-    private val brukerdialogUrl: URL
+    private val brukerdialogUrl: URL,
 ) : River.PacketListener {
     private val eventnavn = "dokumentkrav_innsendt"
 
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", eventnavn) }
-            validate {
-                it.requireKey(
-                    "@opprettet",
-                    "hendelseId",
-                    "ident",
-                    "søknad_uuid",
-                    "dokumentkrav"
-                )
-            }
-            validate { it.interestedIn("kilde") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", eventnavn) }
+                validate {
+                    it.requireKey(
+                        "@opprettet",
+                        "hendelseId",
+                        "ident",
+                        "søknad_uuid",
+                        "dokumentkrav",
+                    )
+                }
+                validate { it.interestedIn("kilde") }
+            }.register(this)
     }
 
     private companion object {
@@ -51,14 +52,19 @@ internal class DokumentInnsendtRiver(
 
     private val oppgavetekst = "Vi mangler dokumentasjon for å kunne behandle søknaden din om dagpenger. Ettersend her."
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val søknadId = packet["søknad_uuid"].asUUID()
         val hendelseId = packet["hendelseId"].asUUID()
         val kilde = packet["kilde"].asText()
 
         withLoggingContext(
             "søknadId" to søknadId.toString(),
-            "hendelseId" to hendelseId.toString()
+            "hendelseId" to hendelseId.toString(),
         ) {
             logger.info { "Fant event av typen '$eventnavn', sjekker om oppgave skal opprettes eller deaktiveres" }
             val ident = Ident(packet["ident"].asText())
@@ -105,10 +111,13 @@ internal class DokumentInnsendtRiver(
 
     private fun LocalDateTime.fireDagerSenereKlokken14(): LocalDateTime = this.toLocalDate().plusDays(4).atTime(14, 0)
 
-    private fun urlTilEttersendingssiden(søknadId: UUID, kilde: String): URL {
-        if(kilde == "orkestrator") {
+    private fun urlTilEttersendingssiden(
+        søknadId: UUID,
+        kilde: String,
+    ): URL {
+        if (kilde == "orkestrator") {
             val url = URL("$brukerdialogUrl/$søknadId/ettersending")
-            logger.info("Det er en Orkestrator-søknad, bruker brukerdialog-url for ettersending med url: $url")
+            logger.info { "Det er en Orkestrator-søknad, bruker brukerdialog-url for ettersending med url: $url" }
             return url
         }
 
@@ -122,12 +131,16 @@ internal class DokumentInnsendtRiver(
     ) = EttersendingUtført(
         søknadId = søknadId,
         ident = ident,
-        deaktiveringstidspunkt = opprettet
+        deaktiveringstidspunkt = opprettet,
     )
 }
 
-private class Dokumentkrav(private val dokumentkravene: JsonNode) {
-    fun venterPåEttersendinger(): Boolean = dokumentkravene.filter { krav ->
-        krav["valg"].asText().equals("SEND_SENERE", ignoreCase = true)
-    }.isNotEmpty()
+private class Dokumentkrav(
+    private val dokumentkravene: JsonNode,
+) {
+    fun venterPåEttersendinger(): Boolean =
+        dokumentkravene
+            .filter { krav ->
+                krav["valg"].asText().equals("SEND_SENERE", ignoreCase = true)
+            }.isNotEmpty()
 }

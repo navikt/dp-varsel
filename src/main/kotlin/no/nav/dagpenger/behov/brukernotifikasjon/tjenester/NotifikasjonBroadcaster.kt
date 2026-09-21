@@ -1,6 +1,6 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.behov.brukernotifikasjon.notifikasjoner.Beskjed
 import java.net.URL
 import java.time.LocalDateTime
@@ -8,7 +8,7 @@ import java.util.*
 
 internal class NotifikasjonBroadcaster(
     private val mottakerkilde: Mottakerkilde,
-    private val notifikasjoner: Notifikasjoner
+    private val notifikasjoner: Notifikasjoner,
 ) {
     companion object {
         private val tekst =
@@ -20,12 +20,13 @@ internal class NotifikasjonBroadcaster(
     fun sendBeskjedTilAlleIdenterISecreten(dryRun: Boolean): Oppsummering {
         val identer: List<Ident> = mottakerkilde.hentMottakere()
         logger.info { "Hentet ${identer.size} identer" }
-        val oppsummering = if (dryRun) {
-            logger.info { "Dry run, ville ha produsert ${identer.size} beskjeder." }
-            Oppsummering(0, 0, identer.size)
-        } else {
-            identer.sendEnBeskjedTilHver()
-        }
+        val oppsummering =
+            if (dryRun) {
+                logger.info { "Dry run, ville ha produsert ${identer.size} beskjeder." }
+                Oppsummering(0, 0, identer.size)
+            } else {
+                identer.sendEnBeskjedTilHver()
+            }
 
         logger.info { "Oppsummering: $oppsummering" }
         return oppsummering
@@ -38,15 +39,16 @@ internal class NotifikasjonBroadcaster(
         val tidspunkt = LocalDateTime.now()
         forEach { ident ->
             try {
-                val beskjeden = Beskjed(
-                    ident,
-                    UUID.randomUUID(),
-                    tekst,
-                    tidspunkt,
-                    3,
-                    eksternVarsling = true,
-                    URL("https://www.nav.no/arbeid/dagpenger/mine-dagpenger")
-                )
+                val beskjeden =
+                    Beskjed(
+                        ident,
+                        UUID.randomUUID(),
+                        tekst,
+                        tidspunkt,
+                        3,
+                        eksternVarsling = true,
+                        URL("https://www.nav.no/arbeid/dagpenger/mine-dagpenger"),
+                    )
                 notifikasjoner.send(beskjeden)
                 sikkerLogger.info { "Sendte beskjed til $ident" }
                 success++
@@ -61,6 +63,6 @@ internal class NotifikasjonBroadcaster(
     internal data class Oppsummering(
         val success: Int,
         val feilet: Int,
-        val skulleProdusert: Int
+        val skulleProdusert: Int,
     )
 }

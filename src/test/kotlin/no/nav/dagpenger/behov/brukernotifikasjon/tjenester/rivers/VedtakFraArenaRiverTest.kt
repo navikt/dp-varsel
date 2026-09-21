@@ -1,18 +1,17 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Deaktivering
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
 import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class VedtakFraArenaRiverTest {
-
     private val ettersendinger = mockk<Ettersendinger>(relaxed = true)
     private val rapid by lazy {
         TestRapid().apply {
@@ -44,19 +43,20 @@ class VedtakFraArenaRiverTest {
         }
     }
 
-    private enum class Vedtaktypekode(val kode: String) {
+    private enum class Vedtaktypekode(
+        val kode: String,
+    ) {
         ENDRING("E"),
         GJENNOPPTAK("G"),
-        ORDINAER("O")
+        ORDINAER("O"),
     }
 
     //language=JSON
     private fun vedtakJsonV2(
         ident: Ident,
         vedtaktypekode: Vedtaktypekode,
-        opprettet: LocalDateTime = LocalDateTime.now().minusHours(2)
-    ) =
-"""
+        opprettet: LocalDateTime = LocalDateTime.now().minusHours(2),
+    ) = """
 {
     "table": "SIAMO.VEDTAK",
     "op_type": "I",
@@ -77,5 +77,5 @@ class VedtakFraArenaRiverTest {
     },
     "@opprettet": "$opprettet"
 }
-""".trimIndent()
+        """.trimIndent()
 }

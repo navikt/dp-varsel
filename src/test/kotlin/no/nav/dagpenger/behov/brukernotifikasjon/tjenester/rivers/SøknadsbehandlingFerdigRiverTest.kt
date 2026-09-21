@@ -1,12 +1,12 @@
 package no.nav.dagpenger.behov.brukernotifikasjon.tjenester.rivers
 
-import io.mockk.mockk
-import io.mockk.verify
-import io.mockk.clearAllMocks
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
-import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.mockk.clearAllMocks
+import io.mockk.mockk
+import io.mockk.verify
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ettersendinger
+import no.nav.dagpenger.behov.brukernotifikasjon.tjenester.Ident
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -36,8 +36,8 @@ internal class SøknadsbehandlingFerdigRiverTest {
             "Gjenopptak",
             "Endring",
             "Opphør",
-            "FramtidigUkjentVerdi"
-        ]
+            "FramtidigUkjentVerdi",
+        ],
     )
     fun `skal sende alle førteTil-verdier videre til ettersendinger`(førteTil: String) {
         sendFerdigbehandletSøknad(førteTil = førteTil)
@@ -50,14 +50,16 @@ internal class SøknadsbehandlingFerdigRiverTest {
     @Test
     fun `skal ikke behandle melding med manglende felt`() {
         rapid.sendTestMessage(
-            JsonMessage.newMessage(
-                eventName = "søknadsbehandling_ferdig",
-                map = mapOf(
-                    "ident" to ident,
-                    "søknadId" to søknadId,
-                    "førteTil" to "Innvilgelse"
-                )
-            ).toJson()
+            JsonMessage
+                .newMessage(
+                    eventName = "søknadsbehandling_ferdig",
+                    map =
+                        mapOf(
+                            "ident" to ident,
+                            "søknadId" to søknadId,
+                            "førteTil" to "Innvilgelse",
+                        ),
+                ).toJson(),
         )
 
         verify(exactly = 0) {
@@ -67,16 +69,18 @@ internal class SøknadsbehandlingFerdigRiverTest {
 
     private fun sendFerdigbehandletSøknad(førteTil: String) {
         rapid.sendTestMessage(
-            JsonMessage.newMessage(
-                eventName = "søknadsbehandling_ferdig",
-                map = mapOf(
-                    "ident" to ident,
-                    "behandlingId" to behandlingId,
-                    "søknadId" to søknadId,
-                    "førteTil" to førteTil,
-                    "@opprettet" to opprettet
-                )
-            ).toJson()
+            JsonMessage
+                .newMessage(
+                    eventName = "søknadsbehandling_ferdig",
+                    map =
+                        mapOf(
+                            "ident" to ident,
+                            "behandlingId" to behandlingId,
+                            "søknadId" to søknadId,
+                            "førteTil" to førteTil,
+                            "@opprettet" to opprettet,
+                        ),
+                ).toJson(),
         )
     }
 
