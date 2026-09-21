@@ -47,7 +47,7 @@ dependencies {
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
     implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
 
-    implementation("org.flywaydb:flyway-core:9.22.3")
+    implementation("org.flywaydb:flyway-core:13.6.0")
     implementation("com.zaxxer:HikariCP:7.1.0")
     implementation("org.postgresql:postgresql:42.7.13")
     implementation("com.github.seratch:kotliquery:1.9.1")
