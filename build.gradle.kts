@@ -24,7 +24,7 @@ configurations.all {
 }
 
 dependencies {
-    val ktorVersion = "3.6.0"
+    val ktorVersion = "3.6.1"
 
     implementation(platform("tools.jackson:jackson-bom:3.2.4"))
     implementation("tools.jackson.core:jackson-databind")
