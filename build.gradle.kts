@@ -38,7 +38,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
 
     implementation("com.github.navikt:rapids-and-rivers:2026071513121784113927")
-    implementation("io.github.oshai:kotlin-logging-jvm:8.0.6")
+    implementation("io.github.oshai:kotlin-logging-jvm:8.0.7")
     implementation("com.natpryce:konfig:1.6.10.0")
 
     implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
