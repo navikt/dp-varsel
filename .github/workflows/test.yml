@@ -1,11 +1,8 @@
 name: Test bot PRs
 
 on:
-  merge_group: 
-  push:
-    branches:
-      - 'dependabot/**'
-      - 'renovate/**'
+  merge_group:
+  pull_request:
 
 jobs:
   test:

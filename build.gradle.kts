@@ -9,7 +9,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://jitpack.io")
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
@@ -41,7 +40,7 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:8.0.7")
     implementation("com.natpryce:konfig:1.6.10.0")
 
-    implementation("com.github.navikt:tms-utkast:20230808103449-2eb1848")
+    implementation("no.nav.tms.utkast:builder:1.1.0")
     implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
 
     implementation("org.flywaydb:flyway-core:13.13.0")
